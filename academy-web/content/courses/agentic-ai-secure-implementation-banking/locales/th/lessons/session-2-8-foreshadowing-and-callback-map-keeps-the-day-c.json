@@ -1,0 +1,115 @@
+{
+  "nodeId": "session-2-8-foreshadowing-and-callback-map-keeps-the-day-c",
+  "locale": "th",
+  "title": "8. Foreshadowing & callback map (keeps the day coherent)",
+  "objective": "Study-guide review — Study Guide — Session 2: Practical Agentic Workflow Controls: 8. Foreshadowing & callback map (keeps the day coherent).",
+  "blocks": [
+    {
+      "kind": "list",
+      "items": [
+        "← S1: \"read-only first / least privilege / human approval / audit trail\" → now formalized as the **named"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "four-control pattern.** [SRC: design/S2_workflow_controls.md §6]"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "→ S3 (Case Study / Quiz): every case = \"which of the four gates was missing?\"; the per-scenario poll primes the"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "S3 vote labels. Note the S3-verified cases that S2's scenarios rhyme with — e.g. the agent-auto-deploys-to-prod excessive-agency scenario, and the prompt-injection cases. [SRC: design/S3_case_study_quiz.md — Q3 Excessive agency; Q9 Prompt injection; Case 4.2 Chevrolet prompt-injection]"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "→ S4 (OWASP) — apply C1 framing exactly. Scenario B deliberately plants S4 hooks:",
+        "/fetch-statement → API7:2023 Server-Side Request Forgery (SSRF);",
+        "injected log instruction → LLM01:2025 Prompt Injection (indirect variant);",
+        "agent over-acting (key rotation) → LLM06:2025 Excessive Agency."
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Scenario A reuses calculateInterest() (hallucination / wrong business logic — no OWASP ID). (C1) Keep the two S4 routes separate: R4 = LLM05:2025 Improper Output Handling; R5 = LLM06:2025 Excessive Agency. Use LLM02:2025 Sensitive Information Disclosure only when sensitive information is actually shown crossing a boundary. [SRC: BUILD_PLAN.md — Correction #1] [SRC: design/RUN_OF_SHOW_v1.2_polished.md — CORRECTIONS #1] [SRC: OWASP LLM Top 10 2025 — LLM01/LLM02/LLM05/LLM06:2025] [SRC: OWASP API Security Top 10 2023 — API7:2023]"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "→ S5 (Secure Design): the four controls become the backbone of the approval-workflow + monitoring + IR-playbook"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "architecture; \"blast radius\" → risk tiering; audit trail → audit-log requirement; config-as-code + adversarial review land as S5 output/operational controls. [SRC: design/S2_workflow_controls.md §6] [SRC: design/ENRICHMENTS_v1.1.md — S5 fold-ins]"
+    }
+  ],
+  "attribution": "KTB · Agentic AI & Secure Implementation for Banking IT Teams Time: 10:45–12:00 (75 min) · Format: Online, instructor-led, demo-driven · ~50 participants Activity: Control Walkthrough (vendor-neutral) — Task Card → Approval Gate → Execution Proof → Audit Trail Slides: FULL ENGLISH · Spoken delivery ",
+  "cheatsheet": [
+    "← S1: \"read-only first / least privilege / human approval / audit trail\" → now formalized as the **named",
+    "→ S3 (Case Study / Quiz): every case = \"which of the four gates was missing?\"; the per-scenario poll primes the",
+    "→ S5 (Secure Design): the four controls become the backbone of the approval-workflow + monitoring + IR-playbook"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for session 2, \"← S1\" is described as:",
+      "choices": {
+        "A": "\"read-only first / least privilege / human approval / audit trail\" → now formalized as the **named",
+        "B": "the four controls become the backbone of the approval-workflow + monitoring + IR-playbook",
+        "C": "every case = \"which of the four gates was missing?\"; the per-scenario poll primes the",
+        "D": "\"Should the agent have been allowed to merge to main on its own?\" → Yes / No → reveals"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The study guide states: ← S1: \"read-only first / least privilege / human approval / audit trail\" → now formalized as the **named"
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for session 2, \"→ S3 (Case Study / Quiz)\" is described as:",
+      "choices": {
+        "A": "the four controls become the backbone of the approval-workflow + monitoring + IR-playbook",
+        "B": "every case = \"which of the four gates was missing?\"; the per-scenario poll primes the",
+        "C": "\"read-only first / least privilege / human approval / audit trail\" → now formalized as the **named",
+        "D": "\"Should the agent have been allowed to merge to main on its own?\" → Yes / No → reveals"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: → S3 (Case Study / Quiz): every case = \"which of the four gates was missing?\"; the per-scenario poll primes the"
+    },
+    {
+      "id": "q3",
+      "prompt": "In the study guide for session 2, \"→ S5 (Secure Design)\" is described as:",
+      "choices": {
+        "A": "every case = \"which of the four gates was missing?\"; the per-scenario poll primes the",
+        "B": "\"read-only first / least privilege / human approval / audit trail\" → now formalized as the **named",
+        "C": "\"Should the agent have been allowed to merge to main on its own?\" → Yes / No → reveals",
+        "D": "the four controls become the backbone of the approval-workflow + monitoring + IR-playbook"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The study guide states: → S5 (Secure Design): the four controls become the backbone of the approval-workflow + monitoring + IR-playbook"
+    },
+    {
+      "id": "q4",
+      "prompt": "Which term does the study guide for session 2 define as: \"\"read-only first / least privilege / human approval / audit trail\" → now formalized as the **named\"?",
+      "choices": {
+        "A": "→ S5 (Secure Design)",
+        "B": "→ S3 (Case Study / Quiz)",
+        "C": "← S1",
+        "D": "Question"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The study guide states: ← S1: \"read-only first / least privilege / human approval / audit trail\" → now formalized as the **named"
+    }
+  ]
+}

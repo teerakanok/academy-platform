@@ -1,0 +1,115 @@
+{
+  "nodeId": "l11-web-security-2-2-csrf-cross-site-request-forgery",
+  "locale": "en",
+  "title": "2. CSRF (Cross-Site Request Forgery)",
+  "objective": "Study-guide review — ICCS423 v2 — L11: Web Security 2 (XSS · CSRF · Files · SSRF · API · Proactive Controls): 2. CSRF (Cross-Site Request Forgery).",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "Mechanism"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Browser auto-attaches cookies to every request to a domain, regardless of origin",
+        "Attacker tricks victim's browser (image tag, hidden form auto-submit, fetch) into hitting a state-changing endpoint",
+        "Bank server sees a valid session → executes the action"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Attack Patterns"
+    },
+    {
+      "kind": "paragraph",
+      "text": "```html <!-- GET-based CSRF (works in <img> tag!) --> <img src=\"https://bank.com/transfer?to=evil&amount=50000\" hidden>"
+    },
+    {
+      "kind": "paragraph",
+      "text": "<!-- POST-based CSRF (auto-submitting form) --> <body onload=\"document.forms[0].submit()\"> <form action=\"https://bank.com/transfer\" method=\"POST\"> <input name=\"to\" value=\"evil\"><input name=\"amount\" value=\"50000\"> </form> </body> ```"
+    },
+    {
+      "kind": "heading",
+      "text": "Defenses (layered)"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "SameSite=Strict (or Lax) cookie — primary defense",
+        "CSRF token (synchronizer) — random token per session, embedded in form, validated on POST/PUT/DELETE",
+        "Double-submit cookie pattern — stateless alternative",
+        "Origin/Referer header validation — defense-in-depth",
+        "Custom request header (X-Requested-With) — cross-origin requests cannot set custom headers without CORS preflight"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Real-world: Gmail (2007) — CSRF on filter settings → attacker silently created an email-forwarding rule for the victim. Persistent access without ever stealing a password."
+    }
+  ],
+  "attribution": "Course: ICCS423 | Source: Thoth Library + RAG | Target: 3rd-4th year CS | Date: 2026-05-03",
+  "cheatsheet": [
+    "SameSite=Strict (or Lax) cookie: primary defense",
+    "CSRF token (synchronizer): random token per session, embedded in form, validated on POST/PUT/DELETE",
+    "Double-submit cookie pattern: stateless alternative",
+    "Origin/Referer header validation: defense-in-depth"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for L11 Web Security 2, \"SameSite=Strict (or Lax) cookie\" is described as:",
+      "choices": {
+        "A": "defense-in-depth",
+        "B": "primary defense",
+        "C": "stateless alternative",
+        "D": "random token per session, embedded in form, validated on POST/PUT/DELETE"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: SameSite=Strict (or Lax) cookie — primary defense"
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for L11 Web Security 2, \"CSRF token (synchronizer)\" is described as:",
+      "choices": {
+        "A": "random token per session, embedded in form, validated on POST/PUT/DELETE",
+        "B": "primary defense",
+        "C": "defense-in-depth",
+        "D": "stateless alternative"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The study guide states: CSRF token (synchronizer) — random token per session, embedded in form, validated on POST/PUT/DELETE"
+    },
+    {
+      "id": "q3",
+      "prompt": "In the study guide for L11 Web Security 2, \"Double-submit cookie pattern\" is described as:",
+      "choices": {
+        "A": "stateless alternative",
+        "B": "defense-in-depth",
+        "C": "primary defense",
+        "D": "random token per session, embedded in form, validated on POST/PUT/DELETE"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The study guide states: Double-submit cookie pattern — stateless alternative"
+    },
+    {
+      "id": "q4",
+      "prompt": "In the study guide for L11 Web Security 2, \"Origin/Referer header validation\" is described as:",
+      "choices": {
+        "A": "primary defense",
+        "B": "defense-in-depth",
+        "C": "stateless alternative",
+        "D": "random token per session, embedded in form, validated on POST/PUT/DELETE"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: Origin/Referer header validation — defense-in-depth"
+    }
+  ]
+}

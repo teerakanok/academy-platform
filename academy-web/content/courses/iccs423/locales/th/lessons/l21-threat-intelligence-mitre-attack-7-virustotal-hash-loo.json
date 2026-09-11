@@ -1,0 +1,138 @@
+{
+  "nodeId": "l21-threat-intelligence-mitre-attack-7-virustotal-hash-loo",
+  "locale": "th",
+  "title": "7. VirusTotal — Hash Lookup Workflow",
+  "objective": "Study-guide review — ICCS423 v2 — L21: Threat Intelligence & MITRE ATT&CK: 7. VirusTotal — Hash Lookup Workflow.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "VirusTotal (virustotal.com) aggregates 70+ AV engines, sandbox runs, and community intelligence."
+    },
+    {
+      "kind": "heading",
+      "text": "How to interpret a VT result"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Section",
+        "What to look for"
+      ],
+      "rows": [
+        [
+          "Detection ratio",
+          "e.g. 58/72 — number of engines flagging it. >5/72 → likely malicious"
+        ],
+        [
+          "First/Last seen",
+          "If first-seen is recent + low detection → fresh sample, possibly targeted"
+        ],
+        [
+          "Behavior tab",
+          "Sandbox shows file/registry/network activity — DNS queries, dropped files, processes spawned"
+        ],
+        [
+          "Relations tab",
+          "Files dropped, contacted IPs/URLs, files that contain this hash"
+        ],
+        [
+          "Community tab",
+          "Analyst comments, Yara rules, sandbox screenshots"
+        ],
+        [
+          "MITRE tab",
+          "Mapped ATT&CK techniques observed during sandboxing"
+        ]
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Workflow example"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Suspicious file on endpoint → compute SHA-256",
+        "Search VT — never upload sensitive samples (uploads are public to subscribers)",
+        "Read detection ratio + behavior:",
+        "High ratio + known family → malware confirmed → IR",
+        "Low ratio + unusual behavior → possible 0-day/targeted → escalate",
+        "0/72 + no community data → submit private (commercial tier) or local sandbox",
+        "Pivot on contacted IPs to find C2 → block at firewall",
+        "Pivot on dropped files → search EDR for those hashes on other hosts"
+      ],
+      "ordered": true
+    },
+    {
+      "kind": "paragraph",
+      "text": "Privacy warning: anything you upload to VT is shared with paid subscribers. For sensitive corporate samples, use private/enterprise tier or internal sandbox."
+    }
+  ],
+  "attribution": "Course: ICCS423 | Source: Thoth + RAG | Target: 3rd-4th year CS | Date: 2026-05-03",
+  "cheatsheet": [
+    "Detection ratio: e.g. 58/72 — number of engines flagging it. >5/72 → likely malicious",
+    "First/Last seen: If first-seen is recent + low detection → fresh sample, possibly targeted",
+    "Behavior tab: Sandbox shows file/registry/network activity — DNS queries, dropped files, processes spawned",
+    "Relations tab: Files dropped, contacted IPs/URLs, files that contain this hash",
+    "Community tab: Analyst comments, Yara rules, sandbox screenshots",
+    "MITRE tab: Mapped ATT&CK techniques observed during sandboxing"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for L21 Threat Intelligence MITRE ATTACK, \"Detection ratio\" is described as:",
+      "choices": {
+        "A": "If first-seen is recent + low detection → fresh sample, possibly targeted",
+        "B": "e.g. 58/72 — number of engines flagging it. >5/72 → likely malicious",
+        "C": "Files dropped, contacted IPs/URLs, files that contain this hash",
+        "D": "Mapped ATT&CK techniques observed during sandboxing"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: Detection ratio: e.g. 58/72 — number of engines flagging it. >5/72 → likely malicious"
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for L21 Threat Intelligence MITRE ATTACK, \"First/Last seen\" is described as:",
+      "choices": {
+        "A": "e.g. 58/72 — number of engines flagging it. >5/72 → likely malicious",
+        "B": "If first-seen is recent + low detection → fresh sample, possibly targeted",
+        "C": "Files dropped, contacted IPs/URLs, files that contain this hash",
+        "D": "Sandbox shows file/registry/network activity — DNS queries, dropped files, processes spawned"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: First/Last seen: If first-seen is recent + low detection → fresh sample, possibly targeted"
+    },
+    {
+      "id": "q3",
+      "prompt": "In the study guide for L21 Threat Intelligence MITRE ATTACK, \"Behavior tab\" is described as:",
+      "choices": {
+        "A": "Files dropped, contacted IPs/URLs, files that contain this hash",
+        "B": "e.g. 58/72 — number of engines flagging it. >5/72 → likely malicious",
+        "C": "If first-seen is recent + low detection → fresh sample, possibly targeted",
+        "D": "Sandbox shows file/registry/network activity — DNS queries, dropped files, processes spawned"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The study guide states: Behavior tab: Sandbox shows file/registry/network activity — DNS queries, dropped files, processes spawned"
+    },
+    {
+      "id": "q4",
+      "prompt": "In the study guide for L21 Threat Intelligence MITRE ATTACK, \"Relations tab\" is described as:",
+      "choices": {
+        "A": "Mapped ATT&CK techniques observed during sandboxing",
+        "B": "If first-seen is recent + low detection → fresh sample, possibly targeted",
+        "C": "e.g. 58/72 — number of engines flagging it. >5/72 → likely malicious",
+        "D": "Files dropped, contacted IPs/URLs, files that contain this hash"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The study guide states: Relations tab: Files dropped, contacted IPs/URLs, files that contain this hash"
+    }
+  ]
+}

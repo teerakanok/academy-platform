@@ -1,0 +1,162 @@
+{
+  "nodeId": "session-4-1-session",
+  "locale": "th",
+  "title": "1. กรอบของ Session — ประโยคเดียว",
+  "objective": "Study-guide review — Study Guide — Session 4: Actionable OWASP on SecureBank Mini: 1. กรอบของ Session — ประโยคเดียว.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "\"Agentic AI ไม่ได้สร้างประเภทความเสี่ยง ใหม่ — มัน ขยายและร้อยต่อ ความเสี่ยงเดิมให้อันตรายขึ้น.\""
+    },
+    {
+      "kind": "paragraph",
+      "text": "วันนี้เราเดินผ่าน 5 demo routes และ 1 cross-cutting disclosure lens ใน แอปธนาคารจำลองเดียว (SecureBank Mini), แล้วเปรียบเทียบ outcome ก่อนและหลัง control [SRC: SBM-SPEC]. Routes บางชุด chain กันได้ แต่แต่ละ route มี root cause และ proof boundary ของตัวเอง."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Spine question (พูดเปิด): \"ถ้าผมเป็นคนโจมตี agentic banking app ผมจะเข้าทางไหน — และ fix หนึ่งอย่างที่ปิดแต่ละประตูคืออะไร?\""
+    },
+    {
+      "kind": "paragraph",
+      "text": "Energy-reset ที่ S3→S4 boundary (พูด ~10 วิ): \"S3 น้องๆ ตัดสิน 9 เคสจากภายนอก — เหนื่อย. S4 เบากว่า: ตามคนร้าย คนเดียว ลงแผนที่ อันเดียว — 2 ประตูคุ้นๆ แล้ว 3 ประตูใหม่. โหลดเบาลง สัญญา.\""
+    },
+    {
+      "kind": "heading",
+      "text": "1.1 ทำไม 6 ข้อนี้ (mapping ที่ verify แล้ว)"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "#",
+        "OWASP (official 2025/2023 title)",
+        "SecureBank Mini route",
+        "Class"
+      ],
+      "rows": [
+        [
+          "1",
+          "API1:2023 — Broken Object Level Authorization (BOLA/IDOR)",
+          "GET /accounts/:accountId",
+          "Classic API auth"
+        ],
+        [
+          "2",
+          "API7:2023 — Server Side Request Forgery (SSRF)",
+          "POST /fetch-statement",
+          "Classic API"
+        ],
+        [
+          "3",
+          "LLM01:2025 — Prompt Injection",
+          "POST /ai/assist",
+          "LLM-native"
+        ],
+        [
+          "4",
+          "LLM05:2025 — Improper Output Handling",
+          "renderAdvice() / GET /advice",
+          "LLM→Web bridge"
+        ],
+        [
+          "5",
+          "LLM06:2025 — Excessive Agency",
+          "agent/tool layer ที่เชื่อมทุก route",
+          "LLM-native"
+        ],
+        [
+          "6",
+          "LLM02:2025 — Sensitive Information Disclosure",
+          "cross-cutting lens: demo #1/#3 มี disclosure; #4 ใช้ label นี้ต่อเมื่อ protected data ถูกเปิดเผย",
+          "LLM-native"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "[SRC: OWASP-LLM-2025] [SRC: OWASP-API-2023] [SRC: SBM-SPEC]"
+    },
+    {
+      "kind": "paragraph",
+      "text": "OWASP edition stamp (พิมพ์บน roadmap slide, self-checking): \"Mapped to OWASP Top 10 for LLM Applications, 2025 edition — verified 2026-06\" + พิมพ์ label name ตรงๆ ข้างเลขทุก route (เช่น R3 · LLM01 Prompt Injection (2025 ed.)) เพื่อให้ผู้เชี่ยวชาญในห้อง verify mapping ได้บนจอ ไม่ต้องเชื่อเลขลอยๆ. [SRC: OWASP-LLM-2025]"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Build note (fail-closed gate): ก่อน deliver ทุกครั้ง re-confirm label ชื่อและเลข LLM01/05/06/02 และ API1/7 กับ edition ที่ stamp ไว้ — 2025 list มีการ reorder/rename เทียบ 2023; ถ้า stale ห้าม ship จนกว่าจะแก้."
+    },
+    {
+      "kind": "heading",
+      "text": "1.2 หมายเหตุเรื่อง calculateInterest() — ไม่ใช่ OWASP item ของ S4"
+    },
+    {
+      "kind": "paragraph",
+      "text": "bug rounding/logic ของ calculateInterest() (267.00 ผิด vs 267.13 ถูก) เป็นของ Session 1 demo + Session 3 reveal (wrong business logic / hallucination) — ไม่มี OWASP ID จึงไม่ teach ซ้ำใน S4. S4 แค่ name-drop เป็น continuity hook (\"AI เขียนโค้ด ไม่มีใคร review\") แล้วเดินต่อ. [SRC: SBM-SPEC] (D1 correction)."
+    }
+  ],
+  "attribution": "Course: KTB \"Agentic AI & Secure Implementation for Banking IT Teams\" Session 4 · 14:30–15:45 (75 min) · Activity: Risk Walkthrough on SecureBank Mini Delivery (binding): online, instructor-led demo · slides EN, notes/spoken TH · synthetic data only · no participant hands-on in base scope (ผู้เรียนด",
+  "cheatsheet": [
+    "API1:2023 — Broken Object Level Authorization (BOLA/IDOR): GET /accounts/:accountId",
+    "API7:2023 — Server Side Request Forgery (SSRF): POST /fetch-statement",
+    "LLM01:2025 — Prompt Injection: POST /ai/assist",
+    "LLM05:2025 — Improper Output Handling: renderAdvice() / GET /advice",
+    "LLM06:2025 — Excessive Agency: agent/tool layer ที่เชื่อมทุก route",
+    "LLM02:2025 — Sensitive Information Disclosure: cross-cutting lens: demo #1/#3 มี disclosure; #4 ใช้ label นี้ต่อเมื่อ protected data ถูกเปิดเผย"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for session 4, \"API1:2023 — Broken Object Level Authorization (BOLA/IDOR)\" is described as:",
+      "choices": {
+        "A": "POST /ai/assist",
+        "B": "renderAdvice() / GET /advice",
+        "C": "POST /fetch-statement",
+        "D": "GET /accounts/:accountId"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The study guide states: API1:2023 — Broken Object Level Authorization (BOLA/IDOR): GET /accounts/:accountId"
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for session 4, \"API7:2023 — Server Side Request Forgery (SSRF)\" is described as:",
+      "choices": {
+        "A": "renderAdvice() / GET /advice",
+        "B": "POST /ai/assist",
+        "C": "POST /fetch-statement",
+        "D": "GET /accounts/:accountId"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The study guide states: API7:2023 — Server Side Request Forgery (SSRF): POST /fetch-statement"
+    },
+    {
+      "id": "q3",
+      "prompt": "In the study guide for session 4, \"LLM01:2025 — Prompt Injection\" is described as:",
+      "choices": {
+        "A": "renderAdvice() / GET /advice",
+        "B": "POST /ai/assist",
+        "C": "GET /accounts/:accountId",
+        "D": "POST /fetch-statement"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: LLM01:2025 — Prompt Injection: POST /ai/assist"
+    },
+    {
+      "id": "q4",
+      "prompt": "In the study guide for session 4, \"LLM05:2025 — Improper Output Handling\" is described as:",
+      "choices": {
+        "A": "renderAdvice() / GET /advice",
+        "B": "agent/tool layer ที่เชื่อมทุก route",
+        "C": "POST /fetch-statement",
+        "D": "GET /accounts/:accountId"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The study guide states: LLM05:2025 — Improper Output Handling: renderAdvice() / GET /advice"
+    }
+  ]
+}

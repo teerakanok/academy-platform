@@ -1,0 +1,118 @@
+{
+  "nodeId": "l21-threat-intelligence-mitre-attack-3-ioc-vs-ttp-pyramid",
+  "locale": "th",
+  "title": "3. IOC vs TTP — Pyramid of Pain",
+  "objective": "Study-guide review — ICCS423 v2 — L21: Threat Intelligence & MITRE ATT&CK: 3. IOC vs TTP — Pyramid of Pain.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "This concept (David Bianco) is foundational. Master it."
+    },
+    {
+      "kind": "heading",
+      "text": "Indicators of Compromise (IOCs)"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Examples: IP, domain, URL, file hash (MD5/SHA-256), email address, registry key",
+        "Concrete, machine-readable, easy to share",
+        "Short shelf life — attackers rotate IPs, register new domains, repack malware (new hash)",
+        "Value: good for automated blocking, easy to bypass"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Tactics, Techniques, Procedures (TTPs)"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Tactic — why (goal): Initial Access, Persistence, Exfiltration",
+        "Technique — how (method): Spearphishing Attachment, Scheduled Task, DNS C2",
+        "Procedure — specific implementation: \"APT28 uses .xlsm macro → drops .exe in %APPDATA% → schedules task every 4 hours\"",
+        "Abstract, behavioral, hard to change",
+        "Long shelf life — changing TTPs requires retooling, retraining",
+        "Value: gold for detection engineering and threat hunting"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Pyramid of Pain (David Bianco)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "`` ┌─────────────────┐ │ TTPs │ ← maximum pain to attacker ├─────────────────┤ │ Tools │ ├─────────────────┤ │ Network/Host │ │ Artifacts │ ├─────────────────┤ │ Domain Names │ ├─────────────────┤ │ IP Addresses │ ├─────────────────┤ │ Hash Values │ ← trivial pain, attacker re-packs └─────────────────┘ ``"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Key insight: invest in TTP-based detection, not just IOC feeds. A new hash takes attackers 5 minutes; changing a TTP can take months."
+    }
+  ],
+  "attribution": "Course: ICCS423 | Source: Thoth + RAG | Target: 3rd-4th year CS | Date: 2026-05-03",
+  "cheatsheet": [
+    "Short shelf life: attackers rotate IPs, register new domains, repack malware (new hash)",
+    "Tactic: why (goal): Initial Access, Persistence, Exfiltration",
+    "Technique: how (method): Spearphishing Attachment, Scheduled Task, DNS C2",
+    "Procedure: specific implementation: \"APT28 uses .xlsm macro → drops .exe in %APPDATA% → schedules task every 4 hours\"",
+    "Long shelf life: changing TTPs requires retooling, retraining"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for L21 Threat Intelligence MITRE ATTACK, \"Short shelf life\" is described as:",
+      "choices": {
+        "A": "attackers rotate IPs, register new domains, repack malware (new hash)",
+        "B": "changing TTPs requires retooling, retraining",
+        "C": "why (goal): Initial Access, Persistence, Exfiltration",
+        "D": "how (method): Spearphishing Attachment, Scheduled Task, DNS C2"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The study guide states: Short shelf life — attackers rotate IPs, register new domains, repack malware (new hash)"
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for L21 Threat Intelligence MITRE ATTACK, \"Tactic\" is described as:",
+      "choices": {
+        "A": "attackers rotate IPs, register new domains, repack malware (new hash)",
+        "B": "changing TTPs requires retooling, retraining",
+        "C": "how (method): Spearphishing Attachment, Scheduled Task, DNS C2",
+        "D": "why (goal): Initial Access, Persistence, Exfiltration"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The study guide states: Tactic — why (goal): Initial Access, Persistence, Exfiltration"
+    },
+    {
+      "id": "q3",
+      "prompt": "In the study guide for L21 Threat Intelligence MITRE ATTACK, \"Technique\" is described as:",
+      "choices": {
+        "A": "changing TTPs requires retooling, retraining",
+        "B": "why (goal): Initial Access, Persistence, Exfiltration",
+        "C": "attackers rotate IPs, register new domains, repack malware (new hash)",
+        "D": "how (method): Spearphishing Attachment, Scheduled Task, DNS C2"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The study guide states: Technique — how (method): Spearphishing Attachment, Scheduled Task, DNS C2"
+    },
+    {
+      "id": "q4",
+      "prompt": "In the study guide for L21 Threat Intelligence MITRE ATTACK, \"Procedure\" is described as:",
+      "choices": {
+        "A": "attackers rotate IPs, register new domains, repack malware (new hash)",
+        "B": "specific implementation: \"APT28 uses .xlsm macro → drops .exe in %APPDATA% → schedules task every 4 hours\"",
+        "C": "how (method): Spearphishing Attachment, Scheduled Task, DNS C2",
+        "D": "why (goal): Initial Access, Persistence, Exfiltration"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: Procedure — specific implementation: \"APT28 uses .xlsm macro → drops .exe in %APPDATA% → schedules task every 4 hours\""
+    }
+  ]
+}

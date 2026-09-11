@@ -1,0 +1,252 @@
+{
+  "nodeId": "d5-threat-ops-hunting-ir-lesson-5e-incident-analysis-and-r",
+  "locale": "en",
+  "title": "Lesson 5E — Incident Analysis and Response",
+  "objective": "Study-guide review — Day 5 — Threat Modeling, Monitoring, Hunting, and Incident Response: Lesson 5E — Incident Analysis and Response.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "Malware and Forensic Analysis"
+    },
+    {
+      "kind": "paragraph",
+      "text": "The official source covers malware analysis, reverse engineering, forensic analysis, volatile and nonvolatile storage, network and host data, metadata analysis, hardware examination, data recovery, and extraction. Teach the evidence chain: preserve, collect, analyze, correlate, report."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Analysis data:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Volatile memory.",
+        "Disk and file system data.",
+        "Network traffic.",
+        "Host logs.",
+        "Metadata.",
+        "Malware samples.",
+        "Cloud workload evidence where applicable."
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Source: CertMaster Study Lesson 5E; M05 slides \"Malware Analysis\" and \"Forensic Analysis\"."
+    },
+    {
+      "kind": "heading",
+      "text": "Volatile and Nonvolatile Evidence"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Volatile evidence can disappear when a system powers off or changes state. Nonvolatile evidence persists on disk or storage media. Incident responders need to understand both so containment does not destroy the evidence needed for timeline reconstruction and root cause analysis."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Evidence examples:"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Evidence type",
+        "Examples",
+        "Teaching cue"
+      ],
+      "rows": [
+        [
+          "Volatile",
+          "Memory, running processes, network connections, logged-in users",
+          "Collect early if needed"
+        ],
+        [
+          "Nonvolatile",
+          "Disk files, logs, registry/configuration, stored artifacts",
+          "Preserve integrity and chain of custody"
+        ],
+        [
+          "Network",
+          "Packet capture, flow logs, DNS logs",
+          "Correlate movement and exfiltration"
+        ],
+        [
+          "Host",
+          "Process history, file timestamps, service changes",
+          "Reconstruct execution and persistence"
+        ],
+        [
+          "Metadata",
+          "File times, sender/recipient, headers, object metadata",
+          "Establish context and sequence"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Source: CertMaster Study Lesson 5E; M05 slides \"Volatile and Nonvolatile Storage\", \"Host Data\", \"Network Data\", and \"Metadata Analysis\"."
+    },
+    {
+      "kind": "heading",
+      "text": "Data Recovery"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Data recovery is part of incident response because restoration must be trustworthy. Recovering from a compromised or corrupted state without understanding root cause can reintroduce the problem. Recovery planning should include backup integrity, restore testing, recovery point/time objectives where defined, and validation that restored systems are clean enough to return to service."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Decision cues:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Ransomware or destructive malware: verify backup integrity before restore.",
+        "Corrupted records: determine last known-good state.",
+        "Cloud workload incident: confirm snapshot and image provenance.",
+        "Insider deletion: preserve evidence before restoration where possible.",
+        "Recovered service: monitor for recurrence."
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Exam trap: \"restore from backup\" is incomplete if the backup is infected, outdated, untested, or missing required evidence for investigation."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Source: CertMaster Study Lesson 5E; M05 slides \"Data Recovery\" and \"Continuous Improvement\"."
+    },
+    {
+      "kind": "heading",
+      "text": "Detection, Initial Analysis, and Timeline Reconstruction"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Initial analysis determines whether an event is benign, suspicious, or an incident. Timeline reconstruction places evidence in sequence so responders can understand entry, execution, persistence, lateral movement, impact, and recovery needs."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Source: CertMaster Study Lesson 5E; M05 slides \"Detection and Initial Analysis\"."
+    },
+    {
+      "kind": "heading",
+      "text": "Root Cause and Continuous Improvement"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Root cause analysis identifies why the incident happened and what must change. Continuous improvement turns lessons learned into updated controls, monitoring, training, procedures, and architecture changes."
+    },
+    {
+      "kind": "paragraph",
+      "text": "SecurityX cue: closing an incident without improving controls is incomplete."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Source: CertMaster Study Lesson 5E; M05 slide \"Continuous Improvement\"."
+    },
+    {
+      "kind": "heading",
+      "text": "Preparedness and Prevention"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Preparedness includes simulations, drills, playbooks, tabletop exercises, communication plans, evidence handling, and role clarity. Prevention includes control improvements that reduce likelihood or impact before the next incident."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Source: CertMaster Study Lesson 5E; M05 slide \"Preparedness and Prevention\"."
+    },
+    {
+      "kind": "heading",
+      "text": "CWPP and Insider Threats"
+    },
+    {
+      "kind": "paragraph",
+      "text": "The official slides include Cloud Workload Protection Platforms and insider threat programs in preparedness and prevention. CWPPs protect cloud workloads such as virtual machines, containers, and serverless functions. They fit scenarios where the incident or prevention requirement focuses on workload runtime security in cloud environments."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Insider threat programs focus on accidental or malicious actions by internal users or trusted parties. Controls include monitoring, access governance, least privilege, reporting channels, and policy/process improvements. Teach the nuance: insider threat does not always mean malicious employee; it can include negligent or compromised internal accounts."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Decision cues:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Cloud VM/container/serverless runtime risk: consider CWPP.",
+        "Suspicious employee or trusted-user behavior: consider insider threat process plus monitoring.",
+        "Accidental internal data exposure: improve access governance, training, and DLP/data controls.",
+        "Malicious internal action: preserve evidence, involve legal/HR as appropriate, and follow incident process."
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Source: CertMaster Study Lesson 5E; M05 slides \"Preparedness and Prevention\"."
+    }
+  ],
+  "attribution": "Course: SecurityX CAS-005 Primary source: CertMaster Study Lessons 5A, 5B, 5C, 5D, 5E Slide source: SecurityX_M05_PPT.pptx Teaching goal: integrate design, operations, attack analysis, threat intelligence, and response into scenario reasoning.",
+  "cheatsheet": [
+    "Volatile: Memory, running processes, network connections, logged-in users",
+    "Nonvolatile: Disk files, logs, registry/configuration, stored artifacts",
+    "Network: Packet capture, flow logs, DNS logs",
+    "Host: Process history, file timestamps, service changes",
+    "Metadata: File times, sender/recipient, headers, object metadata"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for D5 Threat Ops Hunting IR, \"Volatile\" is described as:",
+      "choices": {
+        "A": "Disk files, logs, registry/configuration, stored artifacts",
+        "B": "Memory, running processes, network connections, logged-in users",
+        "C": "File times, sender/recipient, headers, object metadata",
+        "D": "Process history, file timestamps, service changes"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: Volatile: Memory, running processes, network connections, logged-in users"
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for D5 Threat Ops Hunting IR, \"Nonvolatile\" is described as:",
+      "choices": {
+        "A": "Disk files, logs, registry/configuration, stored artifacts",
+        "B": "Process history, file timestamps, service changes",
+        "C": "Memory, running processes, network connections, logged-in users",
+        "D": "File times, sender/recipient, headers, object metadata"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The study guide states: Nonvolatile: Disk files, logs, registry/configuration, stored artifacts"
+    },
+    {
+      "id": "q3",
+      "prompt": "In the study guide for D5 Threat Ops Hunting IR, \"Network\" is described as:",
+      "choices": {
+        "A": "Disk files, logs, registry/configuration, stored artifacts",
+        "B": "File times, sender/recipient, headers, object metadata",
+        "C": "Process history, file timestamps, service changes",
+        "D": "Packet capture, flow logs, DNS logs"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The study guide states: Network: Packet capture, flow logs, DNS logs"
+    },
+    {
+      "id": "q4",
+      "prompt": "In the study guide for D5 Threat Ops Hunting IR, \"Host\" is described as:",
+      "choices": {
+        "A": "Memory, running processes, network connections, logged-in users",
+        "B": "Disk files, logs, registry/configuration, stored artifacts",
+        "C": "Process history, file timestamps, service changes",
+        "D": "File times, sender/recipient, headers, object metadata"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The study guide states: Host: Process history, file timestamps, service changes"
+    }
+  ]
+}

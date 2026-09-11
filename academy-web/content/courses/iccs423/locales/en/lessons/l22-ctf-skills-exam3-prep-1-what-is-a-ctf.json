@@ -1,0 +1,130 @@
+{
+  "nodeId": "l22-ctf-skills-exam3-prep-1-what-is-a-ctf",
+  "locale": "en",
+  "title": "1. What is a CTF?",
+  "objective": "Study-guide review — ICCS423 v2 — L22: CTF Skills & Exam 3 Prep: 1. What is a CTF?.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "Capture The Flag (CTF) — a cybersecurity competition where players solve puzzles to recover hidden \"flags\" (text strings, e.g., flag{hello_world})."
+    },
+    {
+      "kind": "heading",
+      "text": "Common formats"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Format",
+        "How it works"
+      ],
+      "rows": [
+        [
+          "Jeopardy",
+          "Independent challenges by category, point values; solve as many as possible in time window"
+        ],
+        [
+          "Attack-Defense",
+          "Each team runs a vulnerable service; attack others while defending your own"
+        ],
+        [
+          "King-of-the-Hill",
+          "Compete to control a single shared system"
+        ]
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Categories"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Web — exploit web applications (XSS, SQLi, IDOR, auth bypass, SSRF)",
+        "Pwn / Binary Exploitation — buffer overflow, format string, ROP",
+        "Crypto — break or implement cryptographic schemes",
+        "Forensics — analyze disk/memory/pcap dumps to find hidden data",
+        "Reverse Engineering (Rev) — reverse a binary to understand or bypass it",
+        "OSINT — open-source intelligence (reverse image search, social media, WHOIS)",
+        "Misc — steganography, esoteric programming, puzzles"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Flag format"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Typically flag{...} or CTF{...} — the wrapper signals you've found the answer. Real flags hide the secret string inside the braces."
+    }
+  ],
+  "attribution": "Course: ICCS423 | Source: Thoth + RAG | Target: 3rd-4th year CS | Date: 2026-05-03",
+  "cheatsheet": [
+    "Jeopardy: Independent challenges by category, point values; solve as many as possible in time window",
+    "Attack-Defense: Each team runs a vulnerable service; attack others while defending your own",
+    "King-of-the-Hill: Compete to control a single shared system",
+    "Web: exploit web applications (XSS, SQLi, IDOR, auth bypass, SSRF)",
+    "Pwn / Binary Exploitation: buffer overflow, format string, ROP",
+    "Crypto: break or implement cryptographic schemes",
+    "Forensics: analyze disk/memory/pcap dumps to find hidden data",
+    "Reverse Engineering (Rev): reverse a binary to understand or bypass it"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for L22 CTF Skills Exam3 Prep, \"Jeopardy\" is described as:",
+      "choices": {
+        "A": "Each team runs a vulnerable service; attack others while defending your own",
+        "B": "Independent challenges by category, point values; solve as many as possible in time window",
+        "C": "open-source intelligence (reverse image search, social media, WHOIS)",
+        "D": "exploit web applications (XSS, SQLi, IDOR, auth bypass, SSRF)"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: Jeopardy: Independent challenges by category, point values; solve as many as possible in time window"
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for L22 CTF Skills Exam3 Prep, \"Attack-Defense\" is described as:",
+      "choices": {
+        "A": "open-source intelligence (reverse image search, social media, WHOIS)",
+        "B": "exploit web applications (XSS, SQLi, IDOR, auth bypass, SSRF)",
+        "C": "Independent challenges by category, point values; solve as many as possible in time window",
+        "D": "Each team runs a vulnerable service; attack others while defending your own"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The study guide states: Attack-Defense: Each team runs a vulnerable service; attack others while defending your own"
+    },
+    {
+      "id": "q3",
+      "prompt": "In the study guide for L22 CTF Skills Exam3 Prep, \"King-of-the-Hill\" is described as:",
+      "choices": {
+        "A": "Compete to control a single shared system",
+        "B": "steganography, esoteric programming, puzzles",
+        "C": "reverse a binary to understand or bypass it",
+        "D": "break or implement cryptographic schemes"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The study guide states: King-of-the-Hill: Compete to control a single shared system"
+    },
+    {
+      "id": "q4",
+      "prompt": "In the study guide for L22 CTF Skills Exam3 Prep, \"Web\" is described as:",
+      "choices": {
+        "A": "Each team runs a vulnerable service; attack others while defending your own",
+        "B": "exploit web applications (XSS, SQLi, IDOR, auth bypass, SSRF)",
+        "C": "analyze disk/memory/pcap dumps to find hidden data",
+        "D": "open-source intelligence (reverse image search, social media, WHOIS)"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: Web — exploit web applications (XSS, SQLi, IDOR, auth bypass, SSRF)"
+    }
+  ]
+}

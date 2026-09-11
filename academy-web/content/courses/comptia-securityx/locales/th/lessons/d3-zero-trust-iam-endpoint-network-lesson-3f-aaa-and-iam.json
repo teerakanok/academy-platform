@@ -1,0 +1,259 @@
+{
+  "nodeId": "d3-zero-trust-iam-endpoint-network-lesson-3f-aaa-and-iam",
+  "locale": "th",
+  "title": "Lesson 3F — AAA and IAM",
+  "objective": "Study-guide review — Day 3 — Zero Trust, IAM, Endpoint, and Network Engineering: Lesson 3F — AAA and IAM.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "Provisioning and Deprovisioning"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Provisioning gives a subject the correct access. Deprovisioning removes access when it is no longer needed. The official material includes provisioning/deprovisioning, federation, conditional access, identity/service providers, PDP/PEP, access control models, logging, PKI, biometrics, secrets, cloud IAM, monitoring, and PIM."
+    },
+    {
+      "kind": "paragraph",
+      "text": "SecurityX cue: stale access is a common root cause. If a user changes roles or leaves, deprovisioning and access review matter."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Source: CertMaster Study Lesson 3F; M03 slides \"Provisioning/Deprovisioning\"."
+    },
+    {
+      "kind": "heading",
+      "text": "Federation, IdP, SP, PDP, and PEP"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Federation lets one identity domain trust another. An Identity Provider authenticates the subject. A Service Provider consumes assertions or tokens. A Policy Decision Point evaluates policy. A Policy Enforcement Point enforces the decision."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Simple model:"
+    },
+    {
+      "kind": "paragraph",
+      "text": "``text IdP authenticates -> PDP decides -> PEP enforces -> SP/resource grants or denies ``"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Teach this as a troubleshooting map. If authentication succeeds but resource access fails, inspect authorization policy and enforcement, not only the IdP."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Source: CertMaster Study Lesson 3F; M03 slides \"Identity and Service Providers\" and \"Policy Decision and Enforcement Points\"."
+    },
+    {
+      "kind": "heading",
+      "text": "Access Control Models and Subject Access"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Access control models define how permissions are assigned and evaluated. The official material expects students to reason about selecting and troubleshooting access models, not merely define acronyms."
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Model",
+        "Decision basis",
+        "Common cue"
+      ],
+      "rows": [
+        [
+          "DAC",
+          "Owner discretion",
+          "Resource owner grants access"
+        ],
+        [
+          "MAC",
+          "Labels/classification",
+          "Mandatory sensitivity boundaries"
+        ],
+        [
+          "RBAC",
+          "Job role",
+          "Role-based enterprise access"
+        ],
+        [
+          "ABAC",
+          "Attributes/context",
+          "Dynamic policies using subject/object/environment attributes"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Source: CertMaster Study Lesson 3F; M03 slides \"Access Control Models\" and \"Subject Access Control\"."
+    },
+    {
+      "kind": "heading",
+      "text": "Logging, Monitoring, PIM, and Secrets"
+    },
+    {
+      "kind": "paragraph",
+      "text": "IAM without monitoring cannot prove access behavior. The official lesson includes suspicious IAM log data and privileged identity management. PIM reduces standing privilege by granting elevated access only when needed. Secrets management protects credentials, API keys, tokens, and other non-human authentication material."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Decision cues:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Need temporary admin elevation: PIM.",
+        "Need service credential storage/rotation: secrets management.",
+        "Need suspicious login investigation: logging and monitoring.",
+        "Need certificate-backed trust: PKI.",
+        "Need stronger identity proof: MFA or biometric depending on scenario."
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Source: CertMaster Study Lesson 3F; M03 slides \"Logging and Monitoring\", \"Privilege Identity Management\", \"Secrets Management\"."
+    },
+    {
+      "kind": "heading",
+      "text": "PKI Architecture"
+    },
+    {
+      "kind": "paragraph",
+      "text": "The official source defines PKI as software, services, and hardware that support public key encryption and identity trust. PKI helps prove that the owner of a public key is who they claim to be. SecurityX scenarios may place PKI in certificate-based authentication, encrypted communications, certificate lifecycle, or trust troubleshooting."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Deployment patterns in the official lesson include on-premises PKI, managed PKI services, hybrid PKI, and cloud-based PKI. The architecture choice affects control, operating burden, renewal, monitoring, and integration with directory services and applications."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Decision cues:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Certificate trust or issuance problem: inspect CA chain, renewal, revocation, and deployment model.",
+        "Need full infrastructure control: on-premises or hybrid PKI may fit.",
+        "Need lower operational burden: managed or cloud-based PKI may fit if governance allows it.",
+        "PKI-related incident: protect CA/private keys and audit PKI administrative actions."
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Source: CertMaster Study Lesson 3F; M03 slide \"Public Key Infrastructure Architecture\"."
+    },
+    {
+      "kind": "heading",
+      "text": "Biometrics"
+    },
+    {
+      "kind": "paragraph",
+      "text": "The official source treats biometrics as an authentication factor that can improve assurance but introduces privacy, calibration, cost, integration, and user-trust concerns. Biometric data is sensitive because compromised biometrics cannot be changed like passwords."
+    },
+    {
+      "kind": "paragraph",
+      "text": "SecurityX decision cues:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Need stronger user verification: biometrics may support MFA.",
+        "Concern is privacy or surveillance: require consent, protection, and governance.",
+        "Concern is accuracy in high-risk use: calibration and error rates matter.",
+        "Concern is infrastructure complexity: evaluate integration and support cost."
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Source: CertMaster Study Lesson 3F; M03 slide \"Biometrics\"."
+    },
+    {
+      "kind": "heading",
+      "text": "Cloud IAM Access and Trust Policies"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Cloud IAM controls access to cloud resources and services. The official lesson links cloud IAM with access and trust policies. Teach cloud IAM as identity plus authorization plus resource trust boundaries. Misconfigured trust policies can allow unintended principals, services, or accounts to assume access."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Decision cues:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Cross-account or service-to-service access: inspect trust policy and allowed principals.",
+        "Excessive cloud permissions: reduce privileges and review role bindings.",
+        "Suspicious cloud activity: correlate cloud IAM logs with resource actions.",
+        "Temporary elevated access: use privileged access workflow rather than standing broad roles."
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Source: CertMaster Study Lesson 3F; M03 slide \"Cloud IAM Access and Trust Policies\"."
+    }
+  ],
+  "attribution": "Course: SecurityX CAS-005 Primary source: CertMaster Study Lessons 3E, 3F, 4A, 4B Slide sources: SecurityX_M03_PPT.pptx, SecurityX_M04_PPT.pptx Teaching goal: connect identity, device, endpoint, and network controls into a troubleshooting-ready security architecture.",
+  "cheatsheet": [
+    "DAC: Owner discretion",
+    "MAC: Labels/classification",
+    "ABAC: Attributes/context"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for D3 Zero Trust IAM Endpoint Network, \"DAC\" is described as:",
+      "choices": {
+        "A": "Attributes/context",
+        "B": "Labels/classification",
+        "C": "Enforce expected state",
+        "D": "Owner discretion"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The study guide states: DAC: Owner discretion"
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for D3 Zero Trust IAM Endpoint Network, \"MAC\" is described as:",
+      "choices": {
+        "A": "Labels/classification",
+        "B": "Attributes/context",
+        "C": "Owner discretion",
+        "D": "Enforce expected state"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The study guide states: MAC: Labels/classification"
+    },
+    {
+      "id": "q3",
+      "prompt": "In the study guide for D3 Zero Trust IAM Endpoint Network, \"ABAC\" is described as:",
+      "choices": {
+        "A": "Owner discretion",
+        "B": "Labels/classification",
+        "C": "Enforce expected state",
+        "D": "Attributes/context"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The study guide states: ABAC: Attributes/context"
+    },
+    {
+      "id": "q4",
+      "prompt": "Which term does the study guide for D3 Zero Trust IAM Endpoint Network define as: \"Owner discretion\"?",
+      "choices": {
+        "A": "Anti-malware",
+        "B": "DNS activity",
+        "C": "DAC",
+        "D": "Host firewall"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The study guide states: DAC: Owner discretion"
+    }
+  ]
+}

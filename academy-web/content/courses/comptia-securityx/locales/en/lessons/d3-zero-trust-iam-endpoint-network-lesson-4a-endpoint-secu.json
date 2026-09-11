@@ -1,0 +1,278 @@
+{
+  "nodeId": "d3-zero-trust-iam-endpoint-network-lesson-4a-endpoint-secu",
+  "locale": "en",
+  "title": "Lesson 4A — Endpoint Security",
+  "objective": "Study-guide review — Day 3 — Zero Trust, IAM, Endpoint, and Network Engineering: Lesson 4A — Endpoint Security.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "EDR and Endpoint Protection"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Endpoint Detection and Response collects endpoint telemetry, detects suspicious behavior, supports investigation, and can assist response. Endpoint protection tools may include anti-malware, host firewall, device control, exploit protection, and policy enforcement. Teach the distinction: prevention blocks known or policy-violating actions; EDR helps detect, investigate, and respond."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Source: CertMaster Study Lesson 4A; M04 slides \"Endpoint Detection Response\" and \"Endpoint Protection Tools\"."
+    },
+    {
+      "kind": "heading",
+      "text": "Endpoint Protection Tool Classes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Endpoint protection is a control family, not one product. For teaching, break it into what each tool observes or enforces."
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Tool class",
+        "Primary role",
+        "Decision cue"
+      ],
+      "rows": [
+        [
+          "Anti-malware",
+          "Detect/block known malicious files or behavior",
+          "Commodity malware or known signatures"
+        ],
+        [
+          "Host firewall",
+          "Control inbound/outbound host traffic",
+          "Limit endpoint network exposure"
+        ],
+        [
+          "Device control",
+          "Restrict removable media or peripherals",
+          "Reduce data exfiltration or malware introduction"
+        ],
+        [
+          "Application control",
+          "Allow or deny executable software",
+          "Prevent unauthorized tools or scripts"
+        ],
+        [
+          "EDR",
+          "Investigate behavior and support response",
+          "Process trees, persistence, lateral movement"
+        ],
+        [
+          "Configuration baseline",
+          "Enforce expected state",
+          "Drift, weak settings, missing controls"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Exam trap: endpoint protection does not replace least privilege or patching. A protected endpoint with local admin everywhere and outdated software is still weak."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Source: CertMaster Study Lesson 4A; M04 slides \"Endpoint Protection Tools\"."
+    },
+    {
+      "kind": "heading",
+      "text": "Endpoint Privilege Management"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Endpoint privilege management reduces the risk of local administrator misuse. Users and processes should not run with unnecessary privilege. Temporary elevation should be controlled, logged, and scoped."
+    },
+    {
+      "kind": "paragraph",
+      "text": "SecurityX cue: if malware or a user abuses local admin rights, remove standing privilege and enforce controlled elevation."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Source: CertMaster Study Lesson 4A; M04 slide \"Endpoint Privilege Management\"."
+    },
+    {
+      "kind": "heading",
+      "text": "Attack Surface Monitoring and Reduction"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Endpoint attack surface includes installed software, exposed services, weak configuration, vulnerable agents, unnecessary privileges, and unmanaged devices. Monitoring identifies drift; reduction removes unnecessary exposure."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Practical teaching list:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Remove unused software.",
+        "Disable unnecessary services.",
+        "Patch endpoint OS and applications.",
+        "Enforce configuration baselines.",
+        "Control removable media if required.",
+        "Monitor process, network, and file activity."
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Source: CertMaster Study Lesson 4A; M04 slide \"Attack Surface Monitoring and Reduction\"."
+    },
+    {
+      "kind": "heading",
+      "text": "Endpoint Threat-Actor TTPs"
+    },
+    {
+      "kind": "paragraph",
+      "text": "The official endpoint lesson includes threat-actor tactics, techniques, and procedures. Teach TTPs as behavior patterns that endpoint tools should help reveal: suspicious process execution, credential access attempts, persistence mechanisms, unusual script use, lateral movement from an endpoint, or abnormal privilege use."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Endpoint TTP decision cues:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Suspicious process tree: use EDR investigation.",
+        "Credential access pattern: inspect identity logs and endpoint telemetry.",
+        "Persistence on a workstation: inspect scheduled tasks, services, startup items, and scripts.",
+        "Lateral movement from endpoint: correlate endpoint, network, and authentication evidence."
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Source: CertMaster Study Lesson 4A; M04 slides \"Threat-actor tactics, techniques, and procedures\"."
+    },
+    {
+      "kind": "paragraph",
+      "text": "!Generated neutral control-plane diagram showing subject, policy decision, policy enforcement, object, and evidence sources."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Image teaching note: the official lateral-movement visual is useful but too scenario-specific for this study-guide position. v4.1 uses this neutral generated diagram to connect endpoint telemetry, network telemetry, identity evidence, and policy enforcement without hard-coding one attack path."
+    },
+    {
+      "kind": "heading",
+      "text": "MDM and Specialized Systems"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Mobile Device Management manages mobile enrollment, configuration, compliance, and remote actions. Specialized and embedded systems may be harder to patch, monitor, or replace. The official source calls out industry-specific challenges and characteristics of specialized/legacy systems."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Compensating controls for specialized systems:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Network segmentation.",
+        "Restricted administrative access.",
+        "Monitoring around the device.",
+        "Vendor-supported maintenance windows.",
+        "Documented risk acceptance.",
+        "Replacement roadmap where feasible."
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Source: CertMaster Study Lesson 4A; M04 slides \"MDM\", \"Specialized and Embedded Systems\"."
+    },
+    {
+      "kind": "heading",
+      "text": "Mobile Device Management"
+    },
+    {
+      "kind": "paragraph",
+      "text": "MDM gives the organization a way to enroll, configure, monitor, and respond to mobile devices. It is especially relevant when mobile devices access corporate data, email, SaaS applications, or internal services."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Common MDM controls:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Device enrollment and inventory.",
+        "Screen lock and encryption policy.",
+        "Application restrictions.",
+        "Compliance checks.",
+        "Remote wipe or selective wipe.",
+        "Certificate or profile deployment.",
+        "Separation of personal and corporate data where supported."
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Decision cue: if the scenario involves mobile access to business data, the answer often combines MDM, conditional access, data protection, and user privacy considerations."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Source: CertMaster Study Lesson 4A; M04 slide \"MDM\"."
+    }
+  ],
+  "attribution": "Course: SecurityX CAS-005 Primary source: CertMaster Study Lessons 3E, 3F, 4A, 4B Slide sources: SecurityX_M03_PPT.pptx, SecurityX_M04_PPT.pptx Teaching goal: connect identity, device, endpoint, and network controls into a troubleshooting-ready security architecture.",
+  "cheatsheet": [
+    "Anti-malware: Detect/block known malicious files or behavior",
+    "Host firewall: Control inbound/outbound host traffic",
+    "Device control: Restrict removable media or peripherals",
+    "Application control: Allow or deny executable software",
+    "EDR: Investigate behavior and support response",
+    "Configuration baseline: Enforce expected state"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for D3 Zero Trust IAM Endpoint Network, \"Anti-malware\" is described as:",
+      "choices": {
+        "A": "Detect/block known malicious files or behavior",
+        "B": "Investigate behavior and support response",
+        "C": "Restrict removable media or peripherals",
+        "D": "Control inbound/outbound host traffic"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The study guide states: Anti-malware: Detect/block known malicious files or behavior"
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for D3 Zero Trust IAM Endpoint Network, \"Host firewall\" is described as:",
+      "choices": {
+        "A": "Restrict removable media or peripherals",
+        "B": "Allow or deny executable software",
+        "C": "Control inbound/outbound host traffic",
+        "D": "Investigate behavior and support response"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The study guide states: Host firewall: Control inbound/outbound host traffic"
+    },
+    {
+      "id": "q3",
+      "prompt": "In the study guide for D3 Zero Trust IAM Endpoint Network, \"Device control\" is described as:",
+      "choices": {
+        "A": "Restrict removable media or peripherals",
+        "B": "Allow or deny executable software",
+        "C": "Investigate behavior and support response",
+        "D": "Control inbound/outbound host traffic"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The study guide states: Device control: Restrict removable media or peripherals"
+    },
+    {
+      "id": "q4",
+      "prompt": "In the study guide for D3 Zero Trust IAM Endpoint Network, \"Application control\" is described as:",
+      "choices": {
+        "A": "Investigate behavior and support response",
+        "B": "Restrict removable media or peripherals",
+        "C": "Control inbound/outbound host traffic",
+        "D": "Allow or deny executable software"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The study guide states: Application control: Allow or deny executable software"
+    }
+  ]
+}

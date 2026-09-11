@@ -1,0 +1,128 @@
+{
+  "nodeId": "l20-incident-response-5-phase-3-containment-eradication-re",
+  "locale": "en",
+  "title": "5. Phase 3 — Containment, Eradication, Recovery",
+  "objective": "Study-guide review — ICCS423 v2 — L20: Incident Response: 5. Phase 3 — Containment, Eradication, Recovery.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "Containment"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Two flavors that interact:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Short-term containment — stop the bleeding now (isolate host, disable account, block IP at firewall)",
+        "Long-term containment — sustainable hold while you investigate (network segmentation, hardened access control)"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Critical rule — Evidence first: When safe to do so, preserve evidence before containment. Memory forensics is impossible after a power-off. Disk evidence is destroyed by reimaging."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Containment trade-off: isolate (loud, attacker knows) vs monitor (silent, learn TTPs but more risk). For confirmed ransomware → isolate immediately. For suspected APT reconnaissance → carefully monitor with controlled deception, if you have the maturity."
+    },
+    {
+      "kind": "heading",
+      "text": "Eradication"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Remove malware from every affected system (prefer rebuild from clean image over manual cleanup — you can never be 100% sure malware is gone)",
+        "Patch the vulnerability that enabled initial access",
+        "Reset credentials — every potentially-compromised account, including service accounts and tokens",
+        "Audit accounts for attacker-created persistence (new admin accounts, scheduled tasks, registry Run keys, web shells)"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Recovery"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Restore from clean backup — verify backup integrity before restore",
+        "Staged return to production — validate one system before bringing the whole environment back",
+        "Enhanced monitoring for 30 days — attackers often have multiple footholds; reinfection within weeks is common",
+        "Re-enable accounts only after verification"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "`` ☐ Backup verified clean (offline / immutable) ☐ Vulnerability patched ☐ Credentials rotated (including service accounts) ☐ Persistence mechanisms removed ☐ EDR re-deployed and reporting ☐ Enhanced monitoring active for 30 days ``"
+    }
+  ],
+  "attribution": "Course: ICCS423 | Source: Thoth + RAG | Target: 3rd-4th year CS | Date: 2026-05-03",
+  "cheatsheet": [
+    "Short-term containment: stop the bleeding now (isolate host, disable account, block IP at firewall)",
+    "Long-term containment: sustainable hold while you investigate (network segmentation, hardened access control)",
+    "Reset credentials: every potentially-compromised account, including service accounts and tokens",
+    "Restore from clean backup: verify backup integrity before restore",
+    "Staged return to production: validate one system before bringing the whole environment back",
+    "Enhanced monitoring for 30 days: attackers often have multiple footholds; reinfection within weeks is common"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for L20 Incident Response, \"Short-term containment\" is described as:",
+      "choices": {
+        "A": "sustainable hold while you investigate (network segmentation, hardened access control)",
+        "B": "stop the bleeding now (isolate host, disable account, block IP at firewall)",
+        "C": "every potentially-compromised account, including service accounts and tokens",
+        "D": "attackers often have multiple footholds; reinfection within weeks is common"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: Short-term containment — stop the bleeding now (isolate host, disable account, block IP at firewall)"
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for L20 Incident Response, \"Long-term containment\" is described as:",
+      "choices": {
+        "A": "sustainable hold while you investigate (network segmentation, hardened access control)",
+        "B": "every potentially-compromised account, including service accounts and tokens",
+        "C": "stop the bleeding now (isolate host, disable account, block IP at firewall)",
+        "D": "attackers often have multiple footholds; reinfection within weeks is common"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The study guide states: Long-term containment — sustainable hold while you investigate (network segmentation, hardened access control)"
+    },
+    {
+      "id": "q3",
+      "prompt": "In the study guide for L20 Incident Response, \"Reset credentials\" is described as:",
+      "choices": {
+        "A": "sustainable hold while you investigate (network segmentation, hardened access control)",
+        "B": "attackers often have multiple footholds; reinfection within weeks is common",
+        "C": "stop the bleeding now (isolate host, disable account, block IP at firewall)",
+        "D": "every potentially-compromised account, including service accounts and tokens"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The study guide states: Reset credentials — every potentially-compromised account, including service accounts and tokens"
+    },
+    {
+      "id": "q4",
+      "prompt": "In the study guide for L20 Incident Response, \"Restore from clean backup\" is described as:",
+      "choices": {
+        "A": "verify backup integrity before restore",
+        "B": "attackers often have multiple footholds; reinfection within weeks is common",
+        "C": "stop the bleeding now (isolate host, disable account, block IP at firewall)",
+        "D": "validate one system before bringing the whole environment back"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The study guide states: Restore from clean backup — verify backup integrity before restore"
+    }
+  ]
+}

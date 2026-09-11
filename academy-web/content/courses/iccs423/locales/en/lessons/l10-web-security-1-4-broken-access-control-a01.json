@@ -1,0 +1,132 @@
+{
+  "nodeId": "l10-web-security-1-4-broken-access-control-a01",
+  "locale": "en",
+  "title": "4. Broken Access Control (A01)",
+  "objective": "Study-guide review — ICCS423 v2 — L10: Web Security 1 (Injection · Auth · Access Control · Sessions): 4. Broken Access Control (A01).",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "Why #1"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "94% of tested apps have at least one access-control flaw",
+        "Authentication ≠ authorization — knowing who doesn't say what they can do",
+        "Server-side enforcement is the only reliable layer (client checks are advisory)"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Key Concepts"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Horizontal escalation — same privilege, different user (User A reads User B's order)",
+        "Vertical escalation — lower → higher privilege (regular user gains admin)",
+        "IDOR — predictable IDs in URL/body without ownership check",
+        "Path Traversal — ../../etc/passwd to escape app directory",
+        "Mass Assignment — framework binds extra fields like is_admin=true"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "IDOR Example"
+    },
+    {
+      "kind": "paragraph",
+      "text": "``http # Attacker logs in as user 1001, then iterates: GET /api/orders/1001 → 200 OK (own data) GET /api/orders/1002 → 200 OK (User B's data — IDOR!) GET /api/orders/1003 → 200 OK (User C's data) ``"
+    },
+    {
+      "kind": "paragraph",
+      "text": "``python # ✅ Server-side ownership check @app.route('/api/orders/<order_id>') @login_required def get_order(order_id): order = Order.query.get_or_404(order_id) if order.user_id != current_user.id: abort(403) return jsonify(order.to_dict()) ``"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Real-world: Parler (2021) — sequential post IDs + no auth + no rate limit → 70TB scraped including GPS metadata of deleted posts."
+    },
+    {
+      "kind": "heading",
+      "text": "Defense Patterns"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Deny-by-default — explicit allow per action",
+        "Use UUIDs instead of sequential integers for object references",
+        "RBAC/ABAC — codify roles and attributes; enforce via decorators/middleware",
+        "Centralized authorization — one policy module (OPA, Casbin)"
+      ]
+    }
+  ],
+  "attribution": "Course: ICCS423 | Source: Thoth Library + RAG | Target: 3rd-4th year CS | Date: 2026-05-03",
+  "cheatsheet": [
+    "Horizontal escalation: same privilege, different user (User A reads User B's order)",
+    "Vertical escalation: lower → higher privilege (regular user gains admin)",
+    "IDOR: predictable IDs in URL/body without ownership check",
+    "Path Traversal: ../../etc/passwd to escape app directory",
+    "Mass Assignment: framework binds extra fields like is_admin=true",
+    "Deny-by-default: explicit allow per action",
+    "RBAC/ABAC: codify roles and attributes; enforce via decorators/middleware",
+    "Centralized authorization: one policy module (OPA, Casbin)"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for L10 Web Security 1, \"Horizontal escalation\" is described as:",
+      "choices": {
+        "A": "codify roles and attributes; enforce via decorators/middleware",
+        "B": "same privilege, different user (User A reads User B's order)",
+        "C": "lower → higher privilege (regular user gains admin)",
+        "D": "predictable IDs in URL/body without ownership check"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: Horizontal escalation — same privilege, different user (User A reads User B's order)"
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for L10 Web Security 1, \"Vertical escalation\" is described as:",
+      "choices": {
+        "A": "lower → higher privilege (regular user gains admin)",
+        "B": "same privilege, different user (User A reads User B's order)",
+        "C": "framework binds extra fields like is_admin=true",
+        "D": "predictable IDs in URL/body without ownership check"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The study guide states: Vertical escalation — lower → higher privilege (regular user gains admin)"
+    },
+    {
+      "id": "q3",
+      "prompt": "In the study guide for L10 Web Security 1, \"IDOR\" is described as:",
+      "choices": {
+        "A": "predictable IDs in URL/body without ownership check",
+        "B": "same privilege, different user (User A reads User B's order)",
+        "C": "framework binds extra fields like is_admin=true",
+        "D": "lower → higher privilege (regular user gains admin)"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The study guide states: IDOR — predictable IDs in URL/body without ownership check"
+    },
+    {
+      "id": "q4",
+      "prompt": "In the study guide for L10 Web Security 1, \"Path Traversal\" is described as:",
+      "choices": {
+        "A": "lower → higher privilege (regular user gains admin)",
+        "B": "one policy module (OPA, Casbin)",
+        "C": "framework binds extra fields like is_admin=true",
+        "D": "../../etc/passwd to escape app directory"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The study guide states: Path Traversal — ../../etc/passwd to escape app directory"
+    }
+  ]
+}

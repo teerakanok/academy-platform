@@ -1,0 +1,126 @@
+{
+  "nodeId": "l22-ctf-skills-exam3-prep-3-web-ctf-skills",
+  "locale": "th",
+  "title": "3. Web CTF Skills",
+  "objective": "Study-guide review — ICCS423 v2 — L22: CTF Skills & Exam 3 Prep: 3. Web CTF Skills.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "Reconnaissance"
+    },
+    {
+      "kind": "paragraph",
+      "text": "```bash # Directory busting gobuster dir -u http://target.com -w /usr/share/wordlists/dirb/common.txt"
+    },
+    {
+      "kind": "paragraph",
+      "text": "# Find hidden parameters ffuf -u \"http://target.com/api?FUZZ=value\" -w params.txt"
+    },
+    {
+      "kind": "paragraph",
+      "text": "# Inspect response headers curl -I http://target.com ```"
+    },
+    {
+      "kind": "heading",
+      "text": "Common vulnerabilities (OWASP Top 10)"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "SQL Injection — try ', \" , ' OR '1'='1, error-based / blind / union",
+        "XSS — <script>alert(1)</script> in inputs, look for reflected output",
+        "IDOR — change user IDs in URL: /account/123 → /account/124",
+        "Auth bypass — JWT none algorithm, session token reuse, logic flaws",
+        "SSRF — make the server fetch URLs you choose: http://target/?url=file:///etc/passwd",
+        "Path traversal — ../../etc/passwd, URL-encoded variants"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Cookie & header manipulation"
+    },
+    {
+      "kind": "paragraph",
+      "text": "``bash # Burp Suite or browser DevTools — modify cookies, replay requests # Curl example: curl -X POST http://target.com/login \\ -H \"Cookie: session=admin\" \\ -d \"user=admin\" ``"
+    },
+    {
+      "kind": "heading",
+      "text": "Source code review"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "View page source (Ctrl+U): comments, hidden inputs, JS variables",
+        "robots.txt, sitemap.xml, .git/, .env, backup files (.bak, .old)",
+        "JS bundles often contain API endpoints + sometimes secrets"
+      ]
+    }
+  ],
+  "attribution": "Course: ICCS423 | Source: Thoth + RAG | Target: 3rd-4th year CS | Date: 2026-05-03",
+  "cheatsheet": [
+    "SQL Injection: try ', \" , ' OR '1'='1, error-based / blind / union",
+    "XSS: <script>alert(1)</script> in inputs, look for reflected output",
+    "IDOR: change user IDs in URL: /account/123 → /account/124",
+    "Auth bypass: JWT none algorithm, session token reuse, logic flaws",
+    "SSRF: make the server fetch URLs you choose: http://target/?url=file:///etc/passwd",
+    "Path traversal: ../../etc/passwd, URL-encoded variants"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for L22 CTF Skills Exam3 Prep, \"SQL Injection\" is described as:",
+      "choices": {
+        "A": "change user IDs in URL: /account/123 → /account/124",
+        "B": "try ', \" , ' OR '1'='1, error-based / blind / union",
+        "C": "JWT none algorithm, session token reuse, logic flaws",
+        "D": "<script>alert(1)</script> in inputs, look for reflected output"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: SQL Injection — try ', \" , ' OR '1'='1, error-based / blind / union"
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for L22 CTF Skills Exam3 Prep, \"XSS\" is described as:",
+      "choices": {
+        "A": "change user IDs in URL: /account/123 → /account/124",
+        "B": "<script>alert(1)</script> in inputs, look for reflected output",
+        "C": "try ', \" , ' OR '1'='1, error-based / blind / union",
+        "D": "JWT none algorithm, session token reuse, logic flaws"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: XSS — <script>alert(1)</script> in inputs, look for reflected output"
+    },
+    {
+      "id": "q3",
+      "prompt": "In the study guide for L22 CTF Skills Exam3 Prep, \"IDOR\" is described as:",
+      "choices": {
+        "A": "try ', \" , ' OR '1'='1, error-based / blind / union",
+        "B": "JWT none algorithm, session token reuse, logic flaws",
+        "C": "<script>alert(1)</script> in inputs, look for reflected output",
+        "D": "change user IDs in URL: /account/123 → /account/124"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The study guide states: IDOR — change user IDs in URL: /account/123 → /account/124"
+    },
+    {
+      "id": "q4",
+      "prompt": "In the study guide for L22 CTF Skills Exam3 Prep, \"Auth bypass\" is described as:",
+      "choices": {
+        "A": "JWT none algorithm, session token reuse, logic flaws",
+        "B": "<script>alert(1)</script> in inputs, look for reflected output",
+        "C": "change user IDs in URL: /account/123 → /account/124",
+        "D": "try ', \" , ' OR '1'='1, error-based / blind / union"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The study guide states: Auth bypass — JWT none algorithm, session token reuse, logic flaws"
+    }
+  ]
+}

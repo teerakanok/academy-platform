@@ -1,0 +1,156 @@
+{
+  "nodeId": "l08-cryptography-2-1-asymmetric-cryptography-a-id-asymmetr",
+  "locale": "th",
+  "title": "1. Asymmetric Cryptography <a id=\"asymmetric\"></a>",
+  "objective": "Study-guide review — ICCS423 v2 — L08: Cryptography 2 (Asymmetric, PKI, TLS, Signatures): 1. Asymmetric Cryptography <a id=\"asymmetric\"></a>.",
+  "blocks": [
+    {
+      "kind": "list",
+      "items": [
+        "Key pair — public (share freely) + private (keep secret)",
+        "100–1000× slower than symmetric, but solves key distribution",
+        "Provides confidentiality, authentication, non-repudiation",
+        "Linear scaling — only 2n keys for n users (vs n(n−1)/2 for symmetric)"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Algorithm Map"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Algorithm",
+        "Math basis",
+        "Use",
+        "2026 sizing"
+      ],
+      "rows": [
+        [
+          "RSA",
+          "Integer factorization",
+          "Encrypt + sign + KEX",
+          "≥ 2048, prefer 3072"
+        ],
+        [
+          "Diffie-Hellman",
+          "Discrete log",
+          "Key exchange only",
+          "≥ 2048 (or use ECDH)"
+        ],
+        [
+          "ECDH / ECDSA",
+          "Elliptic curve DLP",
+          "KEX + signatures",
+          "256 (P-256, Curve25519)"
+        ],
+        [
+          "Ed25519",
+          "Edwards curve",
+          "Signatures",
+          "256"
+        ],
+        [
+          "ML-KEM (Kyber)",
+          "Lattice (LWE)",
+          "Post-quantum KEM",
+          "NIST FIPS 203 (2024)"
+        ]
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "The Key Direction Trap"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Operation",
+        "Encrypt with",
+        "Decrypt/Verify with"
+      ],
+      "rows": [
+        [
+          "Confidentiality",
+          "Recipient's public key",
+          "Recipient's private key"
+        ],
+        [
+          "Signature",
+          "Signer's private key",
+          "Signer's public key"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Mnemonic: \"Public for Encryption, Private for Signature.\" Mix these up and you've built an oracle, not a secret."
+    }
+  ],
+  "attribution": "Course: ICCS423 | Source: Thoth Library (cryptography/) + RAG | Target: 3rd-4th year CS | Date: 2026-05-03",
+  "cheatsheet": [
+    "Key pair: public (share freely) + private (keep secret)",
+    "RSA: Integer factorization",
+    "ECDH / ECDSA: Elliptic curve DLP",
+    "Confidentiality: Recipient's public key",
+    "Signature: Signer's private key"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for L08 Cryptography 2, \"Key pair\" is described as:",
+      "choices": {
+        "A": "Recipient's public key",
+        "B": "Integer factorization",
+        "C": "Signer's private key",
+        "D": "public (share freely) + private (keep secret)"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The study guide states: Key pair — public (share freely) + private (keep secret)"
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for L08 Cryptography 2, \"RSA\" is described as:",
+      "choices": {
+        "A": "Recipient's public key",
+        "B": "Signer's private key",
+        "C": "Elliptic curve DLP",
+        "D": "Integer factorization"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The study guide states: RSA: Integer factorization"
+    },
+    {
+      "id": "q3",
+      "prompt": "In the study guide for L08 Cryptography 2, \"ECDH / ECDSA\" is described as:",
+      "choices": {
+        "A": "Signer's private key",
+        "B": "Integer factorization",
+        "C": "Elliptic curve DLP",
+        "D": "Recipient's public key"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The study guide states: ECDH / ECDSA: Elliptic curve DLP"
+    },
+    {
+      "id": "q4",
+      "prompt": "In the study guide for L08 Cryptography 2, \"Confidentiality\" is described as:",
+      "choices": {
+        "A": "Elliptic curve DLP",
+        "B": "Signer's private key",
+        "C": "Recipient's public key",
+        "D": "Integer factorization"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The study guide states: Confidentiality: Recipient's public key"
+    }
+  ]
+}

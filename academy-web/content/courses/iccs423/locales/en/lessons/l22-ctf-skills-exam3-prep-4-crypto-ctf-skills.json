@@ -1,0 +1,187 @@
+{
+  "nodeId": "l22-ctf-skills-exam3-prep-4-crypto-ctf-skills",
+  "locale": "en",
+  "title": "4. Crypto CTF Skills",
+  "objective": "Study-guide review — ICCS423 v2 — L22: CTF Skills & Exam 3 Prep: 4. Crypto CTF Skills.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "Step 1 — Identify the cipher type"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Clue",
+        "Likely cipher"
+      ],
+      "rows": [
+        [
+          "Only A-Z, length divisible by something",
+          "Caesar / Vigenère / substitution"
+        ],
+        [
+          "= padding, only A-Z + a-z + 0-9 + +/",
+          "Base64"
+        ],
+        [
+          "Hex (0-9, a-f)",
+          "Hex encoding"
+        ],
+        [
+          "Pairs/blocks of 5 letters (A-E only)",
+          "Bacon cipher"
+        ],
+        [
+          "Numbers in pairs/triples",
+          "ASCII codes / Polybius"
+        ],
+        [
+          "{....} random-ish",
+          "RSA / AES output"
+        ]
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Step 2 — Try common decodings (CyberChef pipeline)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "CyberChef (gchq.github.io/CyberChef) is the swiss army knife. Common recipes:"
+    },
+    {
+      "kind": "paragraph",
+      "text": "`` From Base64 → From Hex → ROT13 # multi-layer encoding From Base64 → AES Decrypt (mode CBC) # encrypted blob with key in prompt Magic operation # auto-detect (often works!) ``"
+    },
+    {
+      "kind": "heading",
+      "text": "Step 3 — Frequency analysis (substitution)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "For monoalphabetic ciphers (Caesar, simple substitution):"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Count letter frequency in ciphertext",
+        "Compare to English distribution: E (12.7%), T (9%), A (8%), O, I, N, S, H, R",
+        "Most common ciphertext letter ≈ E in plaintext"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Step 4 — Common encodings to recognize"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Encoding",
+        "Indicator"
+      ],
+      "rows": [
+        [
+          "Base64",
+          "A-Za-z0-9+/="
+        ],
+        [
+          "Base32",
+          "A-Z2-7= (uppercase only, no 0-9 + 0-1)"
+        ],
+        [
+          "Hex",
+          "[0-9a-f]+"
+        ],
+        [
+          "URL encoding",
+          "%XX sequences"
+        ],
+        [
+          "HTML entities",
+          "&amp;, &#65;"
+        ],
+        [
+          "Binary",
+          "01010101"
+        ]
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Step 5 — RSA basics (if n, e, c given)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "If n is small enough → factor with factordb.com or RsaCtfTool to recover p, q → compute d → decrypt."
+    },
+    {
+      "kind": "paragraph",
+      "text": "``bash # RsaCtfTool (CTF favorite) RsaCtfTool --publickey key.pub --uncipherfile cipher.bin ``"
+    }
+  ],
+  "attribution": "Course: ICCS423 | Source: Thoth + RAG | Target: 3rd-4th year CS | Date: 2026-05-03",
+  "cheatsheet": [
+    "Only A-Z, length divisible by something: Caesar / Vigenère / substitution",
+    "Numbers in pairs/triples: ASCII codes / Polybius",
+    "{....} random-ish: RSA / AES output",
+    "Base32: A-Z2-7= (uppercase only, no 0-9 + 0-1)"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for L22 CTF Skills Exam3 Prep, \"Only A-Z, length divisible by something\" is described as:",
+      "choices": {
+        "A": "Caesar / Vigenère / substitution",
+        "B": "RSA / AES output",
+        "C": "ASCII codes / Polybius",
+        "D": "A-Z2-7= (uppercase only, no 0-9 + 0-1)"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The study guide states: Only A-Z, length divisible by something: Caesar / Vigenère / substitution"
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for L22 CTF Skills Exam3 Prep, \"Numbers in pairs/triples\" is described as:",
+      "choices": {
+        "A": "ASCII codes / Polybius",
+        "B": "A-Z2-7= (uppercase only, no 0-9 + 0-1)",
+        "C": "Caesar / Vigenère / substitution",
+        "D": "RSA / AES output"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The study guide states: Numbers in pairs/triples: ASCII codes / Polybius"
+    },
+    {
+      "id": "q3",
+      "prompt": "In the study guide for L22 CTF Skills Exam3 Prep, \"{....} random-ish\" is described as:",
+      "choices": {
+        "A": "A-Z2-7= (uppercase only, no 0-9 + 0-1)",
+        "B": "Caesar / Vigenère / substitution",
+        "C": "RSA / AES output",
+        "D": "ASCII codes / Polybius"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The study guide states: {....} random-ish: RSA / AES output"
+    },
+    {
+      "id": "q4",
+      "prompt": "In the study guide for L22 CTF Skills Exam3 Prep, \"Base32\" is described as:",
+      "choices": {
+        "A": "RSA / AES output",
+        "B": "ASCII codes / Polybius",
+        "C": "A-Z2-7= (uppercase only, no 0-9 + 0-1)",
+        "D": "Caesar / Vigenère / substitution"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The study guide states: Base32: A-Z2-7= (uppercase only, no 0-9 + 0-1)"
+    }
+  ]
+}

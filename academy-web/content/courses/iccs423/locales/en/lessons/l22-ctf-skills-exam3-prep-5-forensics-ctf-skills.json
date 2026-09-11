@@ -1,0 +1,153 @@
+{
+  "nodeId": "l22-ctf-skills-exam3-prep-5-forensics-ctf-skills",
+  "locale": "en",
+  "title": "5. Forensics CTF Skills",
+  "objective": "Study-guide review — ICCS423 v2 — L22: CTF Skills & Exam 3 Prep: 5. Forensics CTF Skills.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "File type identification"
+    },
+    {
+      "kind": "paragraph",
+      "text": "``bash file mystery.bin # magic bytes → real type exiftool image.jpg # metadata: GPS, camera, date, software binwalk firmware.bin # find embedded files / signatures strings -n 8 binary # extract printable strings ``"
+    },
+    {
+      "kind": "heading",
+      "text": "Steganography"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Tool",
+        "Purpose"
+      ],
+      "rows": [
+        [
+          "steghide extract -sf image.jpg",
+          "Extract hidden data from JPEG (needs passphrase)"
+        ],
+        [
+          "zsteg image.png",
+          "Detect/extract LSB stego in PNG"
+        ],
+        [
+          "binwalk -e firmware.bin",
+          "Carve embedded files from blobs"
+        ],
+        [
+          "stegsolve",
+          "Visual analysis — bit planes, color channels"
+        ],
+        [
+          "strings file",
+          "Quick check for plaintext flags"
+        ]
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Common stego tricks"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Flag in image EXIF metadata → exiftool",
+        "Flag appended after image data → strings or binwalk",
+        "Flag in least significant bits of pixels → zsteg / stegsolve",
+        "Flag in alpha channel of transparent PNG → bit plane analysis",
+        "Audio: spectrogram contains text → Audacity / Sonic Visualiser"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "PCAP analysis (network forensics)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "```bash # Wireshark — open .pcap, look at: HTTP, FTP, DNS, TCP streams # Right-click packet → Follow → TCP Stream → see full conversation"
+    },
+    {
+      "kind": "paragraph",
+      "text": "# Command-line (tshark) tshark -r capture.pcap -Y \"http.request\" -T fields -e http.host -e http.request.uri ```"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Common PCAP findings: credentials in HTTP, files in FTP transfers, DNS exfiltration patterns, base64 in HTTP POST bodies."
+    },
+    {
+      "kind": "heading",
+      "text": "Memory forensics (Volatility 3)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "``bash volatility3 -f mem.dump windows.pslist # processes volatility3 -f mem.dump windows.netstat # network connections volatility3 -f mem.dump windows.cmdline # command lines volatility3 -f mem.dump windows.malfind # injected code regions ``"
+    }
+  ],
+  "attribution": "Course: ICCS423 | Source: Thoth + RAG | Target: 3rd-4th year CS | Date: 2026-05-03",
+  "cheatsheet": [
+    "steghide extract -sf image.jpg: Extract hidden data from JPEG (needs passphrase)",
+    "zsteg image.png: Detect/extract LSB stego in PNG",
+    "binwalk -e firmware.bin: Carve embedded files from blobs",
+    "stegsolve: Visual analysis — bit planes, color channels",
+    "strings file: Quick check for plaintext flags"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for L22 CTF Skills Exam3 Prep, \"steghide extract -sf image.jpg\" is described as:",
+      "choices": {
+        "A": "Visual analysis — bit planes, color channels",
+        "B": "Extract hidden data from JPEG (needs passphrase)",
+        "C": "Detect/extract LSB stego in PNG",
+        "D": "Carve embedded files from blobs"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: steghide extract -sf image.jpg: Extract hidden data from JPEG (needs passphrase)"
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for L22 CTF Skills Exam3 Prep, \"zsteg image.png\" is described as:",
+      "choices": {
+        "A": "Visual analysis — bit planes, color channels",
+        "B": "Quick check for plaintext flags",
+        "C": "Detect/extract LSB stego in PNG",
+        "D": "Carve embedded files from blobs"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The study guide states: zsteg image.png: Detect/extract LSB stego in PNG"
+    },
+    {
+      "id": "q3",
+      "prompt": "In the study guide for L22 CTF Skills Exam3 Prep, \"binwalk -e firmware.bin\" is described as:",
+      "choices": {
+        "A": "Visual analysis — bit planes, color channels",
+        "B": "Quick check for plaintext flags",
+        "C": "Detect/extract LSB stego in PNG",
+        "D": "Carve embedded files from blobs"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The study guide states: binwalk -e firmware.bin: Carve embedded files from blobs"
+    },
+    {
+      "id": "q4",
+      "prompt": "In the study guide for L22 CTF Skills Exam3 Prep, \"stegsolve\" is described as:",
+      "choices": {
+        "A": "Extract hidden data from JPEG (needs passphrase)",
+        "B": "Visual analysis — bit planes, color channels",
+        "C": "Detect/extract LSB stego in PNG",
+        "D": "Carve embedded files from blobs"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: stegsolve: Visual analysis — bit planes, color channels"
+    }
+  ]
+}

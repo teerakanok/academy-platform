@@ -1,0 +1,133 @@
+{
+  "nodeId": "d5-threat-ops-hunting-ir-day-5-teaching-lab-from-threat-mo",
+  "locale": "en",
+  "title": "Day 5 Teaching Lab — From Threat Model to Incident Improvement",
+  "objective": "Study-guide review — Day 5 — Threat Modeling, Monitoring, Hunting, and Incident Response: Day 5 Teaching Lab — From Threat Model to Incident Improvement.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "Scenario: a public web application begins making unusual DNS requests. Web logs show suspicious parameters. Endpoint telemetry shows the web service spawning a shell. Identity logs show no administrator login. A threat feed contains one matching domain, but the domain appeared after the first suspicious request."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Ask students to produce five artifacts:"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Artifact",
+        "Required content"
+      ],
+      "rows": [
+        [
+          "Threat model update",
+          "Attack surface, likely input path, affected assets, assumptions"
+        ],
+        [
+          "Monitoring query plan",
+          "Web logs, endpoint process data, DNS logs, identity logs, cloud/application logs"
+        ],
+        [
+          "Attack-method analysis",
+          "Injection or command execution hypothesis, least-privilege review"
+        ],
+        [
+          "Incident timeline",
+          "First suspicious request, process execution, DNS activity, containment, recovery"
+        ],
+        [
+          "Continuous improvement",
+          "Secure coding fix, detection update, logging gap, tabletop/playbook change"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Expected reasoning:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "The threat feed is supporting intelligence, not the only evidence.",
+        "The absence of administrator login does not rule out application-layer compromise.",
+        "DNS activity becomes more meaningful when tied to process telemetry.",
+        "Root cause must address input handling, privilege, patching, and monitoring.",
+        "Recovery should include evidence preservation and validation before return to service."
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Wrong-answer discussion: \"block the domain and close the incident\" treats an indicator as the root cause. SecurityX-level response requires timeline, cause, containment, eradication, recovery, and improvement."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Source: CertMaster Study Lessons 5A-5E; SecurityX M05 slides."
+    }
+  ],
+  "attribution": "Course: SecurityX CAS-005 Primary source: CertMaster Study Lessons 5A, 5B, 5C, 5D, 5E Slide source: SecurityX_M05_PPT.pptx Teaching goal: integrate design, operations, attack analysis, threat intelligence, and response into scenario reasoning.",
+  "cheatsheet": [
+    "Threat model update: Attack surface, likely input path, affected assets, assumptions",
+    "Monitoring query plan: Web logs, endpoint process data, DNS logs, identity logs, cloud/application logs",
+    "Attack-method analysis: Injection or command execution hypothesis, least-privilege review",
+    "Incident timeline: First suspicious request, process execution, DNS activity, containment, recovery",
+    "Continuous improvement: Secure coding fix, detection update, logging gap, tabletop/playbook change"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for D5 Threat Ops Hunting IR, \"Threat model update\" is described as:",
+      "choices": {
+        "A": "Web logs, endpoint process data, DNS logs, identity logs, cloud/application logs",
+        "B": "Secure coding fix, detection update, logging gap, tabletop/playbook change",
+        "C": "Injection or command execution hypothesis, least-privilege review",
+        "D": "Attack surface, likely input path, affected assets, assumptions"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The study guide states: Threat model update: Attack surface, likely input path, affected assets, assumptions"
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for D5 Threat Ops Hunting IR, \"Monitoring query plan\" is described as:",
+      "choices": {
+        "A": "First suspicious request, process execution, DNS activity, containment, recovery",
+        "B": "Secure coding fix, detection update, logging gap, tabletop/playbook change",
+        "C": "Web logs, endpoint process data, DNS logs, identity logs, cloud/application logs",
+        "D": "Injection or command execution hypothesis, least-privilege review"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The study guide states: Monitoring query plan: Web logs, endpoint process data, DNS logs, identity logs, cloud/application logs"
+    },
+    {
+      "id": "q3",
+      "prompt": "In the study guide for D5 Threat Ops Hunting IR, \"Attack-method analysis\" is described as:",
+      "choices": {
+        "A": "Web logs, endpoint process data, DNS logs, identity logs, cloud/application logs",
+        "B": "Secure coding fix, detection update, logging gap, tabletop/playbook change",
+        "C": "Injection or command execution hypothesis, least-privilege review",
+        "D": "Attack surface, likely input path, affected assets, assumptions"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The study guide states: Attack-method analysis: Injection or command execution hypothesis, least-privilege review"
+    },
+    {
+      "id": "q4",
+      "prompt": "In the study guide for D5 Threat Ops Hunting IR, \"Incident timeline\" is described as:",
+      "choices": {
+        "A": "Injection or command execution hypothesis, least-privilege review",
+        "B": "Secure coding fix, detection update, logging gap, tabletop/playbook change",
+        "C": "First suspicious request, process execution, DNS activity, containment, recovery",
+        "D": "Web logs, endpoint process data, DNS logs, identity logs, cloud/application logs"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The study guide states: Incident timeline: First suspicious request, process execution, DNS activity, containment, recovery"
+    }
+  ]
+}

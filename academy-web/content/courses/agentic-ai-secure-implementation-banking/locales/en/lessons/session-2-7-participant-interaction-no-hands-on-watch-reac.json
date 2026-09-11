@@ -1,0 +1,101 @@
+{
+  "nodeId": "session-2-7-participant-interaction-no-hands-on-watch-reac",
+  "locale": "en",
+  "title": "7. Participant interaction (no hands-on — watch + react)",
+  "objective": "Study-guide review — Study Guide — Session 2: Practical Agentic Workflow Controls: 7. Participant interaction (no hands-on — watch + react).",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "Keep energy without breaking the demo-only model. One micro-poll per scenario; this primes the exact S3 vote labels (allowed / needs approval / blocked / redesign required). [SRC: design/S2_workflow_controls.md §4] [SRC: COURSE_BUILD_SPEC.md §5 — S3 vote wording]"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "After Scenario A: \"Should the agent have been allowed to merge to main on its own?\" → Yes / No → reveals"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "the maker–checker point (expected: near-unanimous \"No\")."
+    },
+    {
+      "kind": "list",
+      "items": [
+        "During Scenario B, at each 🛑: \"Allow this action — yes or no?\" → surfaces the catch live; lets the room feel"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "the gate."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Spoken (TH): \"ไม่ต้องลงมือทำเอง — แค่โหวต. ของจริงเดี๋ยวเจอใน Session 3 เต็มๆ.\""
+    }
+  ],
+  "attribution": "KTB · Agentic AI & Secure Implementation for Banking IT Teams Time: 10:45–12:00 (75 min) · Format: Online, instructor-led, demo-driven · ~50 participants Activity: Control Walkthrough (vendor-neutral) — Task Card → Approval Gate → Execution Proof → Audit Trail Slides: FULL ENGLISH · Spoken delivery ",
+  "cheatsheet": [
+    "After Scenario A: \"Should the agent have been allowed to merge to main on its own?\" → Yes / No → reveals",
+    "During Scenario B, at each 🛑: \"Allow this action — yes or no?\" → surfaces the catch live; lets the room feel",
+    "After Scenario A: \"Should the agent have been allowed to merge to main on its own?\" → Yes / No → reveals",
+    "During Scenario B, at each 🛑: \"Allow this action — yes or no?\" → surfaces the catch live; lets the room feel"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for session 2, \"After Scenario A\" is described as:",
+      "choices": {
+        "A": "\"Allow this action — yes or no?\" → surfaces the catch live; lets the room feel",
+        "B": "\"Should the agent have been allowed to merge to main on its own?\" → Yes / No → reveals",
+        "C": "the four controls become the backbone of the approval-workflow + monitoring + IR-playbook",
+        "D": "every case = \"which of the four gates was missing?\"; the per-scenario poll primes the"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: After Scenario A: \"Should the agent have been allowed to merge to main on its own?\" → Yes / No → reveals"
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for session 2, \"During Scenario B, at each 🛑\" is described as:",
+      "choices": {
+        "A": "\"Should the agent have been allowed to merge to main on its own?\" → Yes / No → reveals",
+        "B": "nist.gov/itl/ai-risk-management-framework (GOVERN / MAP / MEASURE / MANAGE)",
+        "C": "reframe; reuse existing bank controls; \"bash is all you need\" → risk flip (LLM06)",
+        "D": "\"Allow this action — yes or no?\" → surfaces the catch live; lets the room feel"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The study guide states: During Scenario B, at each 🛑: \"Allow this action — yes or no?\" → surfaces the catch live; lets the room feel"
+    },
+    {
+      "id": "q3",
+      "prompt": "Which term does the study guide for session 2 define as: \"\"Should the agent have been allowed to merge to main on its own?\" → Yes / No → reveals\"?",
+      "choices": {
+        "A": "During Scenario B, at each 🛑",
+        "B": "After Scenario A",
+        "C": "Incident Response",
+        "D": "Execution Proof"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: After Scenario A: \"Should the agent have been allowed to merge to main on its own?\" → Yes / No → reveals"
+    },
+    {
+      "id": "q4",
+      "prompt": "Which term does the study guide for session 2 define as: \"\"Allow this action — yes or no?\" → surfaces the catch live; lets the room feel\"?",
+      "choices": {
+        "A": "After Scenario A",
+        "B": "During Scenario B, at each 🛑",
+        "C": "design/S2_workflow_controls.md",
+        "D": "Injected \"email account list\""
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: During Scenario B, at each 🛑: \"Allow this action — yes or no?\" → surfaces the catch live; lets the room feel"
+    }
+  ]
+}

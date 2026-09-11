@@ -1,0 +1,113 @@
+{
+  "nodeId": "session-5-6-rollout-pilot-risk-tier-scale-s5-10",
+  "locale": "th",
+  "title": "6. Rollout — pilot → risk-tier → scale (S5.10)",
+  "objective": "Study-guide review — Study Guide — Session 5: Designing Secure AI Solutions & Implementation Considerations: 6. Rollout — pilot → risk-tier → scale (S5.10).",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "`` PILOT → RISK-TIER → SCALE narrow scope classify each expand only what low-risk task use case cleared the gates read-only first T1 / T2 / T3 keep the gates on ``"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Tier",
+        "Example",
+        "Posture"
+      ],
+      "rows": [
+        [
+          "T1 · Low",
+          "summarize logs, draft unit tests",
+          "assist freely; human reviews output"
+        ],
+        [
+          "T2 · Medium",
+          "secure code review, RCA suggestions",
+          "assist + mandatory human signoff"
+        ],
+        [
+          "T3 · High",
+          "anything touching customer data, money, or prod writes",
+          "approval gate + audit + restricted — or don't yet"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "In the room (per RUN_OF_SHOW): rollout is demoted too — \"the 2 that matter: start with a read-only pilot, then risk-tier before any write access.\" [CHIP-7]"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Teaching prose (TH): roll out โดยไม่เอาทั้งแบงก์ไปเสี่ยง: เริ่ม pilot scope แคบ งานเสี่ยงต่ำ read-only → จัดระดับความเสี่ยง T1/T2/T3 ให้ control ตามระดับ → scale เฉพาะที่ผ่าน gate. T3 (ข้อมูลลูกค้า/เงิน/write prod) = approval gate + audit + จำกัด หรือ \"ยังไม่ทำ\" ถ้ายังไม่พร้อม."
+    },
+    {
+      "kind": "paragraph",
+      "text": "⚠️ OVERCLAIM GUARD (binding): the T3 posture is explicitly \"approval gate + audit + restricted, or don't yet.\" Never say \"AI autonomously deploys/fixes prod.\" Every state change is framed agent proposes → human/gate approves → logged. [CHIP-7]"
+    }
+  ],
+  "attribution": "Course: Agentic AI & Secure Implementation for Banking IT Teams (KTB) Session: S5 · 15:45–16:30 (45 min) · closing / synthesis session Role of this session: S1 showed what agentic AI is, S2 how to control it, S3 what goes wrong, S4 the OWASP failure modes on SecureBank Mini. S5 is the synthesis — tu",
+  "cheatsheet": [
+    "T1 · Low: summarize logs, draft unit tests",
+    "T2 · Medium: secure code review, RCA suggestions",
+    "T3 · High: anything touching customer data, money, or prod writes"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for session 5, \"T1 · Low\" is described as:",
+      "choices": {
+        "A": "secure code review, RCA suggestions",
+        "B": "summarize logs, draft unit tests",
+        "C": "anything touching customer data, money, or prod writes",
+        "D": "what surrounds the whole thing"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: T1 · Low: summarize logs, draft unit tests"
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for session 5, \"T2 · Medium\" is described as:",
+      "choices": {
+        "A": "secure code review, RCA suggestions",
+        "B": "summarize logs, draft unit tests",
+        "C": "anything touching customer data, money, or prod writes",
+        "D": "LLM01:2025 Prompt Injection [CHIP-1]"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The study guide states: T2 · Medium: secure code review, RCA suggestions"
+    },
+    {
+      "id": "q3",
+      "prompt": "In the study guide for session 5, \"T3 · High\" is described as:",
+      "choices": {
+        "A": "secure code review, RCA suggestions",
+        "B": "anything touching customer data, money, or prod writes",
+        "C": "summarize logs, draft unit tests",
+        "D": "constrain shape, length, type before the model sees it."
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: T3 · High: anything touching customer data, money, or prod writes"
+    },
+    {
+      "id": "q4",
+      "prompt": "Which term does the study guide for session 5 define as: \"summarize logs, draft unit tests\"?",
+      "choices": {
+        "A": "T3 · High",
+        "B": "T2 · Medium",
+        "C": "T1 · Low",
+        "D": "Rollback"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The study guide states: T1 · Low: summarize logs, draft unit tests"
+    }
+  ]
+}

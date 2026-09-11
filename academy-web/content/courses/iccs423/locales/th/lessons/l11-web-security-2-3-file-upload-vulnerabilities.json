@@ -1,0 +1,108 @@
+{
+  "nodeId": "l11-web-security-2-3-file-upload-vulnerabilities",
+  "locale": "th",
+  "title": "3. File Upload Vulnerabilities",
+  "objective": "Study-guide review — ICCS423 v2 — L11: Web Security 2 (XSS · CSRF · Files · SSRF · API · Proactive Controls): 3. File Upload Vulnerabilities.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "Common Bypasses"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Extension blocklist bypass — shell.php.jpg, shell.PhP, shell.php5, shell.phtml",
+        "MIME type spoofing — set Content-Type: image/png while uploading PHP",
+        "Magic byte injection — prepend valid PNG header to a PHP file",
+        "Path traversal in filename — ../../var/www/html/shell.php",
+        "Polyglots — file is valid PNG and valid PHP"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Defenses (combine all)"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Allowlist extensions — never blocklist",
+        "Validate magic bytes server-side — file command or library, not user-supplied MIME",
+        "Rename uploads to UUIDs — strip user filename entirely",
+        "Store outside webroot OR serve via separate domain with Content-Disposition: attachment",
+        "Disable script execution in upload directory — Apache php_admin_flag engine off",
+        "Scan with ClamAV",
+        "Size limits — both at app and reverse proxy"
+      ],
+      "ordered": true
+    }
+  ],
+  "attribution": "Course: ICCS423 | Source: Thoth Library + RAG | Target: 3rd-4th year CS | Date: 2026-05-03",
+  "cheatsheet": [
+    "Extension blocklist bypass: shell.php.jpg, shell.PhP, shell.php5, shell.phtml",
+    "MIME type spoofing: set Content-Type: image/png while uploading PHP",
+    "Magic byte injection: prepend valid PNG header to a PHP file",
+    "Path traversal in filename: ../../var/www/html/shell.php",
+    "Polyglots: file is valid PNG and valid PHP",
+    "Allowlist extensions: never blocklist",
+    "Validate magic bytes server-side: file command or library, not user-supplied MIME",
+    "Rename uploads to UUIDs: strip user filename entirely"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for L11 Web Security 2, \"Extension blocklist bypass\" is described as:",
+      "choices": {
+        "A": "prepend valid PNG header to a PHP file",
+        "B": "file command or library, not user-supplied MIME",
+        "C": "set Content-Type: image/png while uploading PHP",
+        "D": "shell.php.jpg, shell.PhP, shell.php5, shell.phtml"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The study guide states: Extension blocklist bypass — shell.php.jpg, shell.PhP, shell.php5, shell.phtml"
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for L11 Web Security 2, \"MIME type spoofing\" is described as:",
+      "choices": {
+        "A": "prepend valid PNG header to a PHP file",
+        "B": "set Content-Type: image/png while uploading PHP",
+        "C": "shell.php.jpg, shell.PhP, shell.php5, shell.phtml",
+        "D": "file command or library, not user-supplied MIME"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: MIME type spoofing — set Content-Type: image/png while uploading PHP"
+    },
+    {
+      "id": "q3",
+      "prompt": "In the study guide for L11 Web Security 2, \"Magic byte injection\" is described as:",
+      "choices": {
+        "A": "Apache php_admin_flag engine off",
+        "B": "prepend valid PNG header to a PHP file",
+        "C": "file is valid PNG and valid PHP",
+        "D": "set Content-Type: image/png while uploading PHP"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: Magic byte injection — prepend valid PNG header to a PHP file"
+    },
+    {
+      "id": "q4",
+      "prompt": "In the study guide for L11 Web Security 2, \"Path traversal in filename\" is described as:",
+      "choices": {
+        "A": "strip user filename entirely",
+        "B": "../../var/www/html/shell.php",
+        "C": "both at app and reverse proxy",
+        "D": "file is valid PNG and valid PHP"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: Path traversal in filename — ../../var/www/html/shell.php"
+    }
+  ]
+}

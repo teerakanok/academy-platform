@@ -1,0 +1,263 @@
+{
+  "nodeId": "d4-automation-cryptography-data-protection-lesson-4d-crypt",
+  "locale": "th",
+  "title": "Lesson 4D — Cryptographic Concepts",
+  "objective": "Study-guide review — Day 4 — Automation, Cryptography, and Data Protection: Lesson 4D — Cryptographic Concepts.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "Post-Quantum Cryptography"
+    },
+    {
+      "kind": "paragraph",
+      "text": "The official source includes post-quantum cryptography as an advanced cryptographic concept. For SecurityX, the teaching focus is migration and risk planning, not deep math. Students should recognize that future quantum capability can affect current cryptographic choices and long-lived data protection."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Conservative design points:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Inventory cryptographic dependencies.",
+        "Track where long-lived confidentiality matters.",
+        "Prefer algorithm agility.",
+        "Plan migration and compatibility.",
+        "Avoid inventing unsupported timelines or algorithm claims."
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Source: CertMaster Study Lesson 4D; M04 slide \"Post-Quantum Cryptography\"."
+    },
+    {
+      "kind": "heading",
+      "text": "Key Stretching, Key Splitting, and Envelope Encryption"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Key stretching makes password-derived keys more resistant to guessing by increasing computational work. Key splitting separates knowledge or control so no single party has the full key. Envelope encryption uses a data encryption key for data and protects that key with a higher-level key."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Decision cues:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Password-derived secret: key stretching.",
+        "Need split control or separation of duties: key splitting.",
+        "Large-scale data encryption with managed key wrapping: envelope encryption."
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Source: CertMaster Study Lesson 4D; M04 slide \"Key Stretching, Key Splitting, and Envelope Encryption\"."
+    },
+    {
+      "kind": "heading",
+      "text": "Homomorphic Encryption and Secure Multiparty Computation"
+    },
+    {
+      "kind": "paragraph",
+      "text": "The official source includes homomorphic encryption and secure multiparty computation. Teach them as specialized privacy-preserving computation techniques, not general replacements for normal encryption. They are selected when computation must occur without revealing underlying sensitive inputs."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Exam trap: do not choose advanced crypto because it sounds stronger. Choose it only when the scenario requires the property it provides."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Source: CertMaster Study Lesson 4D; M04 slide \"Homomorphic Encryption and Secure Multiparty Computation\"."
+    },
+    {
+      "kind": "heading",
+      "text": "Forward Secrecy, Mutual Authentication, and AEAD"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Forward secrecy protects past sessions from later compromise of long-term keys. Mutual authentication verifies both communicating parties. AEAD combines encryption with authentication/integrity protection for associated data."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Mapping:"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Requirement",
+        "Concept"
+      ],
+      "rows": [
+        [
+          "Past sessions remain protected after long-term key compromise",
+          "Forward secrecy"
+        ],
+        [
+          "Both client and server prove identity",
+          "Mutual authentication"
+        ],
+        [
+          "Confidentiality and integrity in one construction",
+          "AEAD"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Source: CertMaster Study Lesson 4D; M04 slide \"Forward Secrecy, Mutual Authentication, and AEAD\"."
+    },
+    {
+      "kind": "heading",
+      "text": "Performance vs Security"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Cryptographic controls have performance and operational costs. Stronger or more complex cryptography can increase CPU use, latency, key-management overhead, and troubleshooting complexity. SecurityX questions often ask for the appropriate control, not the strongest-sounding control."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Source: CertMaster Study Lesson 4D; M04 slide \"Cryptographic Performance vs. Security\"."
+    },
+    {
+      "kind": "heading",
+      "text": "Data Security States"
+    },
+    {
+      "kind": "paragraph",
+      "text": "The official source includes data at rest, in transit, and in use. Each state needs different controls:"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "State",
+        "Meaning",
+        "Typical controls"
+      ],
+      "rows": [
+        [
+          "At rest",
+          "Stored data",
+          "Storage/database/file encryption, access control, key management"
+        ],
+        [
+          "In transit",
+          "Moving across networks",
+          "TLS, VPN, mutual authentication where appropriate"
+        ],
+        [
+          "In use",
+          "Being processed",
+          "Access control, memory protection, or privacy-preserving computation methods where the requirement justifies them"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Source: CertMaster Study Lesson 4D; M04 slide \"Data Security States\"."
+    },
+    {
+      "kind": "heading",
+      "text": "Blockchain, Immutable Records, Provenance, and Integrity"
+    },
+    {
+      "kind": "paragraph",
+      "text": "The official slides include blockchain/immutable records, software integrity, provenance, data integrity, and authenticity. Teach the practical decision: immutable records can support tamper evidence, but they do not automatically solve trust, privacy, performance, or legal requirements. Software provenance helps prove where code and artifacts came from."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Controls:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Code signing.",
+        "Artifact signing.",
+        "Build provenance.",
+        "Dependency or artifact inventory where required.",
+        "Immutable logs where tamper evidence is needed.",
+        "Key protection for signing keys."
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Source: CertMaster Study Lesson 4D; M04 slides \"Blockchain and Immutable Records\", \"Software Integrity and Provenance\"."
+    },
+    {
+      "kind": "heading",
+      "text": "Legal and Resource Considerations"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Cryptographic designs may be constrained by law, regulation, export considerations, retention requirements, lawful access obligations, performance cost, and operational recoverability. Key loss can become data loss. Weak governance can turn strong encryption into an availability risk."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Source: CertMaster Study Lesson 4D; M04 slide \"Legal and Resource Considerations\"."
+    }
+  ],
+  "attribution": "Course: SecurityX CAS-005 Primary source: CertMaster Study Lessons 4C, 4D Slide source: SecurityX_M04_PPT.pptx Teaching goal: prepare students to select automation and cryptographic controls without over-trusting them.",
+  "cheatsheet": [
+    "Both client and server prove identity: Mutual authentication",
+    "In transit: Moving across networks",
+    "In use: Being processed"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for D4 Automation Cryptography Data Protection, \"Both client and server prove identity\" is described as:",
+      "choices": {
+        "A": "Moving across networks",
+        "B": "Mutual authentication",
+        "C": "Being processed",
+        "D": "Platform attestation"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: Both client and server prove identity: Mutual authentication"
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for D4 Automation Cryptography Data Protection, \"In transit\" is described as:",
+      "choices": {
+        "A": "Moving across networks",
+        "B": "Mutual authentication",
+        "C": "Being processed",
+        "D": "Mutual authentication"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The study guide states: In transit: Moving across networks"
+    },
+    {
+      "id": "q3",
+      "prompt": "In the study guide for D4 Automation Cryptography Data Protection, \"In use\" is described as:",
+      "choices": {
+        "A": "Mutual authentication",
+        "B": "Being processed",
+        "C": "Moving across networks",
+        "D": "Forward secrecy"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: In use: Being processed"
+    },
+    {
+      "id": "q4",
+      "prompt": "Which term does the study guide for D4 Automation Cryptography Data Protection define as: \"Mutual authentication\"?",
+      "choices": {
+        "A": "Both client and server prove identity",
+        "B": "In transit",
+        "C": "\"Past sessions safe after key compromise\"",
+        "D": "\"Compute without revealing inputs\""
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The study guide states: Both client and server prove identity: Mutual authentication"
+    }
+  ]
+}

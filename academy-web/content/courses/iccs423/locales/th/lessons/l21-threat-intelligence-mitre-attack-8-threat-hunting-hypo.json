@@ -1,0 +1,117 @@
+{
+  "nodeId": "l21-threat-intelligence-mitre-attack-8-threat-hunting-hypo",
+  "locale": "th",
+  "title": "8. Threat Hunting — Hypothesis-Driven",
+  "objective": "Study-guide review — ICCS423 v2 — L21: Threat Intelligence & MITRE ATT&CK: 8. Threat Hunting — Hypothesis-Driven.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "Threat hunting is proactive search for adversaries already inside, before alerts fire."
+    },
+    {
+      "kind": "heading",
+      "text": "Hypothesis-driven approach"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Form hypothesis based on threat intel (e.g., \"APT28 uses scheduled tasks for persistence — do we have any anomalous scheduled tasks?\")",
+        "Collect data — query SIEM/EDR for the indicators of the technique",
+        "Analyze — separate normal from suspicious",
+        "Investigate findings — escalate to IR or document as benign",
+        "Convert to detection — if you find anomalies, build a SIEM rule so future occurrences alert automatically"
+      ],
+      "ordered": true
+    },
+    {
+      "kind": "heading",
+      "text": "Hunt for TTPs, not just IOCs"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Bad: \"search for IP 203.0.113.45\" (rotates daily)",
+        "Good: \"find PowerShell processes spawning cmd.exe /c with base64 args that contact non-Microsoft domains\" (TTP-level)"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Data sources"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "EDR process telemetry, Sysmon logs",
+        "Authentication logs (4624, 4625, 4648)",
+        "DNS query logs",
+        "Proxy / firewall logs",
+        "Email gateway logs"
+      ]
+    }
+  ],
+  "attribution": "Course: ICCS423 | Source: Thoth + RAG | Target: 3rd-4th year CS | Date: 2026-05-03",
+  "cheatsheet": [
+    "Collect data: query SIEM/EDR for the indicators of the technique",
+    "Analyze: separate normal from suspicious",
+    "Investigate findings: escalate to IR or document as benign",
+    "Convert to detection: if you find anomalies, build a SIEM rule so future occurrences alert automatically"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for L21 Threat Intelligence MITRE ATTACK, \"Collect data\" is described as:",
+      "choices": {
+        "A": "query SIEM/EDR for the indicators of the technique",
+        "B": "escalate to IR or document as benign",
+        "C": "separate normal from suspicious",
+        "D": "if you find anomalies, build a SIEM rule so future occurrences alert automatically"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The study guide states: Collect data — query SIEM/EDR for the indicators of the technique"
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for L21 Threat Intelligence MITRE ATTACK, \"Analyze\" is described as:",
+      "choices": {
+        "A": "separate normal from suspicious",
+        "B": "escalate to IR or document as benign",
+        "C": "query SIEM/EDR for the indicators of the technique",
+        "D": "if you find anomalies, build a SIEM rule so future occurrences alert automatically"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The study guide states: Analyze — separate normal from suspicious"
+    },
+    {
+      "id": "q3",
+      "prompt": "In the study guide for L21 Threat Intelligence MITRE ATTACK, \"Investigate findings\" is described as:",
+      "choices": {
+        "A": "escalate to IR or document as benign",
+        "B": "if you find anomalies, build a SIEM rule so future occurrences alert automatically",
+        "C": "query SIEM/EDR for the indicators of the technique",
+        "D": "separate normal from suspicious"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The study guide states: Investigate findings — escalate to IR or document as benign"
+    },
+    {
+      "id": "q4",
+      "prompt": "In the study guide for L21 Threat Intelligence MITRE ATTACK, \"Convert to detection\" is described as:",
+      "choices": {
+        "A": "if you find anomalies, build a SIEM rule so future occurrences alert automatically",
+        "B": "separate normal from suspicious",
+        "C": "escalate to IR or document as benign",
+        "D": "query SIEM/EDR for the indicators of the technique"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The study guide states: Convert to detection — if you find anomalies, build a SIEM rule so future occurrences alert automatically"
+    }
+  ]
+}

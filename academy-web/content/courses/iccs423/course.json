@@ -1,0 +1,618 @@
+{
+  "id": "iccs423",
+  "slug": "iccs423",
+  "version": "0.1.0",
+  "publicAvailability": "internal",
+  "defaultLocale": "en",
+  "availableLocales": [
+    "en",
+    "th"
+  ],
+  "level": "intermediate",
+  "estimatedMinutes": 303,
+  "coverMotif": "layers",
+  "skills": [
+    {
+      "id": "l06-security-principles-mindset",
+      "maxScore": 100
+    },
+    {
+      "id": "l07-cryptography-1",
+      "maxScore": 100
+    },
+    {
+      "id": "l08-cryptography-2",
+      "maxScore": 100
+    },
+    {
+      "id": "l09-threat-landscape-malware-ethics",
+      "maxScore": 100
+    },
+    {
+      "id": "l10-web-security-1",
+      "maxScore": 100
+    },
+    {
+      "id": "l11-web-security-2",
+      "maxScore": 100
+    },
+    {
+      "id": "l12-recon-scanning-network-attacks",
+      "maxScore": 100
+    },
+    {
+      "id": "l13-exploitation-basics",
+      "maxScore": 100
+    },
+    {
+      "id": "l14-privilege-escalation",
+      "maxScore": 100
+    },
+    {
+      "id": "l16-security-architecture",
+      "maxScore": 100
+    },
+    {
+      "id": "l18-digital-forensics",
+      "maxScore": 100
+    },
+    {
+      "id": "l19-security-monitoring-siem",
+      "maxScore": 100
+    },
+    {
+      "id": "l20-incident-response",
+      "maxScore": 100
+    },
+    {
+      "id": "l21-threat-intelligence-mitre-attack",
+      "maxScore": 100
+    },
+    {
+      "id": "l22-ctf-skills-exam3-prep",
+      "maxScore": 100
+    }
+  ],
+  "globalSkillWeights": {
+    "foundations": 1
+  },
+  "nodes": [
+    {
+      "id": "l06-security-principles-mindset-1-the-cia-triad-a-id-the-c",
+      "kind": "lesson",
+      "prerequisites": [],
+      "estimatedMinutes": 6,
+      "skillWeights": {
+        "l06-security-principles-mindset": 4
+      }
+    },
+    {
+      "id": "l06-security-principles-mindset-2-iaaa-non-repudiation-a-i",
+      "kind": "lesson",
+      "prerequisites": [
+        "l06-security-principles-mindset-1-the-cia-triad-a-id-the-c"
+      ],
+      "estimatedMinutes": 6,
+      "skillWeights": {
+        "l06-security-principles-mindset": 4
+      }
+    },
+    {
+      "id": "l06-security-principles-mindset-3-saltzer-and-schroeder-8",
+      "kind": "lesson",
+      "prerequisites": [
+        "l06-security-principles-mindset-2-iaaa-non-repudiation-a-i"
+      ],
+      "estimatedMinutes": 6,
+      "skillWeights": {
+        "l06-security-principles-mindset": 4
+      }
+    },
+    {
+      "id": "l06-security-principles-mindset-5-security-controls-2d-cla",
+      "kind": "capstone",
+      "prerequisites": [
+        "l06-security-principles-mindset-3-saltzer-and-schroeder-8"
+      ],
+      "estimatedMinutes": 6,
+      "skillWeights": {
+        "l06-security-principles-mindset": 4
+      }
+    },
+    {
+      "id": "l07-cryptography-1-3-des-3des-aes-a-id-aes-a",
+      "kind": "lesson",
+      "prerequisites": [
+        "l06-security-principles-mindset-5-security-controls-2d-cla"
+      ],
+      "estimatedMinutes": 6,
+      "skillWeights": {
+        "l07-cryptography-1": 4
+      }
+    },
+    {
+      "id": "l07-cryptography-1-5-hash-functions-a-id-hashing-a",
+      "kind": "capstone",
+      "prerequisites": [
+        "l07-cryptography-1-3-des-3des-aes-a-id-aes-a"
+      ],
+      "estimatedMinutes": 7,
+      "skillWeights": {
+        "l07-cryptography-1": 4
+      }
+    },
+    {
+      "id": "l08-cryptography-2-1-asymmetric-cryptography-a-id-asymmetr",
+      "kind": "lesson",
+      "prerequisites": [
+        "l07-cryptography-1-5-hash-functions-a-id-hashing-a"
+      ],
+      "estimatedMinutes": 6,
+      "skillWeights": {
+        "l08-cryptography-2": 4
+      }
+    },
+    {
+      "id": "l08-cryptography-2-4-pki-the-trust-framework-a-id-pki-a",
+      "kind": "lesson",
+      "prerequisites": [
+        "l08-cryptography-2-1-asymmetric-cryptography-a-id-asymmetr"
+      ],
+      "estimatedMinutes": 6,
+      "skillWeights": {
+        "l08-cryptography-2": 4
+      }
+    },
+    {
+      "id": "l08-cryptography-2-5-x-509-certificate-anatomy-a-id-x509-a",
+      "kind": "lesson",
+      "prerequisites": [
+        "l08-cryptography-2-4-pki-the-trust-framework-a-id-pki-a"
+      ],
+      "estimatedMinutes": 6,
+      "skillWeights": {
+        "l08-cryptography-2": 4
+      }
+    },
+    {
+      "id": "l08-cryptography-2-7-digital-signatures-a-id-signatures-a",
+      "kind": "capstone",
+      "prerequisites": [
+        "l08-cryptography-2-5-x-509-certificate-anatomy-a-id-x509-a"
+      ],
+      "estimatedMinutes": 6,
+      "skillWeights": {
+        "l08-cryptography-2": 4
+      }
+    },
+    {
+      "id": "l09-threat-landscape-malware-ethics-7-persistence-and-evas",
+      "kind": "lesson",
+      "prerequisites": [
+        "l08-cryptography-2-7-digital-signatures-a-id-signatures-a"
+      ],
+      "estimatedMinutes": 6,
+      "skillWeights": {
+        "l09-threat-landscape-malware-ethics": 4
+      }
+    },
+    {
+      "id": "l09-threat-landscape-malware-ethics-9-thai-law-snapshot-a",
+      "kind": "capstone",
+      "prerequisites": [
+        "l09-threat-landscape-malware-ethics-7-persistence-and-evas"
+      ],
+      "estimatedMinutes": 8,
+      "skillWeights": {
+        "l09-threat-landscape-malware-ethics": 4
+      }
+    },
+    {
+      "id": "l10-web-security-1-2-sql-injection-a03",
+      "kind": "lesson",
+      "prerequisites": [
+        "l09-threat-landscape-malware-ethics-9-thai-law-snapshot-a"
+      ],
+      "estimatedMinutes": 6,
+      "skillWeights": {
+        "l10-web-security-1": 4
+      }
+    },
+    {
+      "id": "l10-web-security-1-3-authentication-attacks-a07",
+      "kind": "lesson",
+      "prerequisites": [
+        "l10-web-security-1-2-sql-injection-a03"
+      ],
+      "estimatedMinutes": 6,
+      "skillWeights": {
+        "l10-web-security-1": 4
+      }
+    },
+    {
+      "id": "l10-web-security-1-4-broken-access-control-a01",
+      "kind": "lesson",
+      "prerequisites": [
+        "l10-web-security-1-3-authentication-attacks-a07"
+      ],
+      "estimatedMinutes": 6,
+      "skillWeights": {
+        "l10-web-security-1": 4
+      }
+    },
+    {
+      "id": "l10-web-security-1-5-session-management",
+      "kind": "capstone",
+      "prerequisites": [
+        "l10-web-security-1-4-broken-access-control-a01"
+      ],
+      "estimatedMinutes": 7,
+      "skillWeights": {
+        "l10-web-security-1": 4
+      }
+    },
+    {
+      "id": "l11-web-security-2-1-cross-site-scripting-xss",
+      "kind": "lesson",
+      "prerequisites": [
+        "l10-web-security-1-5-session-management"
+      ],
+      "estimatedMinutes": 6,
+      "skillWeights": {
+        "l11-web-security-2": 4
+      }
+    },
+    {
+      "id": "l11-web-security-2-2-csrf-cross-site-request-forgery",
+      "kind": "lesson",
+      "prerequisites": [
+        "l11-web-security-2-1-cross-site-scripting-xss"
+      ],
+      "estimatedMinutes": 6,
+      "skillWeights": {
+        "l11-web-security-2": 4
+      }
+    },
+    {
+      "id": "l11-web-security-2-3-file-upload-vulnerabilities",
+      "kind": "lesson",
+      "prerequisites": [
+        "l11-web-security-2-2-csrf-cross-site-request-forgery"
+      ],
+      "estimatedMinutes": 6,
+      "skillWeights": {
+        "l11-web-security-2": 4
+      }
+    },
+    {
+      "id": "l11-web-security-2-4-server-side-request-forgery-ssrf",
+      "kind": "lesson",
+      "prerequisites": [
+        "l11-web-security-2-3-file-upload-vulnerabilities"
+      ],
+      "estimatedMinutes": 6,
+      "skillWeights": {
+        "l11-web-security-2": 4
+      }
+    },
+    {
+      "id": "l11-web-security-2-5-api-security",
+      "kind": "capstone",
+      "prerequisites": [
+        "l11-web-security-2-4-server-side-request-forgery-ssrf"
+      ],
+      "estimatedMinutes": 7,
+      "skillWeights": {
+        "l11-web-security-2": 4
+      }
+    },
+    {
+      "id": "l12-recon-scanning-network-attacks-1-pentest-methodology-o",
+      "kind": "lesson",
+      "prerequisites": [
+        "l11-web-security-2-5-api-security"
+      ],
+      "estimatedMinutes": 6,
+      "skillWeights": {
+        "l12-recon-scanning-network-attacks": 4
+      }
+    },
+    {
+      "id": "l12-recon-scanning-network-attacks-2-passive-reconnaissanc",
+      "kind": "lesson",
+      "prerequisites": [
+        "l12-recon-scanning-network-attacks-1-pentest-methodology-o"
+      ],
+      "estimatedMinutes": 6,
+      "skillWeights": {
+        "l12-recon-scanning-network-attacks": 4
+      }
+    },
+    {
+      "id": "l12-recon-scanning-network-attacks-3-active-reconnaissance",
+      "kind": "capstone",
+      "prerequisites": [
+        "l12-recon-scanning-network-attacks-2-passive-reconnaissanc"
+      ],
+      "estimatedMinutes": 7,
+      "skillWeights": {
+        "l12-recon-scanning-network-attacks": 4
+      }
+    },
+    {
+      "id": "l13-exploitation-basics-1-cve-system",
+      "kind": "lesson",
+      "prerequisites": [
+        "l12-recon-scanning-network-attacks-3-active-reconnaissance"
+      ],
+      "estimatedMinutes": 6,
+      "skillWeights": {
+        "l13-exploitation-basics": 4
+      }
+    },
+    {
+      "id": "l13-exploitation-basics-2-cvss-scoring",
+      "kind": "lesson",
+      "prerequisites": [
+        "l13-exploitation-basics-1-cve-system"
+      ],
+      "estimatedMinutes": 6,
+      "skillWeights": {
+        "l13-exploitation-basics": 4
+      }
+    },
+    {
+      "id": "l13-exploitation-basics-3-vulnerability-lifecycle",
+      "kind": "lesson",
+      "prerequisites": [
+        "l13-exploitation-basics-2-cvss-scoring"
+      ],
+      "estimatedMinutes": 6,
+      "skillWeights": {
+        "l13-exploitation-basics": 4
+      }
+    },
+    {
+      "id": "l13-exploitation-basics-4-metasploit-framework",
+      "kind": "lesson",
+      "prerequisites": [
+        "l13-exploitation-basics-3-vulnerability-lifecycle"
+      ],
+      "estimatedMinutes": 6,
+      "skillWeights": {
+        "l13-exploitation-basics": 4
+      }
+    },
+    {
+      "id": "l13-exploitation-basics-7-patch-management-first-line-of-d",
+      "kind": "capstone",
+      "prerequisites": [
+        "l13-exploitation-basics-4-metasploit-framework"
+      ],
+      "estimatedMinutes": 7,
+      "skillWeights": {
+        "l13-exploitation-basics": 4
+      }
+    },
+    {
+      "id": "l20-incident-response-2-nist-ir-lifecycle-sp-800-61",
+      "kind": "lesson",
+      "prerequisites": [
+        "l13-exploitation-basics-7-patch-management-first-line-of-d"
+      ],
+      "estimatedMinutes": 6,
+      "skillWeights": {
+        "l20-incident-response": 4
+      }
+    },
+    {
+      "id": "l20-incident-response-3-phase-1-preparation",
+      "kind": "lesson",
+      "prerequisites": [
+        "l20-incident-response-2-nist-ir-lifecycle-sp-800-61"
+      ],
+      "estimatedMinutes": 6,
+      "skillWeights": {
+        "l20-incident-response": 4
+      }
+    },
+    {
+      "id": "l20-incident-response-5-phase-3-containment-eradication-re",
+      "kind": "lesson",
+      "prerequisites": [
+        "l20-incident-response-3-phase-1-preparation"
+      ],
+      "estimatedMinutes": 6,
+      "skillWeights": {
+        "l20-incident-response": 4
+      }
+    },
+    {
+      "id": "l20-incident-response-6-phase-4-post-incident-activity",
+      "kind": "lesson",
+      "prerequisites": [
+        "l20-incident-response-5-phase-3-containment-eradication-re"
+      ],
+      "estimatedMinutes": 6,
+      "skillWeights": {
+        "l20-incident-response": 4
+      }
+    },
+    {
+      "id": "l20-incident-response-7-ransomware-playbook-walkthrough",
+      "kind": "lesson",
+      "prerequisites": [
+        "l20-incident-response-6-phase-4-post-incident-activity"
+      ],
+      "estimatedMinutes": 6,
+      "skillWeights": {
+        "l20-incident-response": 4
+      }
+    },
+    {
+      "id": "l20-incident-response-8-communication-and-legal-obligation",
+      "kind": "capstone",
+      "prerequisites": [
+        "l20-incident-response-7-ransomware-playbook-walkthrough"
+      ],
+      "estimatedMinutes": 6,
+      "skillWeights": {
+        "l20-incident-response": 4
+      }
+    },
+    {
+      "id": "l21-threat-intelligence-mitre-attack-1-what-is-threat-inte",
+      "kind": "lesson",
+      "prerequisites": [
+        "l20-incident-response-8-communication-and-legal-obligation"
+      ],
+      "estimatedMinutes": 6,
+      "skillWeights": {
+        "l21-threat-intelligence-mitre-attack": 4
+      }
+    },
+    {
+      "id": "l21-threat-intelligence-mitre-attack-3-ioc-vs-ttp-pyramid",
+      "kind": "lesson",
+      "prerequisites": [
+        "l21-threat-intelligence-mitre-attack-1-what-is-threat-inte"
+      ],
+      "estimatedMinutes": 6,
+      "skillWeights": {
+        "l21-threat-intelligence-mitre-attack": 4
+      }
+    },
+    {
+      "id": "l21-threat-intelligence-mitre-attack-5-mitre-att-and-ck-st",
+      "kind": "lesson",
+      "prerequisites": [
+        "l21-threat-intelligence-mitre-attack-3-ioc-vs-ttp-pyramid"
+      ],
+      "estimatedMinutes": 6,
+      "skillWeights": {
+        "l21-threat-intelligence-mitre-attack": 4
+      }
+    },
+    {
+      "id": "l21-threat-intelligence-mitre-attack-6-att-and-ck-navigato",
+      "kind": "lesson",
+      "prerequisites": [
+        "l21-threat-intelligence-mitre-attack-5-mitre-att-and-ck-st"
+      ],
+      "estimatedMinutes": 6,
+      "skillWeights": {
+        "l21-threat-intelligence-mitre-attack": 4
+      }
+    },
+    {
+      "id": "l21-threat-intelligence-mitre-attack-7-virustotal-hash-loo",
+      "kind": "lesson",
+      "prerequisites": [
+        "l21-threat-intelligence-mitre-attack-6-att-and-ck-navigato"
+      ],
+      "estimatedMinutes": 6,
+      "skillWeights": {
+        "l21-threat-intelligence-mitre-attack": 4
+      }
+    },
+    {
+      "id": "l21-threat-intelligence-mitre-attack-8-threat-hunting-hypo",
+      "kind": "lesson",
+      "prerequisites": [
+        "l21-threat-intelligence-mitre-attack-7-virustotal-hash-loo"
+      ],
+      "estimatedMinutes": 6,
+      "skillWeights": {
+        "l21-threat-intelligence-mitre-attack": 4
+      }
+    },
+    {
+      "id": "l21-threat-intelligence-mitre-attack-9-apt-case-study-apt2",
+      "kind": "capstone",
+      "prerequisites": [
+        "l21-threat-intelligence-mitre-attack-8-threat-hunting-hypo"
+      ],
+      "estimatedMinutes": 7,
+      "skillWeights": {
+        "l21-threat-intelligence-mitre-attack": 4
+      }
+    },
+    {
+      "id": "l22-ctf-skills-exam3-prep-1-what-is-a-ctf",
+      "kind": "lesson",
+      "prerequisites": [
+        "l21-threat-intelligence-mitre-attack-9-apt-case-study-apt2"
+      ],
+      "estimatedMinutes": 6,
+      "skillWeights": {
+        "l22-ctf-skills-exam3-prep": 4
+      }
+    },
+    {
+      "id": "l22-ctf-skills-exam3-prep-2-ctf-methodology",
+      "kind": "lesson",
+      "prerequisites": [
+        "l22-ctf-skills-exam3-prep-1-what-is-a-ctf"
+      ],
+      "estimatedMinutes": 6,
+      "skillWeights": {
+        "l22-ctf-skills-exam3-prep": 4
+      }
+    },
+    {
+      "id": "l22-ctf-skills-exam3-prep-3-web-ctf-skills",
+      "kind": "lesson",
+      "prerequisites": [
+        "l22-ctf-skills-exam3-prep-2-ctf-methodology"
+      ],
+      "estimatedMinutes": 6,
+      "skillWeights": {
+        "l22-ctf-skills-exam3-prep": 4
+      }
+    },
+    {
+      "id": "l22-ctf-skills-exam3-prep-4-crypto-ctf-skills",
+      "kind": "lesson",
+      "prerequisites": [
+        "l22-ctf-skills-exam3-prep-3-web-ctf-skills"
+      ],
+      "estimatedMinutes": 6,
+      "skillWeights": {
+        "l22-ctf-skills-exam3-prep": 4
+      }
+    },
+    {
+      "id": "l22-ctf-skills-exam3-prep-5-forensics-ctf-skills",
+      "kind": "lesson",
+      "prerequisites": [
+        "l22-ctf-skills-exam3-prep-4-crypto-ctf-skills"
+      ],
+      "estimatedMinutes": 6,
+      "skillWeights": {
+        "l22-ctf-skills-exam3-prep": 4
+      }
+    },
+    {
+      "id": "l22-ctf-skills-exam3-prep-7-log-analysis-for-ctf-exam-3",
+      "kind": "lesson",
+      "prerequisites": [
+        "l22-ctf-skills-exam3-prep-5-forensics-ctf-skills"
+      ],
+      "estimatedMinutes": 6,
+      "skillWeights": {
+        "l22-ctf-skills-exam3-prep": 4
+      }
+    },
+    {
+      "id": "l22-ctf-skills-exam3-prep-8-exam-3-format-preview",
+      "kind": "capstone",
+      "prerequisites": [
+        "l22-ctf-skills-exam3-prep-7-log-analysis-for-ctf-exam-3"
+      ],
+      "estimatedMinutes": 7,
+      "skillWeights": {
+        "l22-ctf-skills-exam3-prep": 4
+      }
+    }
+  ]
+}

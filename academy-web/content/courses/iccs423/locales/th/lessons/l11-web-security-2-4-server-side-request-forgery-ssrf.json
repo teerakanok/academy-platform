@@ -1,0 +1,124 @@
+{
+  "nodeId": "l11-web-security-2-4-server-side-request-forgery-ssrf",
+  "locale": "th",
+  "title": "4. Server-Side Request Forgery (SSRF)",
+  "objective": "Study-guide review — ICCS423 v2 — L11: Web Security 2 (XSS · CSRF · Files · SSRF · API · Proactive Controls): 4. Server-Side Request Forgery (SSRF).",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "What SSRF Does"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Server fetches a URL the attacker controls → server becomes a confused deputy reaching internal resources",
+        "Attack surface: webhook URLs, \"import from URL\", PDF generators, image proxies, any param ending in _url"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Cloud Metadata Endpoint (Critical)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "``bash # AWS IMDSv1 — no auth required! http://169.254.169.254/latest/meta-data/iam/security-credentials/<role-name> # → returns AWS access keys → full cloud takeover ``"
+    },
+    {
+      "kind": "heading",
+      "text": "Bypass Tricks (filter evasion)"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "IP encoding: 127.0.0.1 → 2130706433 (decimal), 0x7f000001 (hex), 127.1 (short)",
+        "IPv6 loopback: [::1], [::ffff:127.0.0.1]",
+        "DNS rebinding: domain resolves to public IP first (passes check), then 127.0.0.1",
+        "URL @: https://expected.com@169.254.169.254/",
+        "Open-redirect chain through trusted host"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Defenses"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "URL allowlist (preferred over blocklist)",
+        "Resolve hostname → check IP isn't private/loopback/link-local — block 10/8, 172.16/12, 192.168/16, 127/8, 169.254/16 (AWS metadata!), fc00::/7",
+        "Disable unnecessary protocols — only https://; reject file://, gopher://, dict://",
+        "Use IMDSv2 on AWS — token-required model defeats SSRF→IMDS pivot",
+        "Network segmentation — webserver shouldn't reach metadata or internal admin services"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Real-world: Capital One (2019) — SSRF on misconfigured WAF → AWS IAM credentials → 100M records, ~$80M cost. IMDSv2 + egress restrictions would have stopped the chain."
+    }
+  ],
+  "attribution": "Course: ICCS423 | Source: Thoth Library + RAG | Target: 3rd-4th year CS | Date: 2026-05-03",
+  "cheatsheet": [
+    "Resolve hostname → check IP isn't private/loopback/link-local: block 10/8, 172.16/12, 192.168/16, 127/8, 169.254/16 (AWS metadata!), fc00::/7",
+    "Disable unnecessary protocols: only https://; reject file://, gopher://, dict://",
+    "Use IMDSv2 on AWS: token-required model defeats SSRF→IMDS pivot",
+    "Network segmentation: webserver shouldn't reach metadata or internal admin services"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for L11 Web Security 2, \"Resolve hostname → check IP isn't private/loopback/link-local\" is described as:",
+      "choices": {
+        "A": "token-required model defeats SSRF→IMDS pivot",
+        "B": "only https://; reject file://, gopher://, dict://",
+        "C": "webserver shouldn't reach metadata or internal admin services",
+        "D": "block 10/8, 172.16/12, 192.168/16, 127/8, 169.254/16 (AWS metadata!), fc00::/7"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The study guide states: Resolve hostname → check IP isn't private/loopback/link-local — block 10/8, 172.16/12, 192.168/16, 127/8, 169.254/16 (AWS metadata!), fc00::/7"
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for L11 Web Security 2, \"Disable unnecessary protocols\" is described as:",
+      "choices": {
+        "A": "token-required model defeats SSRF→IMDS pivot",
+        "B": "webserver shouldn't reach metadata or internal admin services",
+        "C": "only https://; reject file://, gopher://, dict://",
+        "D": "block 10/8, 172.16/12, 192.168/16, 127/8, 169.254/16 (AWS metadata!), fc00::/7"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The study guide states: Disable unnecessary protocols — only https://; reject file://, gopher://, dict://"
+    },
+    {
+      "id": "q3",
+      "prompt": "In the study guide for L11 Web Security 2, \"Use IMDSv2 on AWS\" is described as:",
+      "choices": {
+        "A": "block 10/8, 172.16/12, 192.168/16, 127/8, 169.254/16 (AWS metadata!), fc00::/7",
+        "B": "webserver shouldn't reach metadata or internal admin services",
+        "C": "token-required model defeats SSRF→IMDS pivot",
+        "D": "only https://; reject file://, gopher://, dict://"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The study guide states: Use IMDSv2 on AWS — token-required model defeats SSRF→IMDS pivot"
+    },
+    {
+      "id": "q4",
+      "prompt": "In the study guide for L11 Web Security 2, \"Network segmentation\" is described as:",
+      "choices": {
+        "A": "token-required model defeats SSRF→IMDS pivot",
+        "B": "block 10/8, 172.16/12, 192.168/16, 127/8, 169.254/16 (AWS metadata!), fc00::/7",
+        "C": "webserver shouldn't reach metadata or internal admin services",
+        "D": "only https://; reject file://, gopher://, dict://"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The study guide states: Network segmentation — webserver shouldn't reach metadata or internal admin services"
+    }
+  ]
+}

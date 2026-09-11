@@ -1,0 +1,130 @@
+{
+  "nodeId": "l20-incident-response-8-communication-and-legal-obligation",
+  "locale": "en",
+  "title": "8. Communication & Legal Obligations (Thailand)",
+  "objective": "Study-guide review — ICCS423 v2 — L20: Incident Response: 8. Communication & Legal Obligations (Thailand).",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "Internal Notification Chain"
+    },
+    {
+      "kind": "paragraph",
+      "text": "`` Analyst → SOC Manager / IR Lead → CISO → Legal → CEO → Communications/PR ``"
+    },
+    {
+      "kind": "heading",
+      "text": "External Notifications"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Trigger",
+        "Who to notify",
+        "Deadline"
+      ],
+      "rows": [
+        [
+          "Personal data breach",
+          "PDPC (PDPA Act 2019)",
+          "72 hours"
+        ],
+        [
+          "CII operator incident",
+          "NCSA / ThaiCERT",
+          "per Cybersecurity Act 2019"
+        ],
+        [
+          "Crime / prosecution intent",
+          "DSI / Royal Thai Police",
+          "as needed"
+        ],
+        [
+          "Affected data subjects",
+          "individuals",
+          "\"without undue delay\" if high risk"
+        ]
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Out-of-Band Communication"
+    },
+    {
+      "kind": "paragraph",
+      "text": "If email/Slack may be compromised, switch to:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Personal phones (Signal)",
+        "Pre-arranged conference bridge",
+        "Physical meeting"
+      ]
+    }
+  ],
+  "attribution": "Course: ICCS423 | Source: Thoth + RAG | Target: 3rd-4th year CS | Date: 2026-05-03",
+  "cheatsheet": [
+    "Personal data breach: PDPC (PDPA Act 2019)",
+    "CII operator incident: NCSA / ThaiCERT",
+    "Crime / prosecution intent: DSI / Royal Thai Police"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for L20 Incident Response, \"Personal data breach\" is described as:",
+      "choices": {
+        "A": "PDPC (PDPA Act 2019)",
+        "B": "DSI / Royal Thai Police",
+        "C": "NCSA / ThaiCERT",
+        "D": "why did this happen?"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The study guide states: Personal data breach: PDPC (PDPA Act 2019)"
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for L20 Incident Response, \"CII operator incident\" is described as:",
+      "choices": {
+        "A": "PDPC (PDPA Act 2019)",
+        "B": "NCSA / ThaiCERT",
+        "C": "DSI / Royal Thai Police",
+        "D": "Last resort only"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: CII operator incident: NCSA / ThaiCERT"
+    },
+    {
+      "id": "q3",
+      "prompt": "In the study guide for L20 Incident Response, \"Crime / prosecution intent\" is described as:",
+      "choices": {
+        "A": "PDPC (PDPA Act 2019)",
+        "B": "DSI / Royal Thai Police",
+        "C": "NCSA / ThaiCERT",
+        "D": "how the attacker got in"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: Crime / prosecution intent: DSI / Royal Thai Police"
+    },
+    {
+      "id": "q4",
+      "prompt": "Which term does the study guide for L20 Incident Response define as: \"PDPC (PDPA Act 2019)\"?",
+      "choices": {
+        "A": "Personal data breach",
+        "B": "CII operator incident",
+        "C": "Crime / prosecution intent",
+        "D": "Forensic tools ready"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The study guide states: Personal data breach: PDPC (PDPA Act 2019)"
+    }
+  ]
+}

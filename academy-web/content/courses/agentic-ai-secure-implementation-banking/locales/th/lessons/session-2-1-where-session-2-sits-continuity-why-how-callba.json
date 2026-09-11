@@ -1,0 +1,117 @@
+{
+  "nodeId": "session-2-1-where-session-2-sits-continuity-why-how-callba",
+  "locale": "th",
+  "title": "1. Where Session 2 sits (continuity + WHY→HOW callback)",
+  "objective": "Study-guide review — Study Guide — Session 2: Practical Agentic Workflow Controls: 1. Where Session 2 sits (continuity + WHY→HOW callback).",
+  "blocks": [
+    {
+      "kind": "table",
+      "headers": [
+        "",
+        "S1 (09:00–10:30)",
+        "S2 (10:45–12:00)",
+        "S3 (13:00)"
+      ],
+      "rows": [
+        [
+          "Question",
+          "\"What CAN an agent do?\"",
+          "\"How do we let it do that SAFELY?\"",
+          "\"What goes WRONG without this?\""
+        ],
+        [
+          "Mood",
+          "Wow / capability",
+          "Control / discipline",
+          "Risk / consequence"
+        ],
+        [
+          "Mode",
+          "Watch the agent work",
+          "Watch the governance work",
+          "Vote on scenarios"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "The hinge sentence (say it aloud; put it on the bridge slide):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "In Session 1 you saw an agent that can read code, write a fix, run tests, and summarize an incident. The same same capability can expose sensitive records or change state without authority when its scope is wrong. Session 2 is about the guardrail that makes the difference — not by slowing the agent down, but by making every action requested, approved, proven, and recorded."
+    },
+    {
+      "kind": "paragraph",
+      "text": "WHY→HOW callback (C7). S1 gave the posture — four principles: read-only first · least privilege · human-approves-writes · audit-everything. S2 is the operationalization of exactly those four principles into a named, runnable control pattern. Surface the vocabulary map here, not only at S5. [SRC: design/S2_workflow_controls.md §1; §6 callback map] [SRC: COMMITTED_SCOPE.md — S1 safe-adoption topics]"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Vocabulary map (print on the take-home one-pager; introduce verbally here). principle (the S1 posture) → control (a thing you put in place) → gate (a control that can stop an action) → proof / signal (evidence a control produces). The four S2 controls are the controls; the Approval Gate is the gate; Execution Proof and the Audit Trail are the signals. [SRC: design/RUN_OF_SHOW_v1.2_polished.md §0(a⁗′) vocabulary-reconciliation]"
+    }
+  ],
+  "attribution": "KTB · Agentic AI & Secure Implementation for Banking IT Teams Time: 10:45–12:00 (75 min) · Format: Online, instructor-led, demo-driven · ~50 participants Activity: Control Walkthrough (vendor-neutral) — Task Card → Approval Gate → Execution Proof → Audit Trail Slides: FULL ENGLISH · Spoken delivery ",
+  "cheatsheet": [
+    "Question: \"What CAN an agent do?\"",
+    "Mood: Wow / capability",
+    "Mode: Watch the agent work"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for session 2, \"Question\" is described as:",
+      "choices": {
+        "A": "Watch the agent work",
+        "B": "\"What CAN an agent do?\"",
+        "C": "Wow / capability",
+        "D": "What actually happened?"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: Question: \"What CAN an agent do?\""
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for session 2, \"Mood\" is described as:",
+      "choices": {
+        "A": "Wow / capability",
+        "B": "Watch the agent work",
+        "C": "\"What CAN an agent do?\"",
+        "D": "…/v1/BUILD_PLAN.md"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The study guide states: Mood: Wow / capability"
+    },
+    {
+      "id": "q3",
+      "prompt": "In the study guide for session 2, \"Mode\" is described as:",
+      "choices": {
+        "A": "Watch the agent work",
+        "B": "\"What CAN an agent do?\"",
+        "C": "Wow / capability",
+        "D": "agent obeys, data leak"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The study guide states: Mode: Watch the agent work"
+    },
+    {
+      "id": "q4",
+      "prompt": "Which term does the study guide for session 2 define as: \"\"What CAN an agent do?\"\"?",
+      "choices": {
+        "A": "Question",
+        "B": "Audit Trail",
+        "C": "Log triage",
+        "D": "Task Card"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The study guide states: Question: \"What CAN an agent do?\""
+    }
+  ]
+}

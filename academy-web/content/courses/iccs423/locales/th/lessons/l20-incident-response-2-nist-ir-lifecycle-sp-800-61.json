@@ -1,0 +1,119 @@
+{
+  "nodeId": "l20-incident-response-2-nist-ir-lifecycle-sp-800-61",
+  "locale": "th",
+  "title": "2. NIST IR Lifecycle (SP 800-61)",
+  "objective": "Study-guide review — ICCS423 v2 — L20: Incident Response: 2. NIST IR Lifecycle (SP 800-61).",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "NIST defines a 4-phase lifecycle (also taught as 6-phase PICERL):"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Phase",
+        "Activities",
+        "Goal"
+      ],
+      "rows": [
+        [
+          "1. Preparation",
+          "IR plan, playbooks, team training, tools, contacts",
+          "Be ready before incident"
+        ],
+        [
+          "2. Detection & Analysis",
+          "Triage alerts, classify severity, scope incident",
+          "Confirm: is this real? How bad?"
+        ],
+        [
+          "3. Containment, Eradication & Recovery",
+          "Stop spread, remove threat, restore systems",
+          "Stop, clean, restore"
+        ],
+        [
+          "4. Post-Incident Activity",
+          "Lessons learned, report, update playbooks",
+          "Don't let it happen again"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Note: NIST released SP 800-61 Rev. 3 in April 2025, which maps IR to CSF 2.0 Functions (GOVERN, IDENTIFY, PROTECT, DETECT, RESPOND, RECOVER). The phases are unchanged in practice; Rev. 3 emphasizes IR as part of risk management, not standalone."
+    },
+    {
+      "kind": "paragraph",
+      "text": "PICERL mnemonic (Rev. 2 / common SANS framing):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "`` P — Preparation I — Identification (= Detection & Analysis) C — Containment E — Eradication R — Recovery L — Lessons Learned ``"
+    }
+  ],
+  "attribution": "Course: ICCS423 | Source: Thoth + RAG | Target: 3rd-4th year CS | Date: 2026-05-03",
+  "cheatsheet": [
+    "1. Preparation: IR plan, playbooks, team training, tools, contacts",
+    "2. Detection & Analysis: Triage alerts, classify severity, scope incident",
+    "3. Containment, Eradication & Recovery: Stop spread, remove threat, restore systems",
+    "4. Post-Incident Activity: Lessons learned, report, update playbooks"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for L20 Incident Response, \"1. Preparation\" is described as:",
+      "choices": {
+        "A": "Triage alerts, classify severity, scope incident",
+        "B": "Stop spread, remove threat, restore systems",
+        "C": "IR plan, playbooks, team training, tools, contacts",
+        "D": "Lessons learned, report, update playbooks"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The study guide states: 1. Preparation: IR plan, playbooks, team training, tools, contacts"
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for L20 Incident Response, \"2. Detection & Analysis\" is described as:",
+      "choices": {
+        "A": "Triage alerts, classify severity, scope incident",
+        "B": "Lessons learned, report, update playbooks",
+        "C": "Stop spread, remove threat, restore systems",
+        "D": "IR plan, playbooks, team training, tools, contacts"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The study guide states: 2. Detection & Analysis: Triage alerts, classify severity, scope incident"
+    },
+    {
+      "id": "q3",
+      "prompt": "In the study guide for L20 Incident Response, \"3. Containment, Eradication & Recovery\" is described as:",
+      "choices": {
+        "A": "Stop spread, remove threat, restore systems",
+        "B": "Lessons learned, report, update playbooks",
+        "C": "Triage alerts, classify severity, scope incident",
+        "D": "IR plan, playbooks, team training, tools, contacts"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The study guide states: 3. Containment, Eradication & Recovery: Stop spread, remove threat, restore systems"
+    },
+    {
+      "id": "q4",
+      "prompt": "In the study guide for L20 Incident Response, \"4. Post-Incident Activity\" is described as:",
+      "choices": {
+        "A": "Lessons learned, report, update playbooks",
+        "B": "IR plan, playbooks, team training, tools, contacts",
+        "C": "Triage alerts, classify severity, scope incident",
+        "D": "Stop spread, remove threat, restore systems"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The study guide states: 4. Post-Incident Activity: Lessons learned, report, update playbooks"
+    }
+  ]
+}

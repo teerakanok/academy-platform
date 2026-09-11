@@ -1,0 +1,142 @@
+{
+  "nodeId": "l22-ctf-skills-exam3-prep-8-exam-3-format-preview",
+  "locale": "th",
+  "title": "8. Exam 3 Format Preview",
+  "objective": "Study-guide review — ICCS423 v2 — L22: CTF Skills & Exam 3 Prep: 8. Exam 3 Format Preview.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "Format (per course brief):"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Multi-source logs — you'll receive a packet of logs from different systems (firewall, auth, EDR, email gateway). Reconstruct the attack timeline.",
+        "Malware hash — given a SHA-256, look it up on VirusTotal and report:",
+        "Detection ratio",
+        "Malware family",
+        "Observed behaviors (mapped to ATT&CK techniques)",
+        "Damage assessment — based on logs + malware capability, describe what was likely accessed/exfiltrated/destroyed (per CIA: Confidentiality, Integrity, Availability)",
+        "Recommendations — concrete control improvements (technical + process)"
+      ],
+      "ordered": true
+    },
+    {
+      "kind": "heading",
+      "text": "Answer structure (suggested)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "``` Section 1 — Attack Timeline [chronological log-correlated events in UTC]"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Section 2 — Malware Hash Analysis Hash: <sha256> Detection: <X/Y engines> Family: <name> ATT&CK: <T#### list> Behaviors: <bullet list>"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Section 3 — Damage Assessment Confidentiality: <what data was accessed> Integrity: <what was modified> Availability: <what was disrupted>"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Section 4 — Recommendations Technical:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "[control 1] — [why]",
+        "[control 2] — [why]"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Process:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "[policy change] — [why]",
+        "[training] — [why]"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "```"
+    },
+    {
+      "kind": "heading",
+      "text": "Time management"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "60–90 min total → ~15 min per section",
+        "Don't skip damage assessment + recommendations (often weighted heavily)"
+      ]
+    }
+  ],
+  "attribution": "Course: ICCS423 | Source: Thoth + RAG | Target: 3rd-4th year CS | Date: 2026-05-03",
+  "cheatsheet": [
+    "Multi-source logs: you'll receive a packet of logs from different systems (firewall, auth, EDR, email gateway). Reconstruct the attack timeline.",
+    "Malware hash: given a SHA-256, look it up on VirusTotal and report:",
+    "Recommendations: concrete control improvements (technical + process)"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for L22 CTF Skills Exam3 Prep, \"Multi-source logs\" is described as:",
+      "choices": {
+        "A": "based on logs + malware capability, describe what was likely accessed/exfiltrated/destroyed (per CIA: Confidentiality, Integrity, Availability)",
+        "B": "given a SHA-256, look it up on VirusTotal and report:",
+        "C": "you'll receive a packet of logs from different systems (firewall, auth, EDR, email gateway). Reconstruct the attack timeline.",
+        "D": "concrete control improvements (technical + process)"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The study guide states: Multi-source logs — you'll receive a packet of logs from different systems (firewall, auth, EDR, email gateway). Reconstruct the attack timeline."
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for L22 CTF Skills Exam3 Prep, \"Malware hash\" is described as:",
+      "choices": {
+        "A": "based on logs + malware capability, describe what was likely accessed/exfiltrated/destroyed (per CIA: Confidentiality, Integrity, Availability)",
+        "B": "you'll receive a packet of logs from different systems (firewall, auth, EDR, email gateway). Reconstruct the attack timeline.",
+        "C": "concrete control improvements (technical + process)",
+        "D": "given a SHA-256, look it up on VirusTotal and report:"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The study guide states: Malware hash — given a SHA-256, look it up on VirusTotal and report:"
+    },
+    {
+      "id": "q3",
+      "prompt": "In the study guide for L22 CTF Skills Exam3 Prep, \"Damage assessment\" is described as:",
+      "choices": {
+        "A": "concrete control improvements (technical + process)",
+        "B": "given a SHA-256, look it up on VirusTotal and report:",
+        "C": "based on logs + malware capability, describe what was likely accessed/exfiltrated/destroyed (per CIA: Confidentiality, Integrity, Availability)",
+        "D": "you'll receive a packet of logs from different systems (firewall, auth, EDR, email gateway). Reconstruct the attack timeline."
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The study guide states: Damage assessment — based on logs + malware capability, describe what was likely accessed/exfiltrated/destroyed (per CIA: Confidentiality, Integrity, Availability)"
+    },
+    {
+      "id": "q4",
+      "prompt": "In the study guide for L22 CTF Skills Exam3 Prep, \"Recommendations\" is described as:",
+      "choices": {
+        "A": "given a SHA-256, look it up on VirusTotal and report:",
+        "B": "you'll receive a packet of logs from different systems (firewall, auth, EDR, email gateway). Reconstruct the attack timeline.",
+        "C": "based on logs + malware capability, describe what was likely accessed/exfiltrated/destroyed (per CIA: Confidentiality, Integrity, Availability)",
+        "D": "concrete control improvements (technical + process)"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The study guide states: Recommendations — concrete control improvements (technical + process)"
+    }
+  ]
+}

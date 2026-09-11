@@ -1,0 +1,119 @@
+{
+  "nodeId": "l06-security-principles-mindset-2-iaaa-non-repudiation-a-i",
+  "locale": "th",
+  "title": "2. IAAA + Non-Repudiation <a id=\"iaaa\"></a>",
+  "objective": "Study-guide review — ICCS423 v2 — L06: Security Principles & Mindset: 2. IAAA + Non-Repudiation <a id=\"iaaa\"></a>.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "Identification, Authentication, Authorization, Accountability"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Identification — claim of identity (username)",
+        "Authentication — proof of identity (something you know/have/are)",
+        "Authorization — granted permissions on resources",
+        "Accountability / Auditing — recording actions for traceability"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "IAAA is the access-control loop every system implements, from a Linux login to AWS IAM. Most breaches are failures in one of these four steps."
+    },
+    {
+      "kind": "heading",
+      "text": "Authentication Factors"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Something you know — password, PIN",
+        "Something you have — smartcard, hardware token, phone",
+        "Something you are — biometric (fingerprint, iris, face)",
+        "MFA requires factors from different categories — two passwords ≠ MFA"
+      ],
+      "ordered": true
+    },
+    {
+      "kind": "heading",
+      "text": "Non-Repudiation"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "A party cannot deny performing an action",
+        "Achieved via digital signatures + audit trails",
+        "Combines authentication + integrity → required for legal / commerce",
+        "Symmetric crypto alone cannot provide non-repudiation (shared key)"
+      ]
+    }
+  ],
+  "attribution": "Course: ICCS423 | Source: Thoth Library (CISSP D1, D3) + RAG | Target: 3rd-4th year CS | Date: 2026-05-03",
+  "cheatsheet": [
+    "Identification: claim of identity (username)",
+    "Authentication: proof of identity (something you know/have/are)",
+    "Authorization: granted permissions on resources",
+    "Accountability / Auditing: recording actions for traceability",
+    "Something you have: smartcard, hardware token, phone",
+    "Something you are: biometric (fingerprint, iris, face)"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for L06 Security Principles Mindset, \"Identification\" is described as:",
+      "choices": {
+        "A": "recording actions for traceability",
+        "B": "claim of identity (username)",
+        "C": "smartcard, hardware token, phone",
+        "D": "granted permissions on resources"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: Identification — claim of identity (username)"
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for L06 Security Principles Mindset, \"Authentication\" is described as:",
+      "choices": {
+        "A": "proof of identity (something you know/have/are)",
+        "B": "granted permissions on resources",
+        "C": "recording actions for traceability",
+        "D": "biometric (fingerprint, iris, face)"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The study guide states: Authentication — proof of identity (something you know/have/are)"
+    },
+    {
+      "id": "q3",
+      "prompt": "In the study guide for L06 Security Principles Mindset, \"Authorization\" is described as:",
+      "choices": {
+        "A": "smartcard, hardware token, phone",
+        "B": "recording actions for traceability",
+        "C": "granted permissions on resources",
+        "D": "biometric (fingerprint, iris, face)"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The study guide states: Authorization — granted permissions on resources"
+    },
+    {
+      "id": "q4",
+      "prompt": "In the study guide for L06 Security Principles Mindset, \"Accountability / Auditing\" is described as:",
+      "choices": {
+        "A": "smartcard, hardware token, phone",
+        "B": "granted permissions on resources",
+        "C": "biometric (fingerprint, iris, face)",
+        "D": "recording actions for traceability"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The study guide states: Accountability / Auditing — recording actions for traceability"
+    }
+  ]
+}

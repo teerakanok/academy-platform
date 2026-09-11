@@ -1,0 +1,149 @@
+{
+  "nodeId": "d2-secure-architecture-cloud-resilience-day-2-teaching-lab",
+  "locale": "th",
+  "title": "Day 2 Teaching Lab — Architecture Review Board",
+  "objective": "Study-guide review — Day 2 — Secure Architecture, Cloud, and Resilience: Day 2 Teaching Lab — Architecture Review Board.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "Scenario: a team is moving a customer-facing application to a hybrid cloud architecture. The application uses third-party packages, a CI/CD pipeline, containers, APIs, cloud storage, and a legacy on-premises database that cannot be replaced this quarter."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Ask students to review the design in five passes:"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Pass",
+        "What students must identify"
+      ],
+      "rows": [
+        [
+          "Requirements",
+          "Security, privacy, logging, availability, and audit requirements"
+        ],
+        [
+          "Supply chain",
+          "Dependencies, package monitoring, build artifact integrity, vendor risk"
+        ],
+        [
+          "Hybrid boundary",
+          "Data movement, connectivity, identity federation, logging, encryption"
+        ],
+        [
+          "Cloud responsibility",
+          "Customer-owned IAM, storage configuration, secrets, application security"
+        ],
+        [
+          "Resilience",
+          "Load balancing, backup/restore, integrity validation, EOL compensating controls"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Expected conclusions:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "CI/CD identities are privileged and need least privilege, review, logging, and rollback.",
+        "IaC improves consistency but can scale misconfiguration.",
+        "Cloud storage security requires key management, access control, monitoring, and retention.",
+        "The legacy database needs segmentation, monitoring, restricted access, and replacement planning.",
+        "Hybrid diagrams should be read as data-flow and responsibility maps, not only network drawings."
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Wrong-answer discussion:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "\"The cloud provider handles security\" fails shared responsibility.",
+        "\"Add a load balancer\" does not solve database resilience or data integrity.",
+        "\"Scan the code before launch\" is too late if requirements, pipeline identity, and dependency governance are missing."
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Source: CertMaster Study Lessons 3A-3D; SecurityX M03 slides."
+    },
+    {
+      "kind": "heading",
+      "text": "Pattern 5: Architecture Controls Must Compose"
+    },
+    {
+      "kind": "paragraph",
+      "text": "The official lessons list many controls: CASB, DLP, NAC, VPN, proxies, scanners, load balancers, CI/CD controls, container security, API security, and key management. Teach students to compose controls around the data flow. For example, a cloud-hosted API that processes confidential data may need API authentication, input validation, rate limits, logging, DLP/data classification, cloud IAM, key management, and CI/CD assurance. In practice questions, the answer often asks for the best next control, not every control, but the reasoning comes from understanding the whole flow."
+    }
+  ],
+  "attribution": "Course: SecurityX CAS-005 Primary source: CertMaster Study Lessons 3A, 3B, 3C, 3D Slide source: SecurityX_M03_PPT.pptx Teaching goal: turn governance requirements into secure design decisions across SDLC, architecture, resilience, and cloud.",
+  "cheatsheet": [
+    "Requirements: Security, privacy, logging, availability, and audit requirements",
+    "Supply chain: Dependencies, package monitoring, build artifact integrity, vendor risk",
+    "Hybrid boundary: Data movement, connectivity, identity federation, logging, encryption",
+    "Cloud responsibility: Customer-owned IAM, storage configuration, secrets, application security",
+    "Resilience: Load balancing, backup/restore, integrity validation, EOL compensating controls"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for D2 Secure Architecture Cloud Resilience, \"Requirements\" is described as:",
+      "choices": {
+        "A": "Customer-owned IAM, storage configuration, secrets, application security",
+        "B": "Dependencies, package monitoring, build artifact integrity, vendor risk",
+        "C": "Security, privacy, logging, availability, and audit requirements",
+        "D": "Data movement, connectivity, identity federation, logging, encryption"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The study guide states: Requirements: Security, privacy, logging, availability, and audit requirements"
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for D2 Secure Architecture Cloud Resilience, \"Supply chain\" is described as:",
+      "choices": {
+        "A": "Security, privacy, logging, availability, and audit requirements",
+        "B": "Data movement, connectivity, identity federation, logging, encryption",
+        "C": "Dependencies, package monitoring, build artifact integrity, vendor risk",
+        "D": "Customer-owned IAM, storage configuration, secrets, application security"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The study guide states: Supply chain: Dependencies, package monitoring, build artifact integrity, vendor risk"
+    },
+    {
+      "id": "q3",
+      "prompt": "In the study guide for D2 Secure Architecture Cloud Resilience, \"Hybrid boundary\" is described as:",
+      "choices": {
+        "A": "Security, privacy, logging, availability, and audit requirements",
+        "B": "Data movement, connectivity, identity federation, logging, encryption",
+        "C": "Customer-owned IAM, storage configuration, secrets, application security",
+        "D": "Dependencies, package monitoring, build artifact integrity, vendor risk"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: Hybrid boundary: Data movement, connectivity, identity federation, logging, encryption"
+    },
+    {
+      "id": "q4",
+      "prompt": "In the study guide for D2 Secure Architecture Cloud Resilience, \"Cloud responsibility\" is described as:",
+      "choices": {
+        "A": "Customer-owned IAM, storage configuration, secrets, application security",
+        "B": "Load balancing, backup/restore, integrity validation, EOL compensating controls",
+        "C": "Data movement, connectivity, identity federation, logging, encryption",
+        "D": "Dependencies, package monitoring, build artifact integrity, vendor risk"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The study guide states: Cloud responsibility: Customer-owned IAM, storage configuration, secrets, application security"
+    }
+  ]
+}

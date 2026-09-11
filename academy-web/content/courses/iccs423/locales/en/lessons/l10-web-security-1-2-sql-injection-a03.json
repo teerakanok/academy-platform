@@ -1,0 +1,144 @@
+{
+  "nodeId": "l10-web-security-1-2-sql-injection-a03",
+  "locale": "en",
+  "title": "2. SQL Injection (A03)",
+  "objective": "Study-guide review — ICCS423 v2 — L10: Web Security 1 (Injection · Auth · Access Control · Sessions): 2. SQL Injection (A03).",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "What is Injection?"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Injection = untrusted data sent to an interpreter as part of a command/query",
+        "Interpreter cannot tell \"data\" from \"instruction\" → attacker controls logic",
+        "Affects: SQL, NoSQL, OS commands, LDAP, XPath, ORM-bypass"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Injection is the textbook trust-boundary failure: code and data are concatenated, so user data becomes code."
+    },
+    {
+      "kind": "heading",
+      "text": "SQLi Types"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "In-band (Classic / Union-based) — attacker sees response; uses UNION SELECT to exfiltrate",
+        "Inferential (Blind) — no visible output; uses Boolean (AND 1=1) or Time (SLEEP(5)) signals",
+        "Out-of-band (OOB) — DNS/HTTP callback when in-band is impossible"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Classic Authentication Bypass"
+    },
+    {
+      "kind": "paragraph",
+      "text": "``sql -- Login form: username = ' OR '1'='1' -- SELECT * FROM users WHERE user='' OR '1'='1' --' AND pass='anything' -- WHERE always TRUE → returns first user (often admin) ``"
+    },
+    {
+      "kind": "heading",
+      "text": "Defense (priority order)"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Parameterized queries / prepared statements — separates code from data at the driver level",
+        "Stored procedures — only safe if no internal EXEC() of concatenated strings",
+        "Input validation (allowlist) — defense-in-depth, not primary defense",
+        "Least-privilege DB account — no DROP, GRANT, or system table access",
+        "WAF + sanitized error messages — last line; never blind-trust WAF"
+      ],
+      "ordered": true
+    },
+    {
+      "kind": "paragraph",
+      "text": "```python # ❌ Vulnerable query = \"SELECT * FROM users WHERE id=\" + user_id"
+    },
+    {
+      "kind": "paragraph",
+      "text": "# ✅ Safe — psycopg2 (Python) cursor.execute(\"SELECT * FROM users WHERE id=%s\", (user_id,))"
+    },
+    {
+      "kind": "paragraph",
+      "text": "# ✅ Safe — JDBC (Java) PreparedStatement stmt = conn.prepareStatement(\"SELECT * FROM users WHERE id=?\"); stmt.setString(1, userId); ```"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Real-world: Heartland Payment Systems (2008) — SQLi → 130M cards stolen, ~$140M cost. SQLi was the initial foothold for lateral movement to a packet sniffer on the payment network."
+    }
+  ],
+  "attribution": "Course: ICCS423 | Source: Thoth Library + RAG | Target: 3rd-4th year CS | Date: 2026-05-03",
+  "cheatsheet": [
+    "In-band (Classic / Union-based): attacker sees response; uses UNION SELECT to exfiltrate",
+    "Inferential (Blind): no visible output; uses Boolean (AND 1=1) or Time (SLEEP(5)) signals",
+    "Out-of-band (OOB): DNS/HTTP callback when in-band is impossible",
+    "Parameterized queries / prepared statements: separates code from data at the driver level",
+    "Stored procedures: only safe if no internal EXEC() of concatenated strings",
+    "Input validation (allowlist): defense-in-depth, not primary defense",
+    "Least-privilege DB account: no DROP, GRANT, or system table access",
+    "WAF + sanitized error messages: last line; never blind-trust WAF"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for L10 Web Security 1, \"In-band (Classic / Union-based)\" is described as:",
+      "choices": {
+        "A": "only safe if no internal EXEC() of concatenated strings",
+        "B": "DNS/HTTP callback when in-band is impossible",
+        "C": "attacker sees response; uses UNION SELECT to exfiltrate",
+        "D": "separates code from data at the driver level"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The study guide states: In-band (Classic / Union-based) — attacker sees response; uses UNION SELECT to exfiltrate"
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for L10 Web Security 1, \"Inferential (Blind)\" is described as:",
+      "choices": {
+        "A": "no visible output; uses Boolean (AND 1=1) or Time (SLEEP(5)) signals",
+        "B": "DNS/HTTP callback when in-band is impossible",
+        "C": "only safe if no internal EXEC() of concatenated strings",
+        "D": "attacker sees response; uses UNION SELECT to exfiltrate"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The study guide states: Inferential (Blind) — no visible output; uses Boolean (AND 1=1) or Time (SLEEP(5)) signals"
+    },
+    {
+      "id": "q3",
+      "prompt": "In the study guide for L10 Web Security 1, \"Out-of-band (OOB)\" is described as:",
+      "choices": {
+        "A": "separates code from data at the driver level",
+        "B": "no DROP, GRANT, or system table access",
+        "C": "defense-in-depth, not primary defense",
+        "D": "DNS/HTTP callback when in-band is impossible"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The study guide states: Out-of-band (OOB) — DNS/HTTP callback when in-band is impossible"
+    },
+    {
+      "id": "q4",
+      "prompt": "In the study guide for L10 Web Security 1, \"Parameterized queries / prepared statements\" is described as:",
+      "choices": {
+        "A": "separates code from data at the driver level",
+        "B": "defense-in-depth, not primary defense",
+        "C": "no DROP, GRANT, or system table access",
+        "D": "DNS/HTTP callback when in-band is impossible"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The study guide states: Parameterized queries / prepared statements — separates code from data at the driver level"
+    }
+  ]
+}

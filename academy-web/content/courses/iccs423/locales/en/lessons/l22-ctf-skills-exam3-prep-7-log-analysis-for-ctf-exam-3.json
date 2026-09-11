@@ -1,0 +1,182 @@
+{
+  "nodeId": "l22-ctf-skills-exam3-prep-7-log-analysis-for-ctf-exam-3",
+  "locale": "en",
+  "title": "7. Log Analysis for CTF / Exam 3",
+  "objective": "Study-guide review — ICCS423 v2 — L22: CTF Skills & Exam 3 Prep: 7. Log Analysis for CTF / Exam 3.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "This skill is central to Exam 3. Master the pattern."
+    },
+    {
+      "kind": "heading",
+      "text": "Pattern: Find the anomaly"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Attack chains often look like:"
+    },
+    {
+      "kind": "paragraph",
+      "text": "```"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Many failed logins (brute-force / password spray)",
+        "ONE successful login (account takeover!)",
+        "Lateral movement → access to other systems",
+        "Data exfiltration / persistence / impact"
+      ],
+      "ordered": true
+    },
+    {
+      "kind": "paragraph",
+      "text": "```"
+    },
+    {
+      "kind": "paragraph",
+      "text": "The needle is often the lone success after many failures, or the outlier in volume / time / source IP."
+    },
+    {
+      "kind": "heading",
+      "text": "Cross-source correlation"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Logs come from many sources. Correlate by:"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Pivot",
+        "Use"
+      ],
+      "rows": [
+        [
+          "Timestamp",
+          "Sort all sources by time → reconstruct sequence"
+        ],
+        [
+          "IP address",
+          "Trace one IP across firewall + auth + web logs"
+        ],
+        [
+          "User account",
+          "Follow one account from auth → file access → email"
+        ],
+        [
+          "Hostname / asset",
+          "Build per-host timeline from process + network logs"
+        ],
+        [
+          "Hash / filename",
+          "Track payload as it spreads"
+        ]
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Timezone normalization (critical)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Logs from different sources often have different timezones or formats. Always normalize to UTC before correlating."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Common pitfalls:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Local TZ (e.g., +07:00 Bangkok) vs UTC",
+        "Epoch timestamps (Unix seconds) vs ISO 8601",
+        "12-hour vs 24-hour",
+        "DST transitions"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Building an attack timeline (template)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "``` Timeline — [Incident Name] =========================="
+    },
+    {
+      "kind": "paragraph",
+      "text": "[UTC time] [source] [event] [actor/target] 2026-04-15T02:14:03Z email-gw Phishing email delivered user1@org.tld 2026-04-15T02:32:11Z endpoint user1 opens .docm; macro executes HOST-A 2026-04-15T02:32:14Z edr powershell.exe spawned by winword HOST-A 2026-04-15T02:33:02Z proxy HTTPS to suspicious[.]example HOST-A → C2 2026-04-15T03:18:55Z ad-auth user1 lateral SMB to HOST-B HOST-A → HOST-B ... ```"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Fill the template during the exam — don't wait until the end."
+    }
+  ],
+  "attribution": "Course: ICCS423 | Source: Thoth + RAG | Target: 3rd-4th year CS | Date: 2026-05-03",
+  "cheatsheet": [
+    "Timestamp: Sort all sources by time → reconstruct sequence",
+    "IP address: Trace one IP across firewall + auth + web logs",
+    "User account: Follow one account from auth → file access → email",
+    "Hostname / asset: Build per-host timeline from process + network logs",
+    "Hash / filename: Track payload as it spreads"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for L22 CTF Skills Exam3 Prep, \"Timestamp\" is described as:",
+      "choices": {
+        "A": "Build per-host timeline from process + network logs",
+        "B": "Follow one account from auth → file access → email",
+        "C": "Sort all sources by time → reconstruct sequence",
+        "D": "Trace one IP across firewall + auth + web logs"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The study guide states: Timestamp: Sort all sources by time → reconstruct sequence"
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for L22 CTF Skills Exam3 Prep, \"IP address\" is described as:",
+      "choices": {
+        "A": "Build per-host timeline from process + network logs",
+        "B": "Follow one account from auth → file access → email",
+        "C": "Trace one IP across firewall + auth + web logs",
+        "D": "Sort all sources by time → reconstruct sequence"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The study guide states: IP address: Trace one IP across firewall + auth + web logs"
+    },
+    {
+      "id": "q3",
+      "prompt": "In the study guide for L22 CTF Skills Exam3 Prep, \"User account\" is described as:",
+      "choices": {
+        "A": "Build per-host timeline from process + network logs",
+        "B": "Sort all sources by time → reconstruct sequence",
+        "C": "Trace one IP across firewall + auth + web logs",
+        "D": "Follow one account from auth → file access → email"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The study guide states: User account: Follow one account from auth → file access → email"
+    },
+    {
+      "id": "q4",
+      "prompt": "In the study guide for L22 CTF Skills Exam3 Prep, \"Hostname / asset\" is described as:",
+      "choices": {
+        "A": "Trace one IP across firewall + auth + web logs",
+        "B": "Build per-host timeline from process + network logs",
+        "C": "Sort all sources by time → reconstruct sequence",
+        "D": "Follow one account from auth → file access → email"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: Hostname / asset: Build per-host timeline from process + network logs"
+    }
+  ]
+}

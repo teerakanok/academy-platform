@@ -1,0 +1,113 @@
+{
+  "nodeId": "l08-cryptography-2-7-digital-signatures-a-id-signatures-a",
+  "locale": "th",
+  "title": "7. Digital Signatures <a id=\"signatures\"></a>",
+  "objective": "Study-guide review — ICCS423 v2 — L08: Cryptography 2 (Asymmetric, PKI, TLS, Signatures): 7. Digital Signatures <a id=\"signatures\"></a>.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "Mechanics (textbook)"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Hash the message → digest",
+        "Encrypt digest with signer's private key → signature",
+        "Receiver decrypts signature with signer's public key → revealed digest",
+        "Receiver hashes message → computed digest",
+        "If equal → integrity + authentication + non-repudiation ✓"
+      ],
+      "ordered": true
+    },
+    {
+      "kind": "heading",
+      "text": "Modern Variants"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "RSA-PSS — preferred over PKCS#1 v1.5 (provably secure padding)",
+        "ECDSA (P-256) — fast, but careful with nonce reuse",
+        "Ed25519 — deterministic, modern default",
+        "ML-DSA (Dilithium) — post-quantum standard (NIST FIPS 204, 2024)"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Sony PS3 Lesson (2010)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Sony's ECDSA implementation reused the nonce. fail0verflow group recovered the master signing key with simple linear algebra. ECDSA nonce reuse = total private key leak."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Ed25519 fixes this category of bug by deriving the nonce deterministically from key + message."
+    }
+  ],
+  "attribution": "Course: ICCS423 | Source: Thoth Library (cryptography/) + RAG | Target: 3rd-4th year CS | Date: 2026-05-03",
+  "cheatsheet": [
+    "RSA-PSS: preferred over PKCS#1 v1.5 (provably secure padding)",
+    "ECDSA (P-256): fast, but careful with nonce reuse",
+    "Ed25519: deterministic, modern default",
+    "ML-DSA (Dilithium): post-quantum standard (NIST FIPS 204, 2024)"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for L08 Cryptography 2, \"RSA-PSS\" is described as:",
+      "choices": {
+        "A": "deterministic, modern default",
+        "B": "fast, but careful with nonce reuse",
+        "C": "preferred over PKCS#1 v1.5 (provably secure padding)",
+        "D": "post-quantum standard (NIST FIPS 204, 2024)"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The study guide states: RSA-PSS — preferred over PKCS#1 v1.5 (provably secure padding)"
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for L08 Cryptography 2, \"ECDSA (P-256)\" is described as:",
+      "choices": {
+        "A": "preferred over PKCS#1 v1.5 (provably secure padding)",
+        "B": "fast, but careful with nonce reuse",
+        "C": "post-quantum standard (NIST FIPS 204, 2024)",
+        "D": "deterministic, modern default"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: ECDSA (P-256) — fast, but careful with nonce reuse"
+    },
+    {
+      "id": "q3",
+      "prompt": "In the study guide for L08 Cryptography 2, \"Ed25519\" is described as:",
+      "choices": {
+        "A": "preferred over PKCS#1 v1.5 (provably secure padding)",
+        "B": "post-quantum standard (NIST FIPS 204, 2024)",
+        "C": "deterministic, modern default",
+        "D": "fast, but careful with nonce reuse"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The study guide states: Ed25519 — deterministic, modern default"
+    },
+    {
+      "id": "q4",
+      "prompt": "In the study guide for L08 Cryptography 2, \"ML-DSA (Dilithium)\" is described as:",
+      "choices": {
+        "A": "post-quantum standard (NIST FIPS 204, 2024)",
+        "B": "preferred over PKCS#1 v1.5 (provably secure padding)",
+        "C": "fast, but careful with nonce reuse",
+        "D": "deterministic, modern default"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The study guide states: ML-DSA (Dilithium) — post-quantum standard (NIST FIPS 204, 2024)"
+    }
+  ]
+}

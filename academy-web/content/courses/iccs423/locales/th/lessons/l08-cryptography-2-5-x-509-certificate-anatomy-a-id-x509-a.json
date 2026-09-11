@@ -1,0 +1,136 @@
+{
+  "nodeId": "l08-cryptography-2-5-x-509-certificate-anatomy-a-id-x509-a",
+  "locale": "th",
+  "title": "5. X.509 Certificate Anatomy <a id=\"x509\"></a>",
+  "objective": "Study-guide review — ICCS423 v2 — L08: Cryptography 2 (Asymmetric, PKI, TLS, Signatures): 5. X.509 Certificate Anatomy <a id=\"x509\"></a>.",
+  "blocks": [
+    {
+      "kind": "table",
+      "headers": [
+        "Field",
+        "Purpose"
+      ],
+      "rows": [
+        [
+          "Version (v3)",
+          "Format version"
+        ],
+        [
+          "Serial Number",
+          "Unique per CA, used in CRL"
+        ],
+        [
+          "Issuer",
+          "CA distinguished name"
+        ],
+        [
+          "Validity (Not Before / Not After)",
+          "Lifetime"
+        ],
+        [
+          "Subject",
+          "Cert holder (CN = domain)"
+        ],
+        [
+          "Subject Public Key Info",
+          "The public key being bound"
+        ],
+        [
+          "Extensions",
+          "SAN, Key Usage, EKU, CRL DP, AIA"
+        ],
+        [
+          "CA Signature",
+          "Hash(all above) signed with CA private key"
+        ]
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "⚠️ Trap"
+    },
+    {
+      "kind": "paragraph",
+      "text": "A certificate does not contain the private key. It contains only the public key + identity, signed by the CA."
+    },
+    {
+      "kind": "heading",
+      "text": "Validation Levels"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "DV (Domain Validated) — Let's Encrypt; proves domain control only",
+        "OV (Organization Validated) — proves org legally exists",
+        "EV (Extended Validation) — strict legal verification"
+      ]
+    }
+  ],
+  "attribution": "Course: ICCS423 | Source: Thoth Library (cryptography/) + RAG | Target: 3rd-4th year CS | Date: 2026-05-03",
+  "cheatsheet": [
+    "Serial Number: Unique per CA, used in CRL",
+    "Issuer: CA distinguished name",
+    "Subject: Cert holder (CN = domain)",
+    "Subject Public Key Info: The public key being bound",
+    "Extensions: SAN, Key Usage, EKU, CRL DP, AIA",
+    "CA Signature: Hash(all above) signed with CA private key"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for L08 Cryptography 2, \"Serial Number\" is described as:",
+      "choices": {
+        "A": "The public key being bound",
+        "B": "Unique per CA, used in CRL",
+        "C": "Cert holder (CN = domain)",
+        "D": "CA distinguished name"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: Serial Number: Unique per CA, used in CRL"
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for L08 Cryptography 2, \"Issuer\" is described as:",
+      "choices": {
+        "A": "CA distinguished name",
+        "B": "The public key being bound",
+        "C": "Unique per CA, used in CRL",
+        "D": "Cert holder (CN = domain)"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The study guide states: Issuer: CA distinguished name"
+    },
+    {
+      "id": "q3",
+      "prompt": "In the study guide for L08 Cryptography 2, \"Subject\" is described as:",
+      "choices": {
+        "A": "Cert holder (CN = domain)",
+        "B": "CA distinguished name",
+        "C": "The public key being bound",
+        "D": "Unique per CA, used in CRL"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The study guide states: Subject: Cert holder (CN = domain)"
+    },
+    {
+      "id": "q4",
+      "prompt": "In the study guide for L08 Cryptography 2, \"Subject Public Key Info\" is described as:",
+      "choices": {
+        "A": "CA distinguished name",
+        "B": "Cert holder (CN = domain)",
+        "C": "The public key being bound",
+        "D": "Unique per CA, used in CRL"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The study guide states: Subject Public Key Info: The public key being bound"
+    }
+  ]
+}

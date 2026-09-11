@@ -1,0 +1,145 @@
+{
+  "nodeId": "l06-security-principles-mindset-1-the-cia-triad-a-id-the-c",
+  "locale": "en",
+  "title": "1. The CIA Triad <a id=\"the-cia-triad\"></a>",
+  "objective": "Study-guide review — ICCS423 v2 — L06: Security Principles & Mindset: 1. The CIA Triad <a id=\"the-cia-triad\"></a>.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "Confidentiality, Integrity, Availability"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Confidentiality — prevents unauthorized disclosure (eavesdropping, leaks)",
+        "Integrity — prevents unauthorized modification (tampering, MITM)",
+        "Availability — ensures timely access for authorized users (DDoS, hardware failure)",
+        "Foundational model that applies to all assets, not just data",
+        "One control may map to multiple components (e.g., RAID = availability)"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Every security decision can be classified by which CIA component it primarily protects. Asking \"Which leg of CIA does this serve?\" is the fastest way to verify a control is actually doing security work."
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Component",
+        "Definition",
+        "Attack Example",
+        "Control Example"
+      ],
+      "rows": [
+        [
+          "Confidentiality",
+          "Prevents unauthorized disclosure",
+          "Data breach, sniffing",
+          "Encryption, access control"
+        ],
+        [
+          "Integrity",
+          "Prevents unauthorized changes",
+          "MITM, tampering",
+          "Hashing, digital signatures"
+        ],
+        [
+          "Availability",
+          "Ensures timely access",
+          "DDoS, hardware failure",
+          "Redundancy, load balancing"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Shon Harris occasionally uses \"AIC\" — same concept, different ordering. The exam uses CIA."
+    },
+    {
+      "kind": "heading",
+      "text": "The DAD Triad — The Threats"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Disclosure — opposite of Confidentiality",
+        "Alteration — opposite of Integrity",
+        "Destruction / Denial — opposite of Availability",
+        "Helps classify which CIA component a given threat targets"
+      ]
+    }
+  ],
+  "attribution": "Course: ICCS423 | Source: Thoth Library (CISSP D1, D3) + RAG | Target: 3rd-4th year CS | Date: 2026-05-03",
+  "cheatsheet": [
+    "Confidentiality: prevents unauthorized disclosure (eavesdropping, leaks)",
+    "Integrity: prevents unauthorized modification (tampering, MITM)",
+    "Availability: ensures timely access for authorized users (DDoS, hardware failure)",
+    "Confidentiality: Prevents unauthorized disclosure",
+    "Integrity: Prevents unauthorized changes",
+    "Availability: Ensures timely access",
+    "Disclosure: opposite of Confidentiality",
+    "Alteration: opposite of Integrity"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for L06 Security Principles Mindset, \"Confidentiality\" is described as:",
+      "choices": {
+        "A": "Prevents unauthorized disclosure",
+        "B": "ensures timely access for authorized users (DDoS, hardware failure)",
+        "C": "prevents unauthorized modification (tampering, MITM)",
+        "D": "prevents unauthorized disclosure (eavesdropping, leaks)"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The study guide states: Confidentiality — prevents unauthorized disclosure (eavesdropping, leaks)"
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for L06 Security Principles Mindset, \"Integrity\" is described as:",
+      "choices": {
+        "A": "prevents unauthorized disclosure (eavesdropping, leaks)",
+        "B": "ensures timely access for authorized users (DDoS, hardware failure)",
+        "C": "prevents unauthorized modification (tampering, MITM)",
+        "D": "Prevents unauthorized disclosure"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The study guide states: Integrity — prevents unauthorized modification (tampering, MITM)"
+    },
+    {
+      "id": "q3",
+      "prompt": "In the study guide for L06 Security Principles Mindset, \"Availability\" is described as:",
+      "choices": {
+        "A": "prevents unauthorized disclosure (eavesdropping, leaks)",
+        "B": "prevents unauthorized modification (tampering, MITM)",
+        "C": "ensures timely access for authorized users (DDoS, hardware failure)",
+        "D": "Prevents unauthorized disclosure"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The study guide states: Availability — ensures timely access for authorized users (DDoS, hardware failure)"
+    },
+    {
+      "id": "q4",
+      "prompt": "In the study guide for L06 Security Principles Mindset, \"Disclosure\" is described as:",
+      "choices": {
+        "A": "opposite of Confidentiality",
+        "B": "Prevents unauthorized disclosure",
+        "C": "opposite of Availability",
+        "D": "Prevents unauthorized changes"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The study guide states: Disclosure — opposite of Confidentiality"
+    }
+  ]
+}

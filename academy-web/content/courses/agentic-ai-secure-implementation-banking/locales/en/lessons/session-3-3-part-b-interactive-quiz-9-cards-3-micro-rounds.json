@@ -1,0 +1,292 @@
+{
+  "nodeId": "session-3-3-part-b-interactive-quiz-9-cards-3-micro-rounds",
+  "locale": "en",
+  "title": "3. PART B — Interactive Quiz (9 cards, 3 micro-rounds)",
+  "objective": "Study-guide review — Study Guide — Session 3: Case Study — AI/Agentic Risk in Financial Services: 3. PART B — Interactive Quiz (9 cards, 3 micro-rounds).",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "Mechanics (พูดครั้งเดียว TH): \"ทุกการ์ดโหวต 4 ตัวเลือกเดิม — Allowed / Needs approval / Blocked / Redesign required. โหวตก่อน เฉลยทีหลัง พร้อมเหตุผล. คำตอบเน้น 'ต้องมี control อะไร' ไม่ใช่จับผิดคน.\" run ผ่าน poll; reveal answer + rationale หลังโหวตทุกใบ. [src: S3 design Part B; COURSE_BUILD_SPEC §5]"
+    },
+    {
+      "kind": "paragraph",
+      "text": "3 micro-rounds = 3 cognitive actions (กัน \"เบื่อภายในการ์ดที่ 7\" + re-energize post-lunch):"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "R1 (13:14–13:18) — warm-up, silent-commit ×3: cards 1 · 4 · 7 (card 7 = grey-zone variant ที่มี teeth)",
+        "R2 (13:44–13:50) — live poll ×3: cards 3 · 6 · 9 (card 9 = 🎯 DEPTH-IN-VOTE)",
+        "R3 (13:50–14:08) — GATE-DIAGNOSTIC ×3: cards 2 · 5 · 8 (reveal ถาม \"WHICH of the 4 S2 gates was missing?\";"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "re-show 4-control strip Task Card / Approval Gate / Execution Proof / Audit Trail เป็น answer key → recognition ไม่ใช่ recall)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "[src: RUN_OF_SHOW lines 197, 205, 209, 210, 214, 222]"
+    },
+    {
+      "kind": "paragraph",
+      "text": "★ ON-SLIDE SHARP (gate-diagnostic reveal, cards 2/5/8): \"The verdict isn't the lesson. The MISSING GATE is.\" [src: RUN_OF_SHOW line 250]"
+    },
+    {
+      "kind": "heading",
+      "text": "Answer key (facilitator quick-reference — v1.2 card set)"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Card",
+        "Scenario seed",
+        "Verdict",
+        "Reveal mechanic / which gate",
+        "Round",
+        "Category"
+      ],
+      "rows": [
+        [
+          "1",
+          "Agent reads logs to summarize (no write)",
+          "Allowed",
+          "read-only ปลอดภัย เมื่อ read target ไม่ sensitive",
+          "R1 warm-up",
+          "Safe adoption"
+        ],
+        [
+          "2",
+          "Agent drafts a config PR, human merges",
+          "Needs approval",
+          "gate = the merge",
+          "R3 diagnostic (key shown)",
+          "Governance"
+        ],
+        [
+          "3",
+          "Agent auto-emails customers on detection",
+          "Blocked",
+          "external write, no gate",
+          "R2 live",
+          "Excessive agency"
+        ],
+        [
+          "4",
+          "Paste prod source into public chat",
+          "Blocked",
+          "data leakage (Samsung echo)",
+          "R1 warm-up",
+          "Data leakage"
+        ],
+        [
+          "5",
+          "Agent installs a suggested package unprompted",
+          "Redesign required → which gate? → Task Card / least-priv",
+          "slopsquatting",
+          "R3 diagnostic (key shown)",
+          "Supply-chain"
+        ],
+        [
+          "6",
+          "LLM assistant surfaces another customer's account data from memory (financial PII)",
+          "Needs approval",
+          "hallucination + leakage → human verify",
+          "R2 live",
+          "Hallucination + leakage"
+        ],
+        [
+          "7",
+          "Agent queries a read-replica a downstream job writes back from",
+          "Needs approval (grey-zone)",
+          "clean read, hidden write tail — classify the path, not the verb",
+          "R1 warm-up (teeth)",
+          "Data-flow / hidden write"
+        ],
+        [
+          "8",
+          "Agent retries a failed payments/transfer API call 5× under pressure",
+          "Redesign required → which gate? → Approval Gate + Execution Proof",
+          "excessive agency (foreshadows S4-R5)",
+          "R3 diagnostic (key shown)",
+          "Excessive agency"
+        ],
+        [
+          "9",
+          "Agent commits to a shared repo, no review",
+          "🎯 block / maker-checker gate / sign-and-attest → maker-checker gate; attest ≠ gate",
+          "audit-trail ≠ approval-gate",
+          "R2 live (depth-in-vote)",
+          "Auditability"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "[src: RUN_OF_SHOW lines 226-236 (FIX verdict rebalance + missing-gate reveal table)]"
+    },
+    {
+      "kind": "heading",
+      "text": "Card teaching notes (rationale TH)"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Card 1 (Allowed): read-only + read target ไม่ sensitive = use case ที่ปลอดภัยสุด (least privilege, no write) —"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "\"เริ่มจาก read-only\" ที่สอนใน S1."
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Card 2 (Needs approval, diagnostic): missing gate = Approval Gate (the merge). agent draft ได้ แต่ human merge เป็น gate.",
+        "Card 3 (Blocked): external write (อีเมลถึงลูกค้า) โดยไม่มี gate = excessive agency — block. ที่ธนาคาร external customer"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "communication ต้องผ่าน gate เสมอ."
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Card 4 (Blocked): PII/source ออกนอก boundary = data leakage (Samsung pattern). แม้ \"แค่ debug\" ก็ห้าม — ใช้ synthetic"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "data หรือ sanctioned internal tool."
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Card 5 (Redesign, diagnostic): package hallucination / slopsquatting — ชื่อ \"ฟังดูถูก\" อาจไม่มีจริงหรือถูก attacker จดไว้."
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "missing gate = Task Card / least-priv (dependency allow-list + private mirror + review ก่อนติดตั้ง). โยง huggingface-cli case."
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Card 6 (Needs approval) — financial PII, NAMED: LLM assistant ดึงข้อมูลบัญชีลูกค้าคนอื่นจาก memory → hallucination",
+        "leakage; human verify ก่อนใช้. ship-current rule: การ์ดนี้ + card 8 เป็น 2 ใบที่ต้อง **NAMED ด้วย freshest"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "publicly-reported financial-sector incident ณ วัน build** + retrieval date stamp บน card-source note. [VERIFY: ต้อง lock เคส financial-sector ที่ named+dated ตอน build; ตอนนี้ design ระบุ requirement แต่ยังไม่ fix เคสตายตัว — src: RUN_OF_SHOW lines 239-242]"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Card 7 (Needs approval, grey-zone teeth): read endpoint อยู่ upstream ของ write (downstream job writes back) —"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "\"read\" ที่ clean แต่ data path มี write tail. บทเรียน: classify the path, not the verb (เหมือน S1 sensitive-read trap)."
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Card 8 (Redesign, diagnostic) — payments retry, NAMED: retry transfer 5× under pressure = excessive agency;"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "missing gate = Approval Gate + Execution Proof. foreshadows S4-R5 (transferFunds). ship NAMED money-movement/ agent-over-permission case + date stamp. [VERIFY: เช่นเดียวกับ card 6 — lock named financial case ตอน build]"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Card 9 (depth-in-vote): options = block / maker-checker gate / sign-and-attest. คำตอบ = maker-checker gate;"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "สอนว่า audit-trail ≠ approval-gate (attestation พิสูจน์ who/what; gate คุม whether — คนละ control ทั้งคู่จำเป็น). เลือกถูก คือ การเรียนรู้ความต่าง."
+    },
+    {
+      "kind": "paragraph",
+      "text": "[src: RUN_OF_SHOW lines 214, 217-218, 228-236, 256-257]"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Coverage check: ครบ 4 categories — data leakage (card 4 + Case 1.x); hallucination (card 6 + Case 2.x); shadow AI (Case 3.x + card 3 governance); supply-chain (card 5 + huggingface-cli/slopsquatting). vote wording เป๊ะ. cards 5/8/9 seed SecureBank Mini surfaces + S2 controls ต่อเข้า S4. ไม่มีการ name Baton/vendor governance product. [src: S3 design coverage check; RUN_OF_SHOW line 261; COURSE_BUILD_SPEC §5 coverage]"
+    }
+  ],
+  "attribution": "Session: S3 · 13:00–14:15 (75 min) · When Agents Go Wrong Format: Online · instructor-led · ~50 participants · Interactive Quiz (vote-then-reveal) Language contract: สไลด์ = English · พูด + speaker notes = ภาษาไทย · visual-first Vote options (ทุกการ์ด, fixed wording): Allowed · Needs approval · Bloc",
+  "cheatsheet": [
+    "R1 (13:14–13:18) — warm-up, silent-commit ×3: cards 1 · 4 · 7 (card 7 = grey-zone variant ที่มี teeth)",
+    "R2 (13:44–13:50) — live poll ×3: cards 3 · 6 · 9 (card 9 = 🎯 DEPTH-IN-VOTE)",
+    "R3 (13:50–14:08) — GATE-DIAGNOSTIC ×3: cards 2 · 5 · 8 (reveal ถาม \"WHICH of the 4 S2 gates was missing?\";",
+    "Agent installs a suggested package unprompted: Redesign required → which gate? → Task Card / least-priv",
+    "Agent commits to a shared repo, no review: 🎯 block / maker-checker gate / sign-and-attest → maker-checker gate; attest ≠ gate",
+    "Card 1 (Allowed): read-only + read target ไม่ sensitive = use case ที่ปลอดภัยสุด (least privilege, no write) —",
+    "Card 2 (Needs approval, diagnostic): missing gate = Approval Gate (the merge). agent draft ได้ แต่ human merge เป็น gate.",
+    "Card 3 (Blocked): external write (อีเมลถึงลูกค้า) โดยไม่มี gate = excessive agency — block. ที่ธนาคาร external customer"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for session 3, \"R1 (13:14–13:18) — warm-up, silent-commit ×3\" is described as:",
+      "choices": {
+        "A": "LLM assistant ดึงข้อมูลบัญชีลูกค้าคนอื่นจาก memory → hallucination",
+        "B": "retry transfer 5× under pressure = excessive agency;",
+        "C": "cards 1 · 4 · 7 (card 7 = grey-zone variant ที่มี teeth)",
+        "D": "Redesign required → which gate? → Task Card / least-priv"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The study guide states: R1 (13:14–13:18) — warm-up, silent-commit ×3: cards 1 · 4 · 7 (card 7 = grey-zone variant ที่มี teeth)"
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for session 3, \"R2 (13:44–13:50) — live poll ×3\" is described as:",
+      "choices": {
+        "A": "retry transfer 5× under pressure = excessive agency;",
+        "B": "cards 1 · 4 · 7 (card 7 = grey-zone variant ที่มี teeth)",
+        "C": "Redesign required → which gate? → Task Card / least-priv",
+        "D": "cards 3 · 6 · 9 (card 9 = 🎯 DEPTH-IN-VOTE)"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The study guide states: R2 (13:44–13:50) — live poll ×3: cards 3 · 6 · 9 (card 9 = 🎯 DEPTH-IN-VOTE)"
+    },
+    {
+      "id": "q3",
+      "prompt": "In the study guide for session 3, \"R3 (13:50–14:08) — GATE-DIAGNOSTIC ×3\" is described as:",
+      "choices": {
+        "A": "cards 2 · 5 · 8 (reveal ถาม \"WHICH of the 4 S2 gates was missing?\";",
+        "B": "cards 1 · 4 · 7 (card 7 = grey-zone variant ที่มี teeth)",
+        "C": "read endpoint อยู่ upstream ของ write (downstream job writes back) —",
+        "D": "LLM assistant ดึงข้อมูลบัญชีลูกค้าคนอื่นจาก memory → hallucination"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The study guide states: R3 (13:50–14:08) — GATE-DIAGNOSTIC ×3: cards 2 · 5 · 8 (reveal ถาม \"WHICH of the 4 S2 gates was missing?\";"
+    },
+    {
+      "id": "q4",
+      "prompt": "In the study guide for session 3, \"Agent installs a suggested package unprompted\" is described as:",
+      "choices": {
+        "A": "Redesign required → which gate? → Task Card / least-priv",
+        "B": "LLM assistant ดึงข้อมูลบัญชีลูกค้าคนอื่นจาก memory → hallucination",
+        "C": "retry transfer 5× under pressure = excessive agency;",
+        "D": "cards 1 · 4 · 7 (card 7 = grey-zone variant ที่มี teeth)"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The study guide states: Agent installs a suggested package unprompted: Redesign required → which gate? → Task Card / least-priv"
+    }
+  ]
+}

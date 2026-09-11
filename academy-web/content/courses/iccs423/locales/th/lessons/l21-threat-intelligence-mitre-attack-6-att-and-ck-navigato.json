@@ -1,0 +1,120 @@
+{
+  "nodeId": "l21-threat-intelligence-mitre-attack-6-att-and-ck-navigato",
+  "locale": "th",
+  "title": "6. ATT&CK Navigator — Practical Use",
+  "objective": "Study-guide review — ICCS423 v2 — L21: Threat Intelligence & MITRE ATT&CK: 6. ATT&CK Navigator — Practical Use.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "ATT&CK Navigator (mitre-attack.github.io/attack-navigator) is a free web tool to annotate, visualize, and explore the matrix."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Use cases:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Coverage mapping — color techniques your SIEM/EDR can detect → see your gaps",
+        "Threat actor profiling — select group (e.g. G0016 APT29) → highlights their techniques → prioritize defense",
+        "Red team planning — pick techniques to test → export scenario",
+        "Comparison overlay — overlap two groups (APT28 ∩ APT29) to see shared TTPs",
+        "Detection engineering — tag every detection rule with its ATT&CK ID"
+      ],
+      "ordered": true
+    },
+    {
+      "kind": "paragraph",
+      "text": "Color convention:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "🟥 Red = attacker technique",
+        "🟩 Green = detected/covered",
+        "🟨 Yellow = partial coverage",
+        "⬛ Gray = not applicable"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Layer creation workflow"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Open Navigator → \"Create New Layer\" → Enterprise",
+        "Right-click techniques → set color/score/comment",
+        "Export as JSON (for sharing) or SVG/Excel (for reports)",
+        "Multi-layer: combine \"what attacker does\" + \"what we detect\" → diff = gap"
+      ],
+      "ordered": true
+    }
+  ],
+  "attribution": "Course: ICCS423 | Source: Thoth + RAG | Target: 3rd-4th year CS | Date: 2026-05-03",
+  "cheatsheet": [
+    "Coverage mapping: color techniques your SIEM/EDR can detect → see your gaps",
+    "Threat actor profiling: select group (e.g. G0016 APT29) → highlights their techniques → prioritize defense",
+    "Red team planning: pick techniques to test → export scenario",
+    "Comparison overlay: overlap two groups (APT28 ∩ APT29) to see shared TTPs",
+    "Detection engineering: tag every detection rule with its ATT&CK ID"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for L21 Threat Intelligence MITRE ATTACK, \"Coverage mapping\" is described as:",
+      "choices": {
+        "A": "overlap two groups (APT28 ∩ APT29) to see shared TTPs",
+        "B": "tag every detection rule with its ATT&CK ID",
+        "C": "pick techniques to test → export scenario",
+        "D": "color techniques your SIEM/EDR can detect → see your gaps"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The study guide states: Coverage mapping — color techniques your SIEM/EDR can detect → see your gaps"
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for L21 Threat Intelligence MITRE ATTACK, \"Threat actor profiling\" is described as:",
+      "choices": {
+        "A": "tag every detection rule with its ATT&CK ID",
+        "B": "overlap two groups (APT28 ∩ APT29) to see shared TTPs",
+        "C": "select group (e.g. G0016 APT29) → highlights their techniques → prioritize defense",
+        "D": "color techniques your SIEM/EDR can detect → see your gaps"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The study guide states: Threat actor profiling — select group (e.g. G0016 APT29) → highlights their techniques → prioritize defense"
+    },
+    {
+      "id": "q3",
+      "prompt": "In the study guide for L21 Threat Intelligence MITRE ATTACK, \"Red team planning\" is described as:",
+      "choices": {
+        "A": "color techniques your SIEM/EDR can detect → see your gaps",
+        "B": "overlap two groups (APT28 ∩ APT29) to see shared TTPs",
+        "C": "pick techniques to test → export scenario",
+        "D": "tag every detection rule with its ATT&CK ID"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The study guide states: Red team planning — pick techniques to test → export scenario"
+    },
+    {
+      "id": "q4",
+      "prompt": "In the study guide for L21 Threat Intelligence MITRE ATTACK, \"Comparison overlay\" is described as:",
+      "choices": {
+        "A": "pick techniques to test → export scenario",
+        "B": "tag every detection rule with its ATT&CK ID",
+        "C": "overlap two groups (APT28 ∩ APT29) to see shared TTPs",
+        "D": "color techniques your SIEM/EDR can detect → see your gaps"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The study guide states: Comparison overlay — overlap two groups (APT28 ∩ APT29) to see shared TTPs"
+    }
+  ]
+}

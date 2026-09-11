@@ -1,0 +1,98 @@
+{
+  "nodeId": "l20-incident-response-3-phase-1-preparation",
+  "locale": "th",
+  "title": "3. Phase 1 — Preparation",
+  "objective": "Study-guide review — ICCS423 v2 — L20: Incident Response: 3. Phase 1 — Preparation.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "The most important phase. Everything that follows depends on what you set up before the incident."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Key preparations:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "IR Team — defined roles: IR Lead, analysts, forensic, legal, communications, executive sponsor",
+        "Playbooks — pre-written decision trees for common incident types (phishing, ransomware, BEC, DDoS, web compromise)",
+        "Communication plan — escalation paths, regulatory contacts, PR templates, out-of-band channels (because email may be compromised)",
+        "Forensic tools ready — DumpIt / WinPMem (memory), FTK Imager / dcfldd (disk), Wireshark (network), evidence storage",
+        "Legal contacts — internal legal counsel, external breach counsel, regulator liaisons (PDPC, NCSA in Thailand)",
+        "Tabletop exercises — practice the playbook quarterly; muscle memory matters under stress"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Key explanation: A team that has never run a tabletop will fumble in a real incident. Practice the playbook so the mechanics are reflexive, leaving brain capacity for the unique decisions."
+    }
+  ],
+  "attribution": "Course: ICCS423 | Source: Thoth + RAG | Target: 3rd-4th year CS | Date: 2026-05-03",
+  "cheatsheet": [
+    "IR Team: defined roles: IR Lead, analysts, forensic, legal, communications, executive sponsor",
+    "Playbooks: pre-written decision trees for common incident types (phishing, ransomware, BEC, DDoS, web compromise)",
+    "Communication plan: escalation paths, regulatory contacts, PR templates, out-of-band channels (because email may be compromised)",
+    "Forensic tools ready: DumpIt / WinPMem (memory), FTK Imager / dcfldd (disk), Wireshark (network), evidence storage",
+    "Legal contacts: internal legal counsel, external breach counsel, regulator liaisons (PDPC, NCSA in Thailand)",
+    "Tabletop exercises: practice the playbook quarterly; muscle memory matters under stress"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for L20 Incident Response, \"IR Team\" is described as:",
+      "choices": {
+        "A": "DumpIt / WinPMem (memory), FTK Imager / dcfldd (disk), Wireshark (network), evidence storage",
+        "B": "defined roles: IR Lead, analysts, forensic, legal, communications, executive sponsor",
+        "C": "internal legal counsel, external breach counsel, regulator liaisons (PDPC, NCSA in Thailand)",
+        "D": "practice the playbook quarterly; muscle memory matters under stress"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: IR Team — defined roles: IR Lead, analysts, forensic, legal, communications, executive sponsor"
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for L20 Incident Response, \"Playbooks\" is described as:",
+      "choices": {
+        "A": "pre-written decision trees for common incident types (phishing, ransomware, BEC, DDoS, web compromise)",
+        "B": "escalation paths, regulatory contacts, PR templates, out-of-band channels (because email may be compromised)",
+        "C": "DumpIt / WinPMem (memory), FTK Imager / dcfldd (disk), Wireshark (network), evidence storage",
+        "D": "internal legal counsel, external breach counsel, regulator liaisons (PDPC, NCSA in Thailand)"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The study guide states: Playbooks — pre-written decision trees for common incident types (phishing, ransomware, BEC, DDoS, web compromise)"
+    },
+    {
+      "id": "q3",
+      "prompt": "In the study guide for L20 Incident Response, \"Communication plan\" is described as:",
+      "choices": {
+        "A": "escalation paths, regulatory contacts, PR templates, out-of-band channels (because email may be compromised)",
+        "B": "pre-written decision trees for common incident types (phishing, ransomware, BEC, DDoS, web compromise)",
+        "C": "DumpIt / WinPMem (memory), FTK Imager / dcfldd (disk), Wireshark (network), evidence storage",
+        "D": "internal legal counsel, external breach counsel, regulator liaisons (PDPC, NCSA in Thailand)"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The study guide states: Communication plan — escalation paths, regulatory contacts, PR templates, out-of-band channels (because email may be compromised)"
+    },
+    {
+      "id": "q4",
+      "prompt": "In the study guide for L20 Incident Response, \"Forensic tools ready\" is described as:",
+      "choices": {
+        "A": "internal legal counsel, external breach counsel, regulator liaisons (PDPC, NCSA in Thailand)",
+        "B": "defined roles: IR Lead, analysts, forensic, legal, communications, executive sponsor",
+        "C": "pre-written decision trees for common incident types (phishing, ransomware, BEC, DDoS, web compromise)",
+        "D": "DumpIt / WinPMem (memory), FTK Imager / dcfldd (disk), Wireshark (network), evidence storage"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The study guide states: Forensic tools ready — DumpIt / WinPMem (memory), FTK Imager / dcfldd (disk), Wireshark (network), evidence storage"
+    }
+  ]
+}

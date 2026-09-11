@@ -1,0 +1,161 @@
+{
+  "nodeId": "l12-recon-scanning-network-attacks-2-passive-reconnaissanc",
+  "locale": "th",
+  "title": "2. Passive Reconnaissance (OSINT)",
+  "objective": "Study-guide review — ICCS423 v2 — L12: Recon, Scanning & Network Attacks: 2. Passive Reconnaissance (OSINT).",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "What \"Passive\" Means"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "No traffic to target = no log entry on victim infrastructure = no detection signal",
+        "All data from publicly accessible sources"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Categories & Tools"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Source",
+        "Tool",
+        "What you find"
+      ],
+      "rows": [
+        [
+          "WHOIS",
+          "whois target.com",
+          "Registrar, name servers, sometimes contact email"
+        ],
+        [
+          "DNS",
+          "dig, nslookup, DNSdumpster",
+          "A/MX/TXT/NS records, SPF/DKIM hints"
+        ],
+        [
+          "Subdomains",
+          "crt.sh, subfinder, amass",
+          "Cert-transparency logs reveal forgotten subdomains"
+        ],
+        [
+          "Search engines",
+          "Google Dorks",
+          "Exposed PDFs, admin panels, error messages"
+        ],
+        [
+          "Internet-wide",
+          "Shodan, Censys, ZoomEye",
+          "Banner-indexed exposed services + IoT"
+        ],
+        [
+          "People",
+          "LinkedIn, Hunter.io",
+          "Email format, employees, tech stack from job posts"
+        ],
+        [
+          "Code",
+          "GitHub search, truffleHog",
+          "Leaked credentials, internal hostnames"
+        ],
+        [
+          "Breach data",
+          "HaveIBeenPwned, DeHashed",
+          "Already-leaked passwords for the org"
+        ]
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Google Dorks (key operators)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "``text site:target.com filetype:pdf # exposed documents site:target.com inurl:admin # admin panels site:target.com filetype:env # leaked .env files site:github.com \"target.com\" password # GitHub credential leaks intitle:\"index of\" site:target.com # directory listing ``"
+    },
+    {
+      "kind": "heading",
+      "text": "Shodan"
+    },
+    {
+      "kind": "paragraph",
+      "text": "``bash shodan search 'org:\"Target Corp\"' shodan search 'port:3389 country:TH' # exposed RDP in Thailand shodan search 'product:\"Apache httpd\" version:\"2.4.46\"' ``"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Real-world: Cl0p group enumerated all internet-facing MOVEit servers via Shodan/Censys before exploiting CVE-2023-34362, hitting 2,500+ orgs and 90M+ records (CISA AA23-158A)."
+    }
+  ],
+  "attribution": "Course: ICCS423 | Source: Thoth Library + RAG | Target: 3rd-4th year CS | Date: 2026-05-03",
+  "cheatsheet": [
+    "WHOIS: whois target.com",
+    "DNS: dig, nslookup, DNSdumpster",
+    "Subdomains: crt.sh, subfinder, amass",
+    "Internet-wide: Shodan, Censys, ZoomEye",
+    "People: LinkedIn, Hunter.io",
+    "Code: GitHub search, truffleHog",
+    "Breach data: HaveIBeenPwned, DeHashed"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for L12 Recon Scanning Network Attacks, \"WHOIS\" is described as:",
+      "choices": {
+        "A": "whois target.com",
+        "B": "LinkedIn, Hunter.io",
+        "C": "Shodan, Censys, ZoomEye",
+        "D": "crt.sh, subfinder, amass"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The study guide states: WHOIS: whois target.com"
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for L12 Recon Scanning Network Attacks, \"DNS\" is described as:",
+      "choices": {
+        "A": "HaveIBeenPwned, DeHashed",
+        "B": "crt.sh, subfinder, amass",
+        "C": "dig, nslookup, DNSdumpster",
+        "D": "GitHub search, truffleHog"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The study guide states: DNS: dig, nslookup, DNSdumpster"
+    },
+    {
+      "id": "q3",
+      "prompt": "In the study guide for L12 Recon Scanning Network Attacks, \"Subdomains\" is described as:",
+      "choices": {
+        "A": "HaveIBeenPwned, DeHashed",
+        "B": "Shodan, Censys, ZoomEye",
+        "C": "GitHub search, truffleHog",
+        "D": "crt.sh, subfinder, amass"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The study guide states: Subdomains: crt.sh, subfinder, amass"
+    },
+    {
+      "id": "q4",
+      "prompt": "In the study guide for L12 Recon Scanning Network Attacks, \"Internet-wide\" is described as:",
+      "choices": {
+        "A": "crt.sh, subfinder, amass",
+        "B": "HaveIBeenPwned, DeHashed",
+        "C": "Shodan, Censys, ZoomEye",
+        "D": "GitHub search, truffleHog"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The study guide states: Internet-wide: Shodan, Censys, ZoomEye"
+    }
+  ]
+}

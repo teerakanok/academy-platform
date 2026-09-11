@@ -1,0 +1,126 @@
+{
+  "nodeId": "session-3-0-corrections-s3-binding",
+  "locale": "en",
+  "title": "0. Corrections ที่ผูกกับ S3 (อ่านก่อนสอน — binding)",
+  "objective": "Study-guide review — Study Guide — Session 3: Case Study — AI/Agentic Risk in Financial Services: 0. Corrections ที่ผูกกับ S3 (อ่านก่อนสอน — binding).",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "จาก BUILD_PLAN.md (must-apply corrections) + RUN_OF_SHOW_v1.2_polished.md (CORRECTIONS header)"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "ENRICHMENTS_v1.1.md. S3 ต้องสอนให้สอดคล้องข้อพวกนี้:"
+      ]
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "#",
+        "Correction",
+        "ผลกับ S3"
+      ],
+      "rows": [
+        [
+          "C-1",
+          "แยก R4/R5: R4 = LLM05 Improper Output Handling; R5 = LLM06 Excessive Agency. LLM02 ใช้เฉพาะเมื่อ sensitive data ถูกเปิดเผยจริง.",
+          "Current R4 canary พิสูจน์ event-handler execution เท่านั้น ไม่พิสูจน์ cookie theft/exfiltration. [src: BUILD_PLAN.md correction #1; RUN_OF_SHOW header #1]"
+        ],
+        [
+          "C-2",
+          "D1 satang-consistent: raw 267.125; vulnerable Math.floor ตัดเป็นบาทเต็ม 267.00; fixed round-half-up to 2dp ได้ 267.13; ทั้งคู่ใช้ ACT/360.",
+          "ใช้ตอน hallucination beat เชื่อม S1↔S3 และย้ำว่า executable เปลี่ยนเฉพาะกฎการปัด. [src: securebank-mini/src/lib/interest.js; test/v6.interest.test.js]"
+        ],
+        [
+          "C-3",
+          "ENRICHMENTS Theme A → fold เข้า S3: \"model variance / reliability\" (ห้ามคำว่า \"bias\"), ห้าม name-shame model รุ่นไหน; teach principle ไม่ใช่ leaderboard.",
+          "Explain that repeated runs may vary and are not independent verification. No current recording/clip is claimed; optional future media must be produced and verified first. [src: ENRICHMENTS_v1.1.md Theme A; RUN_OF_SHOW lines 206, 248, 255]"
+        ],
+        [
+          "C-4",
+          "agent-review ≠ approval gate (Theme A/B): second model = signal ไม่ใช่ control; adversarial review > redundant review เพราะ similar-trained models มี correlated blind spots.",
+          "quiz card \"add a second agent to review\" = signal not control; gate ต้องเป็น human/structure ไม่ใช่ second opinion จากระบบแบบเดียวกัน. [src: ENRICHMENTS_v1.1.md Theme A; RUN_OF_SHOW line 322, 252]"
+        ],
+        [
+          "C-5",
+          "Quiz verdict rebalance — ไม่ให้กองอยู่ที่ \"Redesign\" + reveal บอก \"which of the 4 S2 gates was missing?\"",
+          "9 cards กระจาย verdict (ดูตาราง §3); gate-diagnostic round re-show 4-control strip เป็น answer key. [src: BUILD_PLAN.md #6; RUN_OF_SHOW lines 210, 214, 224-236]"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "bash → config-as-code (ENRICHMENTS Theme B) เป็นของ S4 Route 5 + S5 เป็นหลัก; ใน S3 โผล่เฉพาะ excessive-agency cards (เช่น auto-deploy, payments retry) — กรอบคือ \"design the gate\" ไม่ใช่ \"ban AI\". [src: ENRICHMENTS_v1.1.md Theme B fold-in]"
+    },
+    {
+      "kind": "paragraph",
+      "text": "No-overclaim (binding): ทุกเคสที่มี agent/automation → frame ว่า control gap ปล่อยให้เกิด ไม่ใช่ \"AI ตัดสินใจทำร้าย\". ห้ามพูด \"AI autonomously deploys to prod\". [src: COMMITTED_SCOPE.md Hard constraints]"
+    }
+  ],
+  "attribution": "Session: S3 · 13:00–14:15 (75 min) · When Agents Go Wrong Format: Online · instructor-led · ~50 participants · Interactive Quiz (vote-then-reveal) Language contract: สไลด์ = English · พูด + speaker notes = ภาษาไทย · visual-first Vote options (ทุกการ์ด, fixed wording): Allowed · Needs approval · Bloc",
+  "cheatsheet": [
+    "C-1: แยก R4/R5: R4 = LLM05 Improper Output Handling; R5 = LLM06 Excessive Agency. LLM02 ใช้เฉพาะเมื่อ sensitive data ถูกเปิดเผยจริง.",
+    "C-2: D1 satang-consistent: raw 267.125; vulnerable Math.floor ตัดเป็นบาทเต็ม 267.00; fixed round-half-up to 2dp ได้ 267.13; ทั้งคู่ใช้ ACT/360.",
+    "C-3: ENRICHMENTS Theme A → fold เข้า S3: \"model variance / reliability\" (ห้ามคำว่า \"bias\"), ห้าม name-shame model รุ่นไหน; teach principle ไม่ใช่ leaderboard.",
+    "C-5: Quiz verdict rebalance — ไม่ให้กองอยู่ที่ \"Redesign\" + reveal บอก \"which of the 4 S2 gates was missing?\""
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for session 3, \"C-1\" is described as:",
+      "choices": {
+        "A": "แยก R4/R5: R4 = LLM05 Improper Output Handling; R5 = LLM06 Excessive Agency. LLM02 ใช้เฉพาะเมื่อ sensitive data ถูกเปิดเผยจริง.",
+        "B": "D1 satang-consistent: raw 267.125; vulnerable Math.floor ตัดเป็นบาทเต็ม 267.00; fixed round-half-up to 2dp ได้ 267.13; ทั้งคู่ใช้ ACT/360.",
+        "C": "Quiz verdict rebalance — ไม่ให้กองอยู่ที่ \"Redesign\" + reveal บอก \"which of the 4 S2 gates was missing?\"",
+        "D": "ENRICHMENTS Theme A → fold เข้า S3: \"model variance / reliability\" (ห้ามคำว่า \"bias\"), ห้าม name-shame model รุ่นไหน; teach principle ไม่ใช่ leaderboard."
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The study guide states: C-1: แยก R4/R5: R4 = LLM05 Improper Output Handling; R5 = LLM06 Excessive Agency. LLM02 ใช้เฉพาะเมื่อ sensitive data ถูกเปิดเผยจริง."
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for session 3, \"C-2\" is described as:",
+      "choices": {
+        "A": "Quiz verdict rebalance — ไม่ให้กองอยู่ที่ \"Redesign\" + reveal บอก \"which of the 4 S2 gates was missing?\"",
+        "B": "ENRICHMENTS Theme A → fold เข้า S3: \"model variance / reliability\" (ห้ามคำว่า \"bias\"), ห้าม name-shame model รุ่นไหน; teach principle ไม่ใช่ leaderboard.",
+        "C": "D1 satang-consistent: raw 267.125; vulnerable Math.floor ตัดเป็นบาทเต็ม 267.00; fixed round-half-up to 2dp ได้ 267.13; ทั้งคู่ใช้ ACT/360.",
+        "D": "แยก R4/R5: R4 = LLM05 Improper Output Handling; R5 = LLM06 Excessive Agency. LLM02 ใช้เฉพาะเมื่อ sensitive data ถูกเปิดเผยจริง."
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The study guide states: C-2: D1 satang-consistent: raw 267.125; vulnerable Math.floor ตัดเป็นบาทเต็ม 267.00; fixed round-half-up to 2dp ได้ 267.13; ทั้งคู่ใช้ ACT/360."
+    },
+    {
+      "id": "q3",
+      "prompt": "In the study guide for session 3, \"C-3\" is described as:",
+      "choices": {
+        "A": "แยก R4/R5: R4 = LLM05 Improper Output Handling; R5 = LLM06 Excessive Agency. LLM02 ใช้เฉพาะเมื่อ sensitive data ถูกเปิดเผยจริง.",
+        "B": "agent-review ≠ approval gate (Theme A/B): second model = signal ไม่ใช่ control; adversarial review > redundant review เพราะ similar-trained models มี correlated blind spots.",
+        "C": "D1 satang-consistent: raw 267.125; vulnerable Math.floor ตัดเป็นบาทเต็ม 267.00; fixed round-half-up to 2dp ได้ 267.13; ทั้งคู่ใช้ ACT/360.",
+        "D": "ENRICHMENTS Theme A → fold เข้า S3: \"model variance / reliability\" (ห้ามคำว่า \"bias\"), ห้าม name-shame model รุ่นไหน; teach principle ไม่ใช่ leaderboard."
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The study guide states: C-3: ENRICHMENTS Theme A → fold เข้า S3: \"model variance / reliability\" (ห้ามคำว่า \"bias\"), ห้าม name-shame model รุ่นไหน; teach principle ไม่ใช่ leaderboard."
+    },
+    {
+      "id": "q4",
+      "prompt": "In the study guide for session 3, \"C-4\" is described as:",
+      "choices": {
+        "A": "ENRICHMENTS Theme A → fold เข้า S3: \"model variance / reliability\" (ห้ามคำว่า \"bias\"), ห้าม name-shame model รุ่นไหน; teach principle ไม่ใช่ leaderboard.",
+        "B": "D1 satang-consistent: raw 267.125; vulnerable Math.floor ตัดเป็นบาทเต็ม 267.00; fixed round-half-up to 2dp ได้ 267.13; ทั้งคู่ใช้ ACT/360.",
+        "C": "แยก R4/R5: R4 = LLM05 Improper Output Handling; R5 = LLM06 Excessive Agency. LLM02 ใช้เฉพาะเมื่อ sensitive data ถูกเปิดเผยจริง.",
+        "D": "agent-review ≠ approval gate (Theme A/B): second model = signal ไม่ใช่ control; adversarial review > redundant review เพราะ similar-trained models มี correlated blind spots."
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The study guide states: C-4: agent-review ≠ approval gate (Theme A/B): second model = signal ไม่ใช่ control; adversarial review > redundant review เพราะ similar-trained models มี correlated blind spots."
+    }
+  ]
+}

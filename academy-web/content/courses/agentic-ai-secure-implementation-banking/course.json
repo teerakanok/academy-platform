@@ -1,0 +1,237 @@
+{
+  "id": "agentic-ai-secure-implementation-banking",
+  "slug": "agentic-ai-secure-implementation-banking",
+  "version": "0.1.0",
+  "publicAvailability": "internal",
+  "defaultLocale": "en",
+  "availableLocales": [
+    "en",
+    "th"
+  ],
+  "level": "intermediate",
+  "estimatedMinutes": 162,
+  "coverMotif": "terminal",
+  "skills": [
+    {
+      "id": "session-1",
+      "maxScore": 100
+    },
+    {
+      "id": "session-2",
+      "maxScore": 100
+    },
+    {
+      "id": "session-3",
+      "maxScore": 100
+    },
+    {
+      "id": "session-4",
+      "maxScore": 100
+    },
+    {
+      "id": "session-5",
+      "maxScore": 100
+    }
+  ],
+  "globalSkillWeights": {
+    "foundations": 1
+  },
+  "nodes": [
+    {
+      "id": "session-1-3-teaching-content-source-backed",
+      "kind": "capstone",
+      "prerequisites": [],
+      "estimatedMinutes": 26,
+      "skillWeights": {
+        "session-1": 4
+      }
+    },
+    {
+      "id": "session-2-1-where-session-2-sits-continuity-why-how-callba",
+      "kind": "lesson",
+      "prerequisites": [
+        "session-1-3-teaching-content-source-backed"
+      ],
+      "estimatedMinutes": 6,
+      "skillWeights": {
+        "session-2": 4
+      }
+    },
+    {
+      "id": "session-2-4-the-four-control-spine-the-heart-of-the-sessio",
+      "kind": "lesson",
+      "prerequisites": [
+        "session-2-1-where-session-2-sits-continuity-why-how-callba"
+      ],
+      "estimatedMinutes": 6,
+      "skillWeights": {
+        "session-2": 4
+      }
+    },
+    {
+      "id": "session-2-5-the-control-walkthrough-demo-spec-30-min",
+      "kind": "lesson",
+      "prerequisites": [
+        "session-2-4-the-four-control-spine-the-heart-of-the-sessio"
+      ],
+      "estimatedMinutes": 11,
+      "skillWeights": {
+        "session-2": 4
+      }
+    },
+    {
+      "id": "session-2-6-one-pattern-four-banking-domains-take-home-app",
+      "kind": "lesson",
+      "prerequisites": [
+        "session-2-5-the-control-walkthrough-demo-spec-30-min"
+      ],
+      "estimatedMinutes": 6,
+      "skillWeights": {
+        "session-2": 4
+      }
+    },
+    {
+      "id": "session-2-7-participant-interaction-no-hands-on-watch-reac",
+      "kind": "lesson",
+      "prerequisites": [
+        "session-2-6-one-pattern-four-banking-domains-take-home-app"
+      ],
+      "estimatedMinutes": 6,
+      "skillWeights": {
+        "session-2": 4
+      }
+    },
+    {
+      "id": "session-2-8-foreshadowing-and-callback-map-keeps-the-day-c",
+      "kind": "lesson",
+      "prerequisites": [
+        "session-2-7-participant-interaction-no-hands-on-watch-reac"
+      ],
+      "estimatedMinutes": 6,
+      "skillWeights": {
+        "session-2": 4
+      }
+    },
+    {
+      "id": "session-2-11-source-map-citation-chips-used-in-this-guide",
+      "kind": "capstone",
+      "prerequisites": [
+        "session-2-8-foreshadowing-and-callback-map-keeps-the-day-c"
+      ],
+      "estimatedMinutes": 7,
+      "skillWeights": {
+        "session-2": 4
+      }
+    },
+    {
+      "id": "session-3-0-corrections-s3-binding",
+      "kind": "lesson",
+      "prerequisites": [
+        "session-2-11-source-map-citation-chips-used-in-this-guide"
+      ],
+      "estimatedMinutes": 6,
+      "skillWeights": {
+        "session-3": 4
+      }
+    },
+    {
+      "id": "session-3-2-part-a-verified-case-studies-4-categories",
+      "kind": "lesson",
+      "prerequisites": [
+        "session-3-0-corrections-s3-binding"
+      ],
+      "estimatedMinutes": 11,
+      "skillWeights": {
+        "session-3": 4
+      }
+    },
+    {
+      "id": "session-3-3-part-b-interactive-quiz-9-cards-3-micro-rounds",
+      "kind": "lesson",
+      "prerequisites": [
+        "session-3-2-part-a-verified-case-studies-4-categories"
+      ],
+      "estimatedMinutes": 7,
+      "skillWeights": {
+        "session-3": 4
+      }
+    },
+    {
+      "id": "session-3-6-build-team-notes-surfaced-risks",
+      "kind": "capstone",
+      "prerequisites": [
+        "session-3-3-part-b-interactive-quiz-9-cards-3-micro-rounds"
+      ],
+      "estimatedMinutes": 7,
+      "skillWeights": {
+        "session-3": 4
+      }
+    },
+    {
+      "id": "session-4-0-study-guide",
+      "kind": "lesson",
+      "prerequisites": [
+        "session-3-6-build-team-notes-surfaced-risks"
+      ],
+      "estimatedMinutes": 6,
+      "skillWeights": {
+        "session-4": 4
+      }
+    },
+    {
+      "id": "session-4-1-session",
+      "kind": "lesson",
+      "prerequisites": [
+        "session-4-0-study-guide"
+      ],
+      "estimatedMinutes": 6,
+      "skillWeights": {
+        "session-4": 4
+      }
+    },
+    {
+      "id": "session-4-3-teaching-treatment-owasp-item",
+      "kind": "lesson",
+      "prerequisites": [
+        "session-4-1-session"
+      ],
+      "estimatedMinutes": 9,
+      "skillWeights": {
+        "session-4": 4
+      }
+    },
+    {
+      "id": "session-4-4-risk-walkthrough-instructor-led-demo-5-routes",
+      "kind": "capstone",
+      "prerequisites": [
+        "session-4-3-teaching-treatment-owasp-item"
+      ],
+      "estimatedMinutes": 16,
+      "skillWeights": {
+        "session-4": 4
+      }
+    },
+    {
+      "id": "session-5-3-the-4-layer-control-framework-the-spine-of-s5",
+      "kind": "lesson",
+      "prerequisites": [
+        "session-4-4-risk-walkthrough-instructor-led-demo-5-routes"
+      ],
+      "estimatedMinutes": 13,
+      "skillWeights": {
+        "session-5": 4
+      }
+    },
+    {
+      "id": "session-5-6-rollout-pilot-risk-tier-scale-s5-10",
+      "kind": "capstone",
+      "prerequisites": [
+        "session-5-3-the-4-layer-control-framework-the-spine-of-s5"
+      ],
+      "estimatedMinutes": 7,
+      "skillWeights": {
+        "session-5": 4
+      }
+    }
+  ]
+}

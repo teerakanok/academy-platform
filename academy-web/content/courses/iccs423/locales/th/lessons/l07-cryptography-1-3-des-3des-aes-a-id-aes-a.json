@@ -1,0 +1,142 @@
+{
+  "nodeId": "l07-cryptography-1-3-des-3des-aes-a-id-aes-a",
+  "locale": "th",
+  "title": "3. DES → 3DES → AES <a id=\"aes\"></a>",
+  "objective": "Study-guide review — ICCS423 v2 — L07: Cryptography 1 (Symmetric, Hashing, Encoding): 3. DES → 3DES → AES <a id=\"aes\"></a>.",
+  "blocks": [
+    {
+      "kind": "table",
+      "headers": [
+        "Algorithm",
+        "Key",
+        "Block",
+        "Status",
+        "Why retired"
+      ],
+      "rows": [
+        [
+          "DES (1977)",
+          "56 bits",
+          "64 bits",
+          "❌ Broken",
+          "EFF Deep Crack 1998 — $250K, 56h"
+        ],
+        [
+          "3DES (1998)",
+          "112/168",
+          "64 bits",
+          "❌ Deprecated",
+          "Sweet32 (CVE-2016-2183), slow"
+        ],
+        [
+          "AES-128",
+          "128",
+          "128",
+          "✅ Standard",
+          "None practical"
+        ],
+        [
+          "AES-192",
+          "192",
+          "128",
+          "✅ Standard",
+          "None practical"
+        ],
+        [
+          "AES-256",
+          "256",
+          "128",
+          "✅ Top Secret",
+          "None practical"
+        ]
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "AES Internals (per round)"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "SubBytes — substitution via S-Box (confusion)",
+        "ShiftRows — row shifting (diffusion)",
+        "MixColumns — matrix multiply (diffusion)",
+        "AddRoundKey — XOR with round key"
+      ],
+      "ordered": true
+    },
+    {
+      "kind": "paragraph",
+      "text": "Rounds: 10 (AES-128) / 12 (AES-192) / 14 (AES-256)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "AES is everywhere — TLS, FileVault, BitLocker, WPA2, Signal. If you find software claiming to invent its own cipher, run."
+    }
+  ],
+  "attribution": "Course: ICCS423 | Source: Thoth Library (cryptography/) + RAG | Target: 3rd-4th year CS | Date: 2026-05-03",
+  "cheatsheet": [
+    "SubBytes: substitution via S-Box (confusion)",
+    "ShiftRows: row shifting (diffusion)",
+    "MixColumns: matrix multiply (diffusion)",
+    "AddRoundKey: XOR with round key"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for L07 Cryptography 1, \"SubBytes\" is described as:",
+      "choices": {
+        "A": "matrix multiply (diffusion)",
+        "B": "row shifting (diffusion)",
+        "C": "XOR with round key",
+        "D": "substitution via S-Box (confusion)"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The study guide states: SubBytes — substitution via S-Box (confusion)"
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for L07 Cryptography 1, \"ShiftRows\" is described as:",
+      "choices": {
+        "A": "substitution via S-Box (confusion)",
+        "B": "XOR with round key",
+        "C": "row shifting (diffusion)",
+        "D": "matrix multiply (diffusion)"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The study guide states: ShiftRows — row shifting (diffusion)"
+    },
+    {
+      "id": "q3",
+      "prompt": "In the study guide for L07 Cryptography 1, \"MixColumns\" is described as:",
+      "choices": {
+        "A": "matrix multiply (diffusion)",
+        "B": "row shifting (diffusion)",
+        "C": "substitution via S-Box (confusion)",
+        "D": "XOR with round key"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The study guide states: MixColumns — matrix multiply (diffusion)"
+    },
+    {
+      "id": "q4",
+      "prompt": "In the study guide for L07 Cryptography 1, \"AddRoundKey\" is described as:",
+      "choices": {
+        "A": "substitution via S-Box (confusion)",
+        "B": "matrix multiply (diffusion)",
+        "C": "row shifting (diffusion)",
+        "D": "XOR with round key"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The study guide states: AddRoundKey — XOR with round key"
+    }
+  ]
+}

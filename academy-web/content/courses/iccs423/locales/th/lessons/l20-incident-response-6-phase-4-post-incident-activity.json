@@ -1,0 +1,123 @@
+{
+  "nodeId": "l20-incident-response-6-phase-4-post-incident-activity",
+  "locale": "th",
+  "title": "6. Phase 4 — Post-Incident Activity",
+  "objective": "Study-guide review — ICCS423 v2 — L20: Incident Response: 6. Phase 4 — Post-Incident Activity.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "The phase most often skipped — and the most valuable."
+    },
+    {
+      "kind": "heading",
+      "text": "Lessons Learned Meeting"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Held within 2 weeks of incident closure (memory is fresh; calendars haven't moved on)",
+        "Attendees: full IR team + management + affected business units",
+        "Blame-free format — focus on system failures, not individual mistakes"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Timeline Documentation"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Reconstruct what happened minute by minute:"
+    },
+    {
+      "kind": "paragraph",
+      "text": "`` 2026-04-15 02:14 Initial access via phishing email 2026-04-15 02:32 Macro execution drops payload 2026-04-15 03:18 Lateral movement to file server via SMB 2026-04-15 09:42 SOC alert: unusual SMB write pattern 2026-04-15 09:51 Analyst confirms incident, escalates to IR Lead 2026-04-15 10:05 Containment: isolate file server ... ``"
+    },
+    {
+      "kind": "heading",
+      "text": "Stakeholder Report"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Executive summary (1 page) — what happened, impact, what we did",
+        "Technical timeline — full attack chain",
+        "Root cause — why did this happen?",
+        "IOCs discovered — for sharing with industry/regulators",
+        "Recommendations — concrete control improvements with owners and dates"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Playbook + Detection Update"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Every incident reveals a gap. Update playbooks immediately so the next analyst benefits from your pain."
+    }
+  ],
+  "attribution": "Course: ICCS423 | Source: Thoth + RAG | Target: 3rd-4th year CS | Date: 2026-05-03",
+  "cheatsheet": [
+    "Technical timeline: full attack chain",
+    "Root cause: why did this happen?",
+    "IOCs discovered: for sharing with industry/regulators",
+    "Recommendations: concrete control improvements with owners and dates"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for L20 Incident Response, \"Technical timeline\" is described as:",
+      "choices": {
+        "A": "why did this happen?",
+        "B": "for sharing with industry/regulators",
+        "C": "full attack chain",
+        "D": "concrete control improvements with owners and dates"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The study guide states: Technical timeline — full attack chain"
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for L20 Incident Response, \"Root cause\" is described as:",
+      "choices": {
+        "A": "concrete control improvements with owners and dates",
+        "B": "for sharing with industry/regulators",
+        "C": "why did this happen?",
+        "D": "full attack chain"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The study guide states: Root cause — why did this happen?"
+    },
+    {
+      "id": "q3",
+      "prompt": "In the study guide for L20 Incident Response, \"IOCs discovered\" is described as:",
+      "choices": {
+        "A": "concrete control improvements with owners and dates",
+        "B": "why did this happen?",
+        "C": "for sharing with industry/regulators",
+        "D": "full attack chain"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The study guide states: IOCs discovered — for sharing with industry/regulators"
+    },
+    {
+      "id": "q4",
+      "prompt": "In the study guide for L20 Incident Response, \"Recommendations\" is described as:",
+      "choices": {
+        "A": "full attack chain",
+        "B": "why did this happen?",
+        "C": "concrete control improvements with owners and dates",
+        "D": "for sharing with industry/regulators"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The study guide states: Recommendations — concrete control improvements with owners and dates"
+    }
+  ]
+}

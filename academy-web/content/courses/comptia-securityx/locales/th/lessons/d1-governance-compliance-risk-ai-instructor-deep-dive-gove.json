@@ -1,0 +1,153 @@
+{
+  "nodeId": "d1-governance-compliance-risk-ai-instructor-deep-dive-gove",
+  "locale": "th",
+  "title": "Instructor Deep Dive — Governance as a Decision System",
+  "objective": "Study-guide review — Day 1 — Governance, Compliance, Risk, and AI Governance: Instructor Deep Dive — Governance as a Decision System.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "Program Documents Create Enforcement Paths"
+    },
+    {
+      "kind": "paragraph",
+      "text": "A policy without standards and procedures is too abstract to enforce. A procedure without policy support is easy to ignore. A guideline without clear status can be mistaken for a mandatory rule. Teach the document hierarchy as an enforcement path:"
+    },
+    {
+      "kind": "paragraph",
+      "text": "``text policy intent -> standard requirement -> procedure execution -> evidence -> audit/reporting ``"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Example: if management requires protection of confidential data, the policy states the requirement, the standard defines encryption/access requirements, the procedure explains how teams classify and protect data, and evidence proves controls operate."
+    },
+    {
+      "kind": "heading",
+      "text": "Governance Needs Evidence, Not Confidence"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Governance answers \"how do we know?\" A team may say backups work, vendors are secure, AI use is safe, or risks are accepted. SecurityX-level governance requires evidence: restore test results, vendor assurance, privacy review, approved risk acceptance, audit records, or GRC workflow state."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Use this phrase in class: confidence is not control evidence."
+    },
+    {
+      "kind": "heading",
+      "text": "Compliance Is Not the Same as Security"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Compliance can define minimum obligations, but it does not guarantee full security. A compliant system can still be poorly designed for a specific threat model. A secure design can still fail if it violates legal or contractual obligations. Students should learn to treat compliance as required context, not the whole security strategy."
+    },
+    {
+      "kind": "heading",
+      "text": "Risk Appetite and Residual Risk"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Risk appetite is the amount and type of risk the organization is willing to pursue or accept. Residual risk is the risk remaining after controls. Security teams can identify and reduce risk, but accountable owners decide whether residual risk is acceptable within governance rules."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Scenario cue: if a mitigation is too costly, impossible, or disruptive, the best answer may be compensating controls plus formal risk acceptance rather than pretending the risk disappeared."
+    },
+    {
+      "kind": "heading",
+      "text": "AI Governance Must Cover Data, Model, and Action"
+    },
+    {
+      "kind": "paragraph",
+      "text": "The official source includes AI legal/privacy concerns and AI usage risk. For teaching, separate three layers:"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Layer",
+        "Question"
+      ],
+      "rows": [
+        [
+          "Data",
+          "What sensitive or regulated data enters the AI system?"
+        ],
+        [
+          "Model/output",
+          "How is output validated before use?"
+        ],
+        [
+          "Action",
+          "Can the AI trigger workflow, access data, or change systems?"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "The more agency the AI has, the stronger the governance needed: least privilege, approval gates, logging, retention rules, and accountability."
+    }
+  ],
+  "attribution": "Course: SecurityX CAS-005 Primary source: CertMaster Study Lessons 2A, 2B, 2C Slide source: SecurityX_M02_PPT.pptx Teaching goal: give students the decision language for governance, compliance, and risk before architecture topics begin.",
+  "cheatsheet": [
+    "Data: What sensitive or regulated data enters the AI system?",
+    "Model/output: How is output validated before use?",
+    "Action: Can the AI trigger workflow, access data, or change systems?"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for D1 Governance Compliance Risk AI, \"Data\" is described as:",
+      "choices": {
+        "A": "Can the AI trigger workflow, access data, or change systems?",
+        "B": "How is output validated before use?",
+        "C": "Evaluation against criteria; may be internal or external",
+        "D": "What sensitive or regulated data enters the AI system?"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The study guide states: Data: What sensitive or regulated data enters the AI system?"
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for D1 Governance Compliance Risk AI, \"Model/output\" is described as:",
+      "choices": {
+        "A": "How is output validated before use?",
+        "B": "What sensitive or regulated data enters the AI system?",
+        "C": "Can the AI trigger workflow, access data, or change systems?",
+        "D": "Reporting framework or GRC workflow"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The study guide states: Model/output: How is output validated before use?"
+    },
+    {
+      "id": "q3",
+      "prompt": "In the study guide for D1 Governance Compliance Risk AI, \"Action\" is described as:",
+      "choices": {
+        "A": "What sensitive or regulated data enters the AI system?",
+        "B": "How is output validated before use?",
+        "C": "Formal review of controls, evidence, and compliance posture",
+        "D": "Can the AI trigger workflow, access data, or change systems?"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The study guide states: Action: Can the AI trigger workflow, access data, or change systems?"
+    },
+    {
+      "id": "q4",
+      "prompt": "Which term does the study guide for D1 Governance Compliance Risk AI define as: \"What sensitive or regulated data enters the AI system?\"?",
+      "choices": {
+        "A": "Model/output",
+        "B": "Data",
+        "C": "Procedure",
+        "D": "Standard"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: Data: What sensitive or regulated data enters the AI system?"
+    }
+  ]
+}

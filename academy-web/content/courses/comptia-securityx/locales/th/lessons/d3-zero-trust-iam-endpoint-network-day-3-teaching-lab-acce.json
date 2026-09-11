@@ -1,0 +1,133 @@
+{
+  "nodeId": "d3-zero-trust-iam-endpoint-network-day-3-teaching-lab-acce",
+  "locale": "th",
+  "title": "Day 3 Teaching Lab — Access Decision and Investigation Chain",
+  "objective": "Study-guide review — Day 3 — Zero Trust, IAM, Endpoint, and Network Engineering: Day 3 Teaching Lab — Access Decision and Investigation Chain.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "Scenario: a contractor uses a personal laptop from a new location to access a source-code repository. The login succeeds. Minutes later, endpoint logs from a build server show unusual script execution, DNS logs show unfamiliar lookups, and IAM logs show a privileged role being assumed by a service account."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Ask students to build a single timeline:"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Evidence",
+        "Control-plane question"
+      ],
+      "rows": [
+        [
+          "Contractor login",
+          "Was conditional access applied? Was the device trusted?"
+        ],
+        [
+          "Repository access",
+          "Was authorization appropriate for subject, object, and context?"
+        ],
+        [
+          "Script execution",
+          "Is this authorized automation or attacker TTP?"
+        ],
+        [
+          "DNS activity",
+          "Is this normal dependency access or command-and-control signal?"
+        ],
+        [
+          "Privileged role assumption",
+          "Was PIM or cloud IAM trust policy involved?"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Expected reasoning:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Zero Trust requires continuous evaluation, not only successful login.",
+        "IAM investigation must separate authentication, authorization, and accounting.",
+        "Endpoint telemetry explains what ran; network telemetry explains where it connected.",
+        "DNS and IAM logs provide context for lateral movement or service misuse.",
+        "Containment must account for business impact and evidence preservation."
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Wrong-answer discussion: \"block the user\" may be necessary, but it is not enough. The investigation still needs device posture, access path, service account trust, endpoint process evidence, and network evidence."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Source: CertMaster Study Lessons 3E, 3F, 4A, and 4B; SecurityX M03-M04 slides."
+    }
+  ],
+  "attribution": "Course: SecurityX CAS-005 Primary source: CertMaster Study Lessons 3E, 3F, 4A, 4B Slide sources: SecurityX_M03_PPT.pptx, SecurityX_M04_PPT.pptx Teaching goal: connect identity, device, endpoint, and network controls into a troubleshooting-ready security architecture.",
+  "cheatsheet": [
+    "Contractor login: Was conditional access applied? Was the device trusted?",
+    "Repository access: Was authorization appropriate for subject, object, and context?",
+    "Script execution: Is this authorized automation or attacker TTP?",
+    "DNS activity: Is this normal dependency access or command-and-control signal?",
+    "Privileged role assumption: Was PIM or cloud IAM trust policy involved?"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for D3 Zero Trust IAM Endpoint Network, \"Contractor login\" is described as:",
+      "choices": {
+        "A": "Was conditional access applied? Was the device trusted?",
+        "B": "Was authorization appropriate for subject, object, and context?",
+        "C": "Is this normal dependency access or command-and-control signal?",
+        "D": "Is this authorized automation or attacker TTP?"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The study guide states: Contractor login: Was conditional access applied? Was the device trusted?"
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for D3 Zero Trust IAM Endpoint Network, \"Repository access\" is described as:",
+      "choices": {
+        "A": "Was authorization appropriate for subject, object, and context?",
+        "B": "Is this normal dependency access or command-and-control signal?",
+        "C": "Was conditional access applied? Was the device trusted?",
+        "D": "Is this authorized automation or attacker TTP?"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The study guide states: Repository access: Was authorization appropriate for subject, object, and context?"
+    },
+    {
+      "id": "q3",
+      "prompt": "In the study guide for D3 Zero Trust IAM Endpoint Network, \"Script execution\" is described as:",
+      "choices": {
+        "A": "Was PIM or cloud IAM trust policy involved?",
+        "B": "Was conditional access applied? Was the device trusted?",
+        "C": "Is this authorized automation or attacker TTP?",
+        "D": "Was authorization appropriate for subject, object, and context?"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The study guide states: Script execution: Is this authorized automation or attacker TTP?"
+    },
+    {
+      "id": "q4",
+      "prompt": "In the study guide for D3 Zero Trust IAM Endpoint Network, \"DNS activity\" is described as:",
+      "choices": {
+        "A": "Is this authorized automation or attacker TTP?",
+        "B": "Is this normal dependency access or command-and-control signal?",
+        "C": "Was conditional access applied? Was the device trusted?",
+        "D": "Was authorization appropriate for subject, object, and context?"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: DNS activity: Is this normal dependency access or command-and-control signal?"
+    }
+  ]
+}

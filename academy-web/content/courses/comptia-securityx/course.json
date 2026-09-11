@@ -1,0 +1,226 @@
+{
+  "id": "comptia-securityx",
+  "slug": "comptia-securityx",
+  "version": "0.1.0",
+  "publicAvailability": "internal",
+  "defaultLocale": "en",
+  "availableLocales": [
+    "en",
+    "th"
+  ],
+  "level": "advanced",
+  "estimatedMinutes": 121,
+  "coverMotif": "shield",
+  "skills": [
+    {
+      "id": "d1-governance-compliance-risk-ai",
+      "maxScore": 100
+    },
+    {
+      "id": "d2-secure-architecture-cloud-resilience",
+      "maxScore": 100
+    },
+    {
+      "id": "d3-zero-trust-iam-endpoint-network",
+      "maxScore": 100
+    },
+    {
+      "id": "d4-automation-cryptography-data-protection",
+      "maxScore": 100
+    },
+    {
+      "id": "d5-threat-ops-hunting-ir",
+      "maxScore": 100
+    }
+  ],
+  "globalSkillWeights": {
+    "foundations": 1
+  },
+  "nodes": [
+    {
+      "id": "d1-governance-compliance-risk-ai-lesson-2a-governance-comp",
+      "kind": "lesson",
+      "prerequisites": [],
+      "estimatedMinutes": 10,
+      "skillWeights": {
+        "d1-governance-compliance-risk-ai": 4
+      }
+    },
+    {
+      "id": "d1-governance-compliance-risk-ai-lesson-2b-legal-complianc",
+      "kind": "lesson",
+      "prerequisites": [
+        "d1-governance-compliance-risk-ai-lesson-2a-governance-comp"
+      ],
+      "estimatedMinutes": 7,
+      "skillWeights": {
+        "d1-governance-compliance-risk-ai": 4
+      }
+    },
+    {
+      "id": "d1-governance-compliance-risk-ai-lesson-2c-risk-management",
+      "kind": "lesson",
+      "prerequisites": [
+        "d1-governance-compliance-risk-ai-lesson-2b-legal-complianc"
+      ],
+      "estimatedMinutes": 8,
+      "skillWeights": {
+        "d1-governance-compliance-risk-ai": 4
+      }
+    },
+    {
+      "id": "d1-governance-compliance-risk-ai-instructor-deep-dive-gove",
+      "kind": "lesson",
+      "prerequisites": [
+        "d1-governance-compliance-risk-ai-lesson-2c-risk-management"
+      ],
+      "estimatedMinutes": 6,
+      "skillWeights": {
+        "d1-governance-compliance-risk-ai": 4
+      }
+    },
+    {
+      "id": "d1-governance-compliance-risk-ai-day-1-teaching-lab-govern",
+      "kind": "capstone",
+      "prerequisites": [
+        "d1-governance-compliance-risk-ai-instructor-deep-dive-gove"
+      ],
+      "estimatedMinutes": 7,
+      "skillWeights": {
+        "d1-governance-compliance-risk-ai": 4
+      }
+    },
+    {
+      "id": "d2-secure-architecture-cloud-resilience-lesson-3c-operatio",
+      "kind": "lesson",
+      "prerequisites": [
+        "d1-governance-compliance-risk-ai-day-1-teaching-lab-govern"
+      ],
+      "estimatedMinutes": 6,
+      "skillWeights": {
+        "d2-secure-architecture-cloud-resilience": 4
+      }
+    },
+    {
+      "id": "d2-secure-architecture-cloud-resilience-lesson-3d-cloud-in",
+      "kind": "lesson",
+      "prerequisites": [
+        "d2-secure-architecture-cloud-resilience-lesson-3c-operatio"
+      ],
+      "estimatedMinutes": 8,
+      "skillWeights": {
+        "d2-secure-architecture-cloud-resilience": 4
+      }
+    },
+    {
+      "id": "d2-secure-architecture-cloud-resilience-day-2-teaching-lab",
+      "kind": "capstone",
+      "prerequisites": [
+        "d2-secure-architecture-cloud-resilience-lesson-3d-cloud-in"
+      ],
+      "estimatedMinutes": 8,
+      "skillWeights": {
+        "d2-secure-architecture-cloud-resilience": 4
+      }
+    },
+    {
+      "id": "d3-zero-trust-iam-endpoint-network-lesson-3f-aaa-and-iam",
+      "kind": "lesson",
+      "prerequisites": [
+        "d2-secure-architecture-cloud-resilience-day-2-teaching-lab"
+      ],
+      "estimatedMinutes": 6,
+      "skillWeights": {
+        "d3-zero-trust-iam-endpoint-network": 4
+      }
+    },
+    {
+      "id": "d3-zero-trust-iam-endpoint-network-lesson-4a-endpoint-secu",
+      "kind": "lesson",
+      "prerequisites": [
+        "d3-zero-trust-iam-endpoint-network-lesson-3f-aaa-and-iam"
+      ],
+      "estimatedMinutes": 6,
+      "skillWeights": {
+        "d3-zero-trust-iam-endpoint-network": 4
+      }
+    },
+    {
+      "id": "d3-zero-trust-iam-endpoint-network-day-3-teaching-lab-acce",
+      "kind": "capstone",
+      "prerequisites": [
+        "d3-zero-trust-iam-endpoint-network-lesson-4a-endpoint-secu"
+      ],
+      "estimatedMinutes": 7,
+      "skillWeights": {
+        "d3-zero-trust-iam-endpoint-network": 4
+      }
+    },
+    {
+      "id": "d4-automation-cryptography-data-protection-lesson-4c-secur",
+      "kind": "lesson",
+      "prerequisites": [
+        "d3-zero-trust-iam-endpoint-network-day-3-teaching-lab-acce"
+      ],
+      "estimatedMinutes": 8,
+      "skillWeights": {
+        "d4-automation-cryptography-data-protection": 4
+      }
+    },
+    {
+      "id": "d4-automation-cryptography-data-protection-lesson-4d-crypt",
+      "kind": "lesson",
+      "prerequisites": [
+        "d4-automation-cryptography-data-protection-lesson-4c-secur"
+      ],
+      "estimatedMinutes": 6,
+      "skillWeights": {
+        "d4-automation-cryptography-data-protection": 4
+      }
+    },
+    {
+      "id": "d4-automation-cryptography-data-protection-instructor-deep",
+      "kind": "capstone",
+      "prerequisites": [
+        "d4-automation-cryptography-data-protection-lesson-4d-crypt"
+      ],
+      "estimatedMinutes": 9,
+      "skillWeights": {
+        "d4-automation-cryptography-data-protection": 4
+      }
+    },
+    {
+      "id": "d5-threat-ops-hunting-ir-lesson-5c-attack-methods-and-miti",
+      "kind": "lesson",
+      "prerequisites": [
+        "d4-automation-cryptography-data-protection-instructor-deep"
+      ],
+      "estimatedMinutes": 6,
+      "skillWeights": {
+        "d5-threat-ops-hunting-ir": 4
+      }
+    },
+    {
+      "id": "d5-threat-ops-hunting-ir-lesson-5e-incident-analysis-and-r",
+      "kind": "lesson",
+      "prerequisites": [
+        "d5-threat-ops-hunting-ir-lesson-5c-attack-methods-and-miti"
+      ],
+      "estimatedMinutes": 6,
+      "skillWeights": {
+        "d5-threat-ops-hunting-ir": 4
+      }
+    },
+    {
+      "id": "d5-threat-ops-hunting-ir-day-5-teaching-lab-from-threat-mo",
+      "kind": "capstone",
+      "prerequisites": [
+        "d5-threat-ops-hunting-ir-lesson-5e-incident-analysis-and-r"
+      ],
+      "estimatedMinutes": 7,
+      "skillWeights": {
+        "d5-threat-ops-hunting-ir": 4
+      }
+    }
+  ]
+}

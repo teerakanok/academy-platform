@@ -1,0 +1,109 @@
+{
+  "nodeId": "l11-web-security-2-5-api-security",
+  "locale": "th",
+  "title": "5. API Security",
+  "objective": "Study-guide review — ICCS423 v2 — L11: Web Security 2 (XSS · CSRF · Files · SSRF · API · Proactive Controls): 5. API Security.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "OWASP API Top 10 — Highlights"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "API1 — BOLA (Broken Object Level Auth) = IDOR in API context (most common API flaw)",
+        "API3 — Broken Object Property Level Auth — mass assignment / excessive data exposure",
+        "API4 — Lack of Resources & Rate Limiting — enables enumeration and DoS",
+        "API5 — Broken Function Level Auth — admin endpoints reachable by regular users"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Mass Assignment"
+    },
+    {
+      "kind": "paragraph",
+      "text": "``http POST /api/users {\"username\":\"alice\",\"email\":\"a@x\",\"is_admin\":true} ← extra field accepted ``"
+    },
+    {
+      "kind": "paragraph",
+      "text": "``python # ✅ Pydantic — only listed fields accepted class UserCreate(BaseModel): username: str email: str # is_admin not declared → ignored ``"
+    },
+    {
+      "kind": "heading",
+      "text": "Rate Limiting Pattern"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Per-IP + per-token combined; sliding window",
+        "Backed by Redis or API gateway (Kong, AWS API Gateway, Cloudflare)",
+        "Return 429 Too Many Requests with Retry-After header"
+      ]
+    }
+  ],
+  "attribution": "Course: ICCS423 | Source: Thoth Library + RAG | Target: 3rd-4th year CS | Date: 2026-05-03",
+  "cheatsheet": [
+    "API3 — Broken Object Property Level Auth: mass assignment / excessive data exposure",
+    "API4 — Lack of Resources & Rate Limiting: enables enumeration and DoS",
+    "API5 — Broken Function Level Auth: admin endpoints reachable by regular users"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for L11 Web Security 2, \"API3 — Broken Object Property Level Auth\" is described as:",
+      "choices": {
+        "A": "mass assignment / excessive data exposure",
+        "B": "admin endpoints reachable by regular users",
+        "C": "enables enumeration and DoS",
+        "D": "claim same gift card twice within 50 ms"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The study guide states: API3 — Broken Object Property Level Auth — mass assignment / excessive data exposure"
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for L11 Web Security 2, \"API4 — Lack of Resources & Rate Limiting\" is described as:",
+      "choices": {
+        "A": "mass assignment / excessive data exposure",
+        "B": "enables enumeration and DoS",
+        "C": "admin endpoints reachable by regular users",
+        "D": "URL/form param echoed back"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: API4 — Lack of Resources & Rate Limiting — enables enumeration and DoS"
+    },
+    {
+      "id": "q3",
+      "prompt": "In the study guide for L11 Web Security 2, \"API5 — Broken Function Level Auth\" is described as:",
+      "choices": {
+        "A": "admin endpoints reachable by regular users",
+        "B": "mass assignment / excessive data exposure",
+        "C": "enables enumeration and DoS",
+        "D": "token-required model defeats SSRF→IMDS pivot"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The study guide states: API5 — Broken Function Level Auth — admin endpoints reachable by regular users"
+    },
+    {
+      "id": "q4",
+      "prompt": "Which term does the study guide for L11 Web Security 2 define as: \"mass assignment / excessive data exposure\"?",
+      "choices": {
+        "A": "API4 — Lack of Resources & Rate Limiting",
+        "B": "API5 — Broken Function Level Auth",
+        "C": "API3 — Broken Object Property Level Auth",
+        "D": "Disable script execution in upload directory"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The study guide states: API3 — Broken Object Property Level Auth — mass assignment / excessive data exposure"
+    }
+  ]
+}

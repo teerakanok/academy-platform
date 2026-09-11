@@ -1,0 +1,168 @@
+{
+  "nodeId": "session-2-11-source-map-citation-chips-used-in-this-guide",
+  "locale": "th",
+  "title": "11. Source map (citation chips used in this guide)",
+  "objective": "Study-guide review — Study Guide — Session 2: Practical Agentic Workflow Controls: 11. Source map (citation chips used in this guide).",
+  "blocks": [
+    {
+      "kind": "table",
+      "headers": [
+        "Chip",
+        "Resolves to",
+        "Notes"
+      ],
+      "rows": [
+        [
+          "COMMITTED_SCOPE.md",
+          "output/ktb-agentic-ai-secure-it/v1/COMMITTED_SCOPE.md",
+          "binding client contract"
+        ],
+        [
+          "COURSE_BUILD_SPEC.md",
+          "…/v1/COURSE_BUILD_SPEC.md",
+          "build contract, §2 routes, §4 caps, §5 quiz"
+        ],
+        [
+          "BUILD_PLAN.md",
+          "…/v1/BUILD_PLAN.md",
+          "the 7 must-apply corrections"
+        ],
+        [
+          "design/S2_workflow_controls.md",
+          "…/v1/design/S2_workflow_controls.md",
+          "the S2 teaching spine"
+        ],
+        [
+          "design/S3_case_study_quiz.md",
+          "…/v1/design/S3_case_study_quiz.md",
+          "verified S3 cases (Q3, Q9, Chevrolet)"
+        ],
+        [
+          "design/S4_owasp.md",
+          "…/v1/design/S4_owasp.md",
+          "OWASP route teaching; indirect prompt injection"
+        ],
+        [
+          "design/ENRICHMENTS_v1.1.md",
+          "…/v1/design/ENRICHMENTS_v1.1.md",
+          "Theme A (variance/reliability), Theme B (config-as-code, agent≠gate)"
+        ],
+        [
+          "design/RUN_OF_SHOW_v1.2_polished.md",
+          "…/v1/design/RUN_OF_SHOW_v1.2_polished.md",
+          "richest run-of-show + corrections header"
+        ],
+        [
+          "OWASP LLM Top 10 2025",
+          "genai.owasp.org (LLM01/02/05/06:2025 titles)",
+          "reproduce exact IDs/titles; [VERIFY] exact title wording at slide-build"
+        ],
+        [
+          "OWASP API Security Top 10 2023",
+          "owasp.org/API-Security/editions/2023 (API1/API7:2023)",
+          "reproduce exact IDs/titles"
+        ],
+        [
+          "NIST AI RMF 1.0",
+          "nist.gov/itl/ai-risk-management-framework (GOVERN / MAP / MEASURE / MANAGE)",
+          "[VERIFY] exact function wording before final slide"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Open [VERIFY] items for the build/QA pass:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "NIST AI RMF 1.0 function names/wording (GOVERN, MANAGE) — confirm against primary source before they appear on a"
+      ],
+      "ordered": true
+    },
+    {
+      "kind": "paragraph",
+      "text": "slide. (Used as backdrop here, not as a load-bearing stat.)"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "OWASP exact title strings (LLM01/02/05/06:2025, API7:2023) — reproduce verbatim from the official editions at"
+      ],
+      "ordered": true
+    },
+    {
+      "kind": "paragraph",
+      "text": "slide-build time; IDs are confirmed from COMMITTED_SCOPE.md but the full English titles should be string-matched to the source."
+    }
+  ],
+  "attribution": "KTB · Agentic AI & Secure Implementation for Banking IT Teams Time: 10:45–12:00 (75 min) · Format: Online, instructor-led, demo-driven · ~50 participants Activity: Control Walkthrough (vendor-neutral) — Task Card → Approval Gate → Execution Proof → Audit Trail Slides: FULL ENGLISH · Spoken delivery ",
+  "cheatsheet": [
+    "COMMITTED_SCOPE.md: output/ktb-agentic-ai-secure-it/v1/COMMITTED_SCOPE.md",
+    "COURSE_BUILD_SPEC.md: …/v1/COURSE_BUILD_SPEC.md",
+    "BUILD_PLAN.md: …/v1/BUILD_PLAN.md",
+    "design/S2_workflow_controls.md: …/v1/design/S2_workflow_controls.md",
+    "design/S3_case_study_quiz.md: …/v1/design/S3_case_study_quiz.md",
+    "design/S4_owasp.md: …/v1/design/S4_owasp.md",
+    "design/ENRICHMENTS_v1.1.md: …/v1/design/ENRICHMENTS_v1.1.md",
+    "design/RUN_OF_SHOW_v1.2_polished.md: …/v1/design/RUN_OF_SHOW_v1.2_polished.md"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for session 2, \"COMMITTED_SCOPE.md\" is described as:",
+      "choices": {
+        "A": "owasp.org/API-Security/editions/2023 (API1/API7:2023)",
+        "B": "genai.owasp.org (LLM01/02/05/06:2025 titles)",
+        "C": "output/ktb-agentic-ai-secure-it/v1/COMMITTED_SCOPE.md",
+        "D": "…/v1/design/RUN_OF_SHOW_v1.2_polished.md"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The study guide states: COMMITTED_SCOPE.md: output/ktb-agentic-ai-secure-it/v1/COMMITTED_SCOPE.md"
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for session 2, \"COURSE_BUILD_SPEC.md\" is described as:",
+      "choices": {
+        "A": "…/v1/BUILD_PLAN.md",
+        "B": "…/v1/design/ENRICHMENTS_v1.1.md",
+        "C": "…/v1/COURSE_BUILD_SPEC.md",
+        "D": "…/v1/design/S4_owasp.md"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The study guide states: COURSE_BUILD_SPEC.md: …/v1/COURSE_BUILD_SPEC.md"
+    },
+    {
+      "id": "q3",
+      "prompt": "In the study guide for session 2, \"BUILD_PLAN.md\" is described as:",
+      "choices": {
+        "A": "…/v1/design/S4_owasp.md",
+        "B": "…/v1/COURSE_BUILD_SPEC.md",
+        "C": "…/v1/BUILD_PLAN.md",
+        "D": "…/v1/design/ENRICHMENTS_v1.1.md"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The study guide states: BUILD_PLAN.md: …/v1/BUILD_PLAN.md"
+    },
+    {
+      "id": "q4",
+      "prompt": "In the study guide for session 2, \"design/S2_workflow_controls.md\" is described as:",
+      "choices": {
+        "A": "…/v1/design/RUN_OF_SHOW_v1.2_polished.md",
+        "B": "…/v1/design/ENRICHMENTS_v1.1.md",
+        "C": "…/v1/design/S2_workflow_controls.md",
+        "D": "…/v1/design/S3_case_study_quiz.md"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The study guide states: design/S2_workflow_controls.md: …/v1/design/S2_workflow_controls.md"
+    }
+  ]
+}

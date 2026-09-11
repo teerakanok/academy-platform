@@ -1,0 +1,128 @@
+{
+  "nodeId": "d1-governance-compliance-risk-ai-day-1-teaching-lab-govern",
+  "locale": "en",
+  "title": "Day 1 Teaching Lab — Governance Decision Tabletop",
+  "objective": "Study-guide review — Day 1 — Governance, Compliance, Risk, and AI Governance: Day 1 Teaching Lab — Governance Decision Tabletop.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "Use this lab to fill a 45-minute block and force students to practice governance language."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Scenario: a business unit wants to launch a customer analytics initiative. It will ingest production customer data, send selected fields to a third-party platform, use an AI assistant for summaries, and present dashboard metrics to executives."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Ask students to produce:"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Question",
+        "Expected answer direction"
+      ],
+      "rows": [
+        [
+          "What program documents are needed?",
+          "Policy intent, data-handling standard, operating procedure, exception process"
+        ],
+        [
+          "Which governance framework question matters?",
+          "How controls, evidence, owners, and reporting are organized"
+        ],
+        [
+          "What compliance review is required?",
+          "Industry, privacy, contract, cross-jurisdiction, retention"
+        ],
+        [
+          "What third-party risk evidence is needed?",
+          "Vendor assurance, data processing terms, incident notification, subprocessor visibility"
+        ],
+        [
+          "What AI governance applies?",
+          "Input classification, output validation, least privilege, logging, retention"
+        ],
+        [
+          "Who accepts residual risk?",
+          "Accountable business/risk owner, not the tool owner alone"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Debrief prompt: ask each group which answer would satisfy an auditor, which answer would satisfy a security architect, and which answer would satisfy an executive. The difference helps students see why governance, compliance, and risk are related but not identical."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Source: CertMaster Study Lessons 2A-2C; SecurityX M02 slides."
+    }
+  ],
+  "attribution": "Course: SecurityX CAS-005 Primary source: CertMaster Study Lessons 2A, 2B, 2C Slide source: SecurityX_M02_PPT.pptx Teaching goal: give students the decision language for governance, compliance, and risk before architecture topics begin.",
+  "cheatsheet": [
+    "What program documents are needed?: Policy intent, data-handling standard, operating procedure, exception process",
+    "Which governance framework question matters?: How controls, evidence, owners, and reporting are organized",
+    "What compliance review is required?: Industry, privacy, contract, cross-jurisdiction, retention",
+    "What third-party risk evidence is needed?: Vendor assurance, data processing terms, incident notification, subprocessor visibility",
+    "What AI governance applies?: Input classification, output validation, least privilege, logging, retention",
+    "Who accepts residual risk?: Accountable business/risk owner, not the tool owner alone"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for D1 Governance Compliance Risk AI, \"What program documents are needed?\" is described as:",
+      "choices": {
+        "A": "How controls, evidence, owners, and reporting are organized",
+        "B": "Vendor assurance, data processing terms, incident notification, subprocessor visibility",
+        "C": "Policy intent, data-handling standard, operating procedure, exception process",
+        "D": "Input classification, output validation, least privilege, logging, retention"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The study guide states: What program documents are needed?: Policy intent, data-handling standard, operating procedure, exception process"
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for D1 Governance Compliance Risk AI, \"Which governance framework question matters?\" is described as:",
+      "choices": {
+        "A": "Input classification, output validation, least privilege, logging, retention",
+        "B": "Accountable business/risk owner, not the tool owner alone",
+        "C": "Industry, privacy, contract, cross-jurisdiction, retention",
+        "D": "How controls, evidence, owners, and reporting are organized"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The study guide states: Which governance framework question matters?: How controls, evidence, owners, and reporting are organized"
+    },
+    {
+      "id": "q3",
+      "prompt": "In the study guide for D1 Governance Compliance Risk AI, \"What compliance review is required?\" is described as:",
+      "choices": {
+        "A": "How controls, evidence, owners, and reporting are organized",
+        "B": "Industry, privacy, contract, cross-jurisdiction, retention",
+        "C": "Accountable business/risk owner, not the tool owner alone",
+        "D": "Input classification, output validation, least privilege, logging, retention"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: What compliance review is required?: Industry, privacy, contract, cross-jurisdiction, retention"
+    },
+    {
+      "id": "q4",
+      "prompt": "In the study guide for D1 Governance Compliance Risk AI, \"What third-party risk evidence is needed?\" is described as:",
+      "choices": {
+        "A": "Policy intent, data-handling standard, operating procedure, exception process",
+        "B": "Vendor assurance, data processing terms, incident notification, subprocessor visibility",
+        "C": "Input classification, output validation, least privilege, logging, retention",
+        "D": "How controls, evidence, owners, and reporting are organized"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: What third-party risk evidence is needed?: Vendor assurance, data processing terms, incident notification, subprocessor visibility"
+    }
+  ]
+}

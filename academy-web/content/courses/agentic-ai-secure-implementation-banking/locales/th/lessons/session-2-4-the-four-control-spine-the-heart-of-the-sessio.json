@@ -1,0 +1,176 @@
+{
+  "nodeId": "session-2-4-the-four-control-spine-the-heart-of-the-sessio",
+  "locale": "th",
+  "title": "4. The four-control spine (the heart of the session)",
+  "objective": "Study-guide review — Study Guide — Session 2: Practical Agentic Workflow Controls: 4. The four-control spine (the heart of the session).",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "Introduce the pattern as a pipeline every agent action must pass through. Each control answers one examiner question and kills one failure mode. [SRC: design/S2_workflow_controls.md §2 Beat 3; §5 slide 6–7]"
+    },
+    {
+      "kind": "paragraph",
+      "text": "[ TASK CARD ] → [ APPROVAL GATE ] → [ EXECUTION PROOF ] → [ AUDIT TRAIL ]"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "#",
+        "Control",
+        "Answers (examiner Q)",
+        "Kills",
+        "One-line definition"
+      ],
+      "rows": [
+        [
+          "1",
+          "Task Card",
+          "What is it allowed to do?",
+          "unbounded scope / excessive access",
+          "A declared, bounded unit of work: goal, allowed tools, allowed data, blast-radius limit."
+        ],
+        [
+          "2",
+          "Approval Gate",
+          "Who said yes?",
+          "silent write / destructive actions",
+          "A required human decision before any write, deploy, or irreversible step."
+        ],
+        [
+          "3",
+          "Execution Proof",
+          "What actually happened?",
+          "\"trust me, it worked\"",
+          "Captured evidence of the run — diffs, test output, commands, before/after — independent of the agent's own claim."
+        ],
+        [
+          "4",
+          "Audit Trail",
+          "Can you prove it later?",
+          "un-auditable shadow automation",
+          "Time-stamped record linking card → approver → proof. The demo row is mutable/resettable in memory; production needs external, access-controlled, tamper-evident logging."
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "[SRC: design/S2_workflow_controls.md §2 Beat 3 — control table]"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Visual (slide 6): one horizontal pipeline, four gates, a request flowing left→right; a red action that tries to skip a gate bounces back at the gate that should have caught it. [SRC: design/S2_workflow_controls.md §3.0 Governance Console]"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Per-control teaching detail (with the enrichment fold-ins):"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Control 1 — Task Card = the least-privilege boundary. Teach by what is deliberately not granted. Fold-in"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "(C3): a deterministic, version-controlled script / procedure the agent must follow is itself a reviewable Task Card — constraining the agent to a checklist shrinks its action space (directly mitigating Excessive Agency). [SRC: design/ENRICHMENTS_v1.1.md — Theme B fold-in / S2]"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Control 2 — Approval Gate = the maker–checker control for agents. (C6) The gate is deterministic — a human"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "decision and/or deterministic checks (tests, lint, policy-as-code). Agent self-review is NOT the gate; \"the AI said it's fine\" is never sold as a control. An agent may draft and flag flaws pre-publish, but the gate that authorizes a state change is human + deterministic. [SRC: design/ENRICHMENTS_v1.1.md — Theme B: agent = drafts/reviews; GATE is deterministic]"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Control 3 — Execution Proof = evidence independent of the agent's claim (diff applied, test red→green, commit"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "hash). Fold-in (C3): when configs are config-as-code in VCS, the proof is diffable — the change is the evidence. [SRC: design/ENRICHMENTS_v1.1.md — Theme B: config-as-code makes Execution Proof + Audit Trail diffable]"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Control 4 — Audit Trail = one linked demo row tying card → approver → timestamp → proof → result. It answers all"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "three examiner questions at once, and it records blocked actions too (see Scenario B). [SRC: design/S2_workflow_controls.md §3 Scenario A step 5; Scenario B step 7]"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Spoken (TH): \"จำสี่อย่างนี้: ขออนุญาตทำอะไร (Task Card) → ใครอนุมัติ (Approval Gate) → ทำแล้วได้อะไรจริง (Execution Proof) → ย้อนตรวจได้ไหม (Audit Trail). ขาดอันใดอันหนึ่ง = ช่องโหว่ governance.\""
+    }
+  ],
+  "attribution": "KTB · Agentic AI & Secure Implementation for Banking IT Teams Time: 10:45–12:00 (75 min) · Format: Online, instructor-led, demo-driven · ~50 participants Activity: Control Walkthrough (vendor-neutral) — Task Card → Approval Gate → Execution Proof → Audit Trail Slides: FULL ENGLISH · Spoken delivery ",
+  "cheatsheet": [
+    "Task Card: What is it allowed to do?",
+    "Execution Proof: What actually happened?",
+    "Audit Trail: Can you prove it later?"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for session 2, \"Task Card\" is described as:",
+      "choices": {
+        "A": "What actually happened?",
+        "B": "Can you prove it later?",
+        "C": "…/v1/COURSE_BUILD_SPEC.md",
+        "D": "What is it allowed to do?"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The study guide states: Task Card: What is it allowed to do?"
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for session 2, \"Execution Proof\" is described as:",
+      "choices": {
+        "A": "Can you prove it later?",
+        "B": "What is it allowed to do?",
+        "C": "\"What CAN an agent do?\"",
+        "D": "What actually happened?"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The study guide states: Execution Proof: What actually happened?"
+    },
+    {
+      "id": "q3",
+      "prompt": "In the study guide for session 2, \"Audit Trail\" is described as:",
+      "choices": {
+        "A": "What actually happened?",
+        "B": "What is it allowed to do?",
+        "C": "\"What CAN an agent do?\"",
+        "D": "Can you prove it later?"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The study guide states: Audit Trail: Can you prove it later?"
+    },
+    {
+      "id": "q4",
+      "prompt": "Which term does the study guide for session 2 define as: \"What is it allowed to do?\"?",
+      "choices": {
+        "A": "Audit Trail",
+        "B": "Task Card",
+        "C": "Execution Proof",
+        "D": "Question"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: Task Card: What is it allowed to do?"
+    }
+  ]
+}

@@ -1,0 +1,141 @@
+{
+  "nodeId": "l06-security-principles-mindset-5-security-controls-2d-cla",
+  "locale": "th",
+  "title": "5. Security Controls — 2D Classification <a id=\"security-controls\"></a>",
+  "objective": "Study-guide review — ICCS423 v2 — L06: Security Principles & Mindset: 5. Security Controls — 2D Classification <a id=\"security-controls\"></a>.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "Categories (How implemented)"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Administrative — policies, training, background checks",
+        "Technical / Logical — firewalls, encryption, IAM",
+        "Physical — locks, guards, cameras, fences"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Types (What they do)"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Preventive — stop incident (lock door)",
+        "Detective — discover incident (CCTV, IDS)",
+        "Corrective — restore after incident (restore from backup)",
+        "Deterrent — discourage (warning sign, visible CCTV)",
+        "Recovery — return to normal operations (DR site)",
+        "Compensating — alternative when primary not feasible"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "2D Matrix (sample mappings)"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "",
+        "Preventive",
+        "Detective",
+        "Corrective"
+      ],
+      "rows": [
+        [
+          "Administrative",
+          "Hiring policy, SoD",
+          "Audit, log review",
+          "IR plan execution"
+        ],
+        [
+          "Technical",
+          "Firewall, MFA",
+          "IDS, SIEM",
+          "Antivirus quarantine"
+        ],
+        [
+          "Physical",
+          "Door lock, fence",
+          "CCTV, motion sensor",
+          "Fire suppression"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "A single control may fit multiple cells. Encryption at rest is technical preventive, while encryption-key audit logs are technical detective."
+    }
+  ],
+  "attribution": "Course: ICCS423 | Source: Thoth Library (CISSP D1, D3) + RAG | Target: 3rd-4th year CS | Date: 2026-05-03",
+  "cheatsheet": [
+    "Administrative: policies, training, background checks",
+    "Technical / Logical: firewalls, encryption, IAM",
+    "Physical: locks, guards, cameras, fences",
+    "Preventive: stop incident (lock door)",
+    "Detective: discover incident (CCTV, IDS)",
+    "Corrective: restore after incident (restore from backup)",
+    "Deterrent: discourage (warning sign, visible CCTV)",
+    "Recovery: return to normal operations (DR site)"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for L06 Security Principles Mindset, \"Administrative\" is described as:",
+      "choices": {
+        "A": "return to normal operations (DR site)",
+        "B": "policies, training, background checks",
+        "C": "alternative when primary not feasible",
+        "D": "discourage (warning sign, visible CCTV)"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: Administrative — policies, training, background checks"
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for L06 Security Principles Mindset, \"Technical / Logical\" is described as:",
+      "choices": {
+        "A": "stop incident (lock door)",
+        "B": "discover incident (CCTV, IDS)",
+        "C": "locks, guards, cameras, fences",
+        "D": "firewalls, encryption, IAM"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The study guide states: Technical / Logical — firewalls, encryption, IAM"
+    },
+    {
+      "id": "q3",
+      "prompt": "In the study guide for L06 Security Principles Mindset, \"Physical\" is described as:",
+      "choices": {
+        "A": "discover incident (CCTV, IDS)",
+        "B": "firewalls, encryption, IAM",
+        "C": "stop incident (lock door)",
+        "D": "locks, guards, cameras, fences"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The study guide states: Physical — locks, guards, cameras, fences"
+    },
+    {
+      "id": "q4",
+      "prompt": "In the study guide for L06 Security Principles Mindset, \"Preventive\" is described as:",
+      "choices": {
+        "A": "firewalls, encryption, IAM",
+        "B": "discover incident (CCTV, IDS)",
+        "C": "stop incident (lock door)",
+        "D": "locks, guards, cameras, fences"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The study guide states: Preventive — stop incident (lock door)"
+    }
+  ]
+}

@@ -1,0 +1,332 @@
+{
+  "nodeId": "d1-governance-compliance-risk-ai-lesson-2c-risk-management",
+  "locale": "en",
+  "title": "Lesson 2C — Risk Management",
+  "objective": "Study-guide review — Day 1 — Governance, Compliance, Risk, and AI Governance: Lesson 2C — Risk Management.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "Impact Analysis"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Impact analysis examines consequences to systems, data, operations, and reputation. The official source starts with identifying critical assets and processes, then understanding how incidents affect them. This is the foundation for prioritization."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Impact categories:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Availability: outage, degraded service, missed SLA.",
+        "Confidentiality: unauthorized disclosure.",
+        "Integrity: unauthorized or accidental alteration.",
+        "Privacy: personal data misuse or noncompliance.",
+        "Operational: process disruption.",
+        "Reputational: loss of stakeholder trust."
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "SecurityX cue: choose controls according to impact. A public website outage, payroll data leak, and corrupted medical record require different priority decisions."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Source: CertMaster Study Lesson 2C; M02 slide \"Impact Analysis\"."
+    },
+    {
+      "kind": "heading",
+      "text": "Quantitative and Qualitative Risk"
+    },
+    {
+      "kind": "paragraph",
+      "text": "The official lesson includes both quantitative and qualitative risk analysis. Teach the difference by decision need:"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Method",
+        "Best when",
+        "Output"
+      ],
+      "rows": [
+        [
+          "Qualitative",
+          "Data is incomplete or speed is needed",
+          "Relative ratings such as high/medium/low"
+        ],
+        [
+          "Quantitative",
+          "Financial estimates and frequency data exist",
+          "Numeric loss estimate"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Quantitative terms include asset value, exposure factor, single loss expectancy, annualized rate of occurrence, and annualized loss expectancy. Use them carefully: the decision point is whether the method fits the available information and decision."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Source: CertMaster Study Lesson 2C."
+    },
+    {
+      "kind": "heading",
+      "text": "Quantitative Risk Walkthrough"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Quantitative risk analysis is useful when the organization has enough information to estimate financial impact and frequency. Teach it as a decision support method, not a precision guarantee. The common terms are asset value, exposure factor, single loss expectancy, annualized rate of occurrence, and annualized loss expectancy."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Simple classroom model:"
+    },
+    {
+      "kind": "paragraph",
+      "text": "``text SLE = asset value x exposure factor ALE = SLE x annualized rate of occurrence ``"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Example: if a business process has an estimated asset value of 500,000, an event would affect 20 percent of that value, and the event is expected once every five years, then SLE is 100,000 and ARO is 0.2. ALE is 20,000. A mitigation that costs far more than the expected annualized loss may still be justified for legal, safety, or reputational reasons, but the quantitative result makes the tradeoff visible."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Exam trap: quantitative analysis does not eliminate judgment. If the data is weak, the numeric result can create false confidence. If legal notification or life-safety impact exists, pure financial comparison is incomplete."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Source: CertMaster Study Lesson 2C."
+    },
+    {
+      "kind": "heading",
+      "text": "CIA and Privacy Risk"
+    },
+    {
+      "kind": "paragraph",
+      "text": "SecurityX risk scenarios often blend confidentiality, integrity, availability, and privacy. Students should identify which property is harmed before choosing the control. A corrupted record is not the same as an exposed record. A service outage is not the same as an unauthorized disclosure. Privacy risk can exist even when confidentiality controls are present, because improper collection, processing, retention, or sharing can violate obligations."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Decision map:"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Harm",
+        "Primary risk lens",
+        "Better control direction"
+      ],
+      "rows": [
+        [
+          "Unauthorized disclosure",
+          "Confidentiality/privacy",
+          "Access control, encryption, DLP, data minimization"
+        ],
+        [
+          "Incorrect or altered data",
+          "Integrity",
+          "Change control, validation, signatures, reconciliation"
+        ],
+        [
+          "Service unavailable",
+          "Availability",
+          "Redundancy, resilience, capacity, incident response"
+        ],
+        [
+          "Data used beyond purpose",
+          "Privacy",
+          "Governance, consent/notice where required, retention, purpose limitation"
+        ],
+        [
+          "Sensitive data copied to test",
+          "Privacy/confidentiality",
+          "Masking, tokenization, staging controls"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Mini scenario: payroll data is accurate and available, but a test team copied full records into a weakly controlled staging database. This is primarily a confidentiality and privacy governance problem, not an availability problem."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Source: CertMaster Study Lesson 2C; M02 slide \"Impact Analysis\"."
+    },
+    {
+      "kind": "heading",
+      "text": "AI Usage Risk in Risk Management"
+    },
+    {
+      "kind": "paragraph",
+      "text": "AI risk appears in governance and risk management because AI can change data exposure, decision quality, and accountability. A security team using AI for triage still owns the decision. A vendor AI tool that ingests logs may process sensitive data. An AI assistant with tool access can create operational impact if its permissions are broad."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Risk questions:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "What data enters the AI system?",
+        "Is the AI internal, vendor-hosted, or integrated into another platform?",
+        "Can the AI only summarize, or can it trigger actions?",
+        "How is output validated before security decisions?",
+        "What logs prove who prompted, approved, or executed the action?",
+        "What is the rollback path for AI-assisted automation?"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Exam trap: \"AI improves speed\" is not a complete risk answer. The risk answer must include input governance, output validation, least privilege, auditability, and approval boundaries."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Source: CertMaster Study Lesson 2C; M02 slides \"AI Usage Risk\" and Lesson 2A \"Legal and Privacy Implications of AI Use\"."
+    },
+    {
+      "kind": "heading",
+      "text": "Risk Validation and Remediation"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Risk management does not end when a risk is identified. Validation confirms that the risk is real, relevant, and accurately rated. Remediation reduces the risk through controls. Residual risk remains after treatment and must be accepted, transferred, avoided, or further mitigated."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Decision cues:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "If the control exists but is untested, validate effectiveness.",
+        "If the vulnerability is exploitable and high impact, remediate.",
+        "If remediation is not possible, document compensating controls.",
+        "If risk remains, obtain appropriate risk acceptance."
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Source: CertMaster Study Lesson 2C; M02 slides \"Risk Assessment and Management\"."
+    },
+    {
+      "kind": "heading",
+      "text": "Third-Party Risk"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Third-party risk management checks whether vendors, suppliers, cloud providers, contractors, and service providers meet the organization's security and compliance needs. Contracts can transfer some financial responsibility, but they do not remove accountability for customers, regulators, or business impact."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Due diligence topics:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Data type and classification.",
+        "Access level and integration depth.",
+        "Security control evidence.",
+        "Incident notification.",
+        "Subprocessor dependencies.",
+        "Data location and jurisdiction.",
+        "Exit and data-return process."
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Source: CertMaster Study Lesson 2C; M02 slide \"Third-Party Risk Management\"."
+    },
+    {
+      "kind": "heading",
+      "text": "Crisis Management and Breach Response"
+    },
+    {
+      "kind": "paragraph",
+      "text": "The official source separates proactive risk work from crisis management and breach response. Crisis management coordinates leadership, communication, continuity, and decision authority during disruptive events. Breach response focuses on identifying, containing, investigating, notifying, and improving after a security incident."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Teach students to distinguish:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Crisis management: executive coordination under disruption.",
+        "Incident response: technical and procedural handling of security events.",
+        "Breach response: incident response plus legal/privacy notification obligations.",
+        "Business continuity: keeping critical services operating."
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Source: CertMaster Study Lesson 2C; M02 slides \"Crisis Management\" and \"Breach Response\"."
+    }
+  ],
+  "attribution": "Course: SecurityX CAS-005 Primary source: CertMaster Study Lessons 2A, 2B, 2C Slide source: SecurityX_M02_PPT.pptx Teaching goal: give students the decision language for governance, compliance, and risk before architecture topics begin.",
+  "cheatsheet": [
+    "Qualitative: Data is incomplete or speed is needed",
+    "Quantitative: Financial estimates and frequency data exist",
+    "Unauthorized disclosure: Confidentiality/privacy",
+    "Sensitive data copied to test: Privacy/confidentiality"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for D1 Governance Compliance Risk AI, \"Qualitative\" is described as:",
+      "choices": {
+        "A": "Financial estimates and frequency data exist",
+        "B": "Confidentiality/privacy",
+        "C": "Data is incomplete or speed is needed",
+        "D": "Privacy/confidentiality"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The study guide states: Qualitative: Data is incomplete or speed is needed"
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for D1 Governance Compliance Risk AI, \"Quantitative\" is described as:",
+      "choices": {
+        "A": "Privacy/confidentiality",
+        "B": "Financial estimates and frequency data exist",
+        "C": "Confidentiality/privacy",
+        "D": "Data is incomplete or speed is needed"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: Quantitative: Financial estimates and frequency data exist"
+    },
+    {
+      "id": "q3",
+      "prompt": "In the study guide for D1 Governance Compliance Risk AI, \"Unauthorized disclosure\" is described as:",
+      "choices": {
+        "A": "Financial estimates and frequency data exist",
+        "B": "Data is incomplete or speed is needed",
+        "C": "Privacy/confidentiality",
+        "D": "Confidentiality/privacy"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The study guide states: Unauthorized disclosure: Confidentiality/privacy"
+    },
+    {
+      "id": "q4",
+      "prompt": "In the study guide for D1 Governance Compliance Risk AI, \"Sensitive data copied to test\" is described as:",
+      "choices": {
+        "A": "Financial estimates and frequency data exist",
+        "B": "Data is incomplete or speed is needed",
+        "C": "Confidentiality/privacy",
+        "D": "Privacy/confidentiality"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The study guide states: Sensitive data copied to test: Privacy/confidentiality"
+    }
+  ]
+}

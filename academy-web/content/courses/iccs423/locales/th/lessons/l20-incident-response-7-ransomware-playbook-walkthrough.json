@@ -1,0 +1,213 @@
+{
+  "nodeId": "l20-incident-response-7-ransomware-playbook-walkthrough",
+  "locale": "th",
+  "title": "7. Ransomware Playbook Walkthrough",
+  "objective": "Study-guide review — ICCS423 v2 — L20: Incident Response: 7. Ransomware Playbook Walkthrough.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "Concrete walkthrough of a ransomware incident applying the lifecycle:"
+    },
+    {
+      "kind": "heading",
+      "text": "Step 1 — Detection"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Endpoint alert: mass file rename to .encrypted extension",
+        "User reports: ransom note on desktop, files won't open",
+        "SIEM: anomalous file write rate from one host"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Step 2 — Initial Containment (urgent)"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Isolate infected hosts from network — disconnect LAN, disable WiFi",
+        "Do NOT power off — RAM may contain encryption key or malware artifacts",
+        "Disable compromised user accounts",
+        "Block known C2 IPs/domains at firewall",
+        "Disconnect network shares (ransomware spreads via SMB)"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Step 3 — Scope Assessment"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "How many systems are encrypted?",
+        "Patient zero — which user/system was infected first?",
+        "Are backups affected? (networked backups are usually encrypted too)",
+        "Did lateral movement occur?"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Step 4 — Communication (do not skip)"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Internal: SOC → IR Lead → CISO → Legal → Executive Management → PR",
+        "External (if applicable):",
+        "NCSA — if Critical Information Infrastructure (CII) operator (Thailand Cybersecurity Act)",
+        "PDPC — if personal data was breached (PDPA: 72 hours)",
+        "Law enforcement (DSI / Police) — for prosecution"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Never issue a public statement before legal review. Legal may require silence to protect litigation; or may require disclosure under regulation."
+    },
+    {
+      "kind": "heading",
+      "text": "Step 5 — Evidence Preservation"
+    },
+    {
+      "kind": "paragraph",
+      "text": "`` ☐ RAM dump of every affected system (DumpIt, Magnet RAM Capture) ☐ Forensic disk image (FTK Imager) before reimage ☐ SIEM log export (window: pre/during/post incident) ☐ Process list + network connections (tasklist /v, netstat -ano) ☐ Ransom note saved as text ☐ Sample of encrypted files (some decryptors need them) ☐ SHA-256 hash of every evidence item + chain of custody form ``"
+    },
+    {
+      "kind": "heading",
+      "text": "Step 6 — Identify Variant"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "ID Ransomware (id-ransomware.malwarehunterteam.com) — upload note or encrypted file",
+        "Check extension, ransom note language",
+        "Match to known family"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Step 7 — Check for Decryptor"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "No More Ransom (nomoreransom.org) — free decryptors aggregated by Europol partnership"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Step 8 — Recovery Decision"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Option",
+        "When to choose",
+        "Caveats"
+      ],
+      "rows": [
+        [
+          "Restore from offline backup",
+          "Verified clean immutable backup exists",
+          "Verify integrity before restore"
+        ],
+        [
+          "Rebuild from scratch",
+          "No backup or backup encrypted",
+          "Time-consuming"
+        ],
+        [
+          "Pay ransom",
+          "Last resort only",
+          "No guarantee, may violate sanctions, funds criminals"
+        ],
+        [
+          "Use decryptor",
+          "Free decryptor available for variant",
+          "Test on a sample first"
+        ]
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Step 9–11 — Root Cause, Eradication, Post-Incident"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Identify initial access vector (phishing? RDP brute force? unpatched vuln?)",
+        "Patch vulnerability, rotate all credentials, remove persistence",
+        "Lessons learned within 2 weeks; update backup strategy (offline / immutable)"
+      ]
+    }
+  ],
+  "attribution": "Course: ICCS423 | Source: Thoth + RAG | Target: 3rd-4th year CS | Date: 2026-05-03",
+  "cheatsheet": [
+    "Do NOT power off: RAM may contain encryption key or malware artifacts",
+    "NCSA: if Critical Information Infrastructure (CII) operator (Thailand Cybersecurity Act)",
+    "PDPC: if personal data was breached (PDPA: 72 hours)",
+    "Restore from offline backup: Verified clean immutable backup exists",
+    "Rebuild from scratch: No backup or backup encrypted",
+    "Pay ransom: Last resort only",
+    "Use decryptor: Free decryptor available for variant"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for L20 Incident Response, \"Do NOT power off\" is described as:",
+      "choices": {
+        "A": "Free decryptor available for variant",
+        "B": "RAM may contain encryption key or malware artifacts",
+        "C": "Verified clean immutable backup exists",
+        "D": "if personal data was breached (PDPA: 72 hours)"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: Do NOT power off — RAM may contain encryption key or malware artifacts"
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for L20 Incident Response, \"NCSA\" is described as:",
+      "choices": {
+        "A": "if Critical Information Infrastructure (CII) operator (Thailand Cybersecurity Act)",
+        "B": "RAM may contain encryption key or malware artifacts",
+        "C": "if personal data was breached (PDPA: 72 hours)",
+        "D": "Verified clean immutable backup exists"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The study guide states: NCSA — if Critical Information Infrastructure (CII) operator (Thailand Cybersecurity Act)"
+    },
+    {
+      "id": "q3",
+      "prompt": "In the study guide for L20 Incident Response, \"PDPC\" is described as:",
+      "choices": {
+        "A": "Free decryptor available for variant",
+        "B": "if personal data was breached (PDPA: 72 hours)",
+        "C": "Verified clean immutable backup exists",
+        "D": "RAM may contain encryption key or malware artifacts"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: PDPC — if personal data was breached (PDPA: 72 hours)"
+    },
+    {
+      "id": "q4",
+      "prompt": "In the study guide for L20 Incident Response, \"Restore from offline backup\" is described as:",
+      "choices": {
+        "A": "Free decryptor available for variant",
+        "B": "if personal data was breached (PDPA: 72 hours)",
+        "C": "Verified clean immutable backup exists",
+        "D": "No backup or backup encrypted"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The study guide states: Restore from offline backup: Verified clean immutable backup exists"
+    }
+  ]
+}

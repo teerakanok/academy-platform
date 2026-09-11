@@ -1,0 +1,149 @@
+{
+  "nodeId": "l06-security-principles-mindset-3-saltzer-and-schroeder-8",
+  "locale": "th",
+  "title": "3. Saltzer & Schroeder — 8 Design Principles <a id=\"saltzer-schroeder\"></a>",
+  "objective": "Study-guide review — ICCS423 v2 — L06: Security Principles & Mindset: 3. Saltzer & Schroeder — 8 Design Principles <a id=\"saltzer-schroeder\"></a>.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "The Classical 8 (1975, still canonical 50 years later)"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "#",
+        "Principle",
+        "One-line meaning"
+      ],
+      "rows": [
+        [
+          "1",
+          "Economy of Mechanism",
+          "KISS — smaller designs have fewer bugs"
+        ],
+        [
+          "2",
+          "Fail-Safe Defaults",
+          "Default deny; access requires explicit permission"
+        ],
+        [
+          "3",
+          "Complete Mediation",
+          "Check authority on every access, no caching of decisions"
+        ],
+        [
+          "4",
+          "Open Design",
+          "Security must not depend on secrecy of the algorithm (Kerckhoffs)"
+        ],
+        [
+          "5",
+          "Separation of Privilege",
+          "Multi-key locks — two-person control"
+        ],
+        [
+          "6",
+          "Least Privilege",
+          "Minimum access required to do the job"
+        ],
+        [
+          "7",
+          "Least Common Mechanism",
+          "Minimize shared resources between subjects"
+        ],
+        [
+          "8",
+          "Psychological Acceptability",
+          "Security must be usable or it will be bypassed"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Security teams that argue against \"complete mediation\" usually call it \"performance optimization.\" The principle is older than the internet — and still wins arguments."
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes — Modern Mappings"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Complete Mediation → Zero Trust (\"never trust, always verify\")",
+        "Fail-Safe Defaults → AWS IAM deny-by-default policy",
+        "Open Design → AES, TLS, OpenSSH all public algorithms",
+        "Psychological Acceptability → if MFA takes 90 seconds, users disable it",
+        "Least Privilege → reduces blast radius from compromised credentials"
+      ]
+    }
+  ],
+  "attribution": "Course: ICCS423 | Source: Thoth Library (CISSP D1, D3) + RAG | Target: 3rd-4th year CS | Date: 2026-05-03",
+  "cheatsheet": [
+    "Economy of Mechanism: KISS — smaller designs have fewer bugs",
+    "Fail-Safe Defaults: Default deny; access requires explicit permission",
+    "Complete Mediation: Check authority on every access, no caching of decisions",
+    "Open Design: Security must not depend on secrecy of the algorithm (Kerckhoffs)",
+    "Separation of Privilege: Multi-key locks — two-person control",
+    "Least Privilege: Minimum access required to do the job",
+    "Least Common Mechanism: Minimize shared resources between subjects",
+    "Psychological Acceptability: Security must be usable or it will be bypassed"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for L06 Security Principles Mindset, \"Economy of Mechanism\" is described as:",
+      "choices": {
+        "A": "Minimize shared resources between subjects",
+        "B": "Multi-key locks — two-person control",
+        "C": "KISS — smaller designs have fewer bugs",
+        "D": "Minimum access required to do the job"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The study guide states: Economy of Mechanism: KISS — smaller designs have fewer bugs"
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for L06 Security Principles Mindset, \"Fail-Safe Defaults\" is described as:",
+      "choices": {
+        "A": "Default deny; access requires explicit permission",
+        "B": "Security must be usable or it will be bypassed",
+        "C": "Check authority on every access, no caching of decisions",
+        "D": "Minimize shared resources between subjects"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The study guide states: Fail-Safe Defaults: Default deny; access requires explicit permission"
+    },
+    {
+      "id": "q3",
+      "prompt": "In the study guide for L06 Security Principles Mindset, \"Complete Mediation\" is described as:",
+      "choices": {
+        "A": "Security must be usable or it will be bypassed",
+        "B": "Security must not depend on secrecy of the algorithm (Kerckhoffs)",
+        "C": "Default deny; access requires explicit permission",
+        "D": "Check authority on every access, no caching of decisions"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The study guide states: Complete Mediation: Check authority on every access, no caching of decisions"
+    },
+    {
+      "id": "q4",
+      "prompt": "In the study guide for L06 Security Principles Mindset, \"Open Design\" is described as:",
+      "choices": {
+        "A": "Security must be usable or it will be bypassed",
+        "B": "Default deny; access requires explicit permission",
+        "C": "Security must not depend on secrecy of the algorithm (Kerckhoffs)",
+        "D": "Check authority on every access, no caching of decisions"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The study guide states: Open Design: Security must not depend on secrecy of the algorithm (Kerckhoffs)"
+    }
+  ]
+}

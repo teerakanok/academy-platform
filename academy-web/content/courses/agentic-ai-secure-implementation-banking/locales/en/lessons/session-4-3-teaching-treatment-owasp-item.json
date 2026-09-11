@@ -1,0 +1,223 @@
+{
+  "nodeId": "session-4-3-teaching-treatment-owasp-item",
+  "locale": "en",
+  "title": "3. Teaching treatment — ทีละ OWASP item",
+  "objective": "Study-guide review — Study Guide — Session 4: Actionable OWASP on SecureBank Mini: 3. Teaching treatment — ทีละ OWASP item.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "รูปแบบต่อ item: definition แบบภาษาคน → ทำไม bank dev ต้องสน → route ใน SecureBank Mini → the one-line tell → agentic amplification."
+    },
+    {
+      "kind": "heading",
+      "text": "3.1 — API1:2023 Broken Object Level Authorization (BOLA / IDOR)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Route: GET /accounts/:accountId"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "คืออะไร (plain): API เช็คว่า คุณ login แล้ว แต่ไม่เช็คว่า object นี้เป็นของคุณไหม. Authentication ≠ authorization. object ID ใน URL ถูกเชื่อราวกับเป็นใบอนุญาต. [SRC: OWASP-API-2023]",
+        "ทำไม bank dev สน: OWASP จัด BOLA ไว้ที่ API1:2023. ในบริบทธนาคาร การอ่านบัญชี/ยอด/statement ของลูกค้าคนอื่นเป็น disclosure ที่ต้องเข้าสู่กระบวนการ incident และ regulatory assessment ตามนโยบายที่ใช้; เลข API1 ไม่ใช่หลักฐานความถี่ของระบบใดระบบหนึ่ง. [SRC: OWASP-API-2023]",
+        "The tell (บนสไลด์): // no check that accountId belongs to req.user",
+        "Agentic amplification: agent สามารถ automate repeated cross-object requests ได้; blast radius จริงขึ้นกับ authorization, rate limit, monitoring และ object set. ownership check เป็น prevention หลัก ส่วน rate limit/monitoring ช่วยจำกัดและตรวจจับความพยายามซ้ำ."
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "(TH note: \"ระบบรู้ว่าคุณคือใคร แต่ไม่ได้ถามว่าบัญชีนี้เป็นของคุณไหม\" — ประโยคเดียวจบ) (SOC defender aside: \"สิ่งที่อยากให้ log ที่สุดคือ — ใคร เปิดบัญชีของใคร เมื่อไหร่; pattern ของ ID ที่วิ่งไล่เลขคือสัญญาณ BOLA-by-agent\")"
+    },
+    {
+      "kind": "heading",
+      "text": "3.2 — API7:2023 Server-Side Request Forgery (SSRF)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Route: POST /fetch-statement (ดึง statement จาก URL ที่ผู้เรียกส่งมา)"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "คืออะไร (plain): server ยิง HTTP request ไปยัง URL ที่ user คุมได้ โดยไม่ validate ปลายทาง. ผู้โจมตี \"ยืม\" ตำแหน่ง network ของ server ไปถึงสิ่งที่ ตัวเอง เข้าไม่ถึง — internal services, cloud metadata endpoint (169.254.169.254), admin panel ภายใน. [SRC: OWASP-API-2023]",
+        "ทำไม bank dev สน: ใน cloud bank, metadata endpoint แจก temporary cloud credentials ได้ → SSRF → credentials → lateral movement. ฟีเจอร์ \"ดึงเอกสารตาม URL\" มีอยู่ทุกที่ (statement, KYC docs, webhook) จึงอันตรายมาก. [SRC: OWASP-API-2023] (API7:2023 = \"fetching a remote resource without validating the user-supplied URI\").",
+        "The tell: axios.get(req.body.url) ไม่มี allowlist.",
+        "Agentic amplification: หัวใจของ agentic tool คือ \"ดึง resource นี้ให้หน่อย\" — agent ที่มี fetch tool + คำสั่งที่ถูก poison = SSRF engine."
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "(TH note: \"เซิร์ฟเวอร์ยิง request แทนเราไปยังที่ที่เราเองเข้าไม่ถึง — รวมถึง metadata endpoint ที่แจก cloud credential\") (↳ DEEPER: read-scoped creds + metadata pivot — fix ต้องทั้ง allowlist และ block link-local ที่ระดับ IP เพื่อกัน DNS-rebinding)"
+    },
+    {
+      "kind": "heading",
+      "text": "3.3 — LLM01:2025 Prompt Injection"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Route: POST /ai/assist (AI banking assistant ในแอป)"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "คืออะไร (plain): ข้อความจาก user ถูกต่อ (concat) เข้าไปใน instruction context ของ model. model แยกไม่ออก ว่าอันไหนคำสั่ง ของเรา อันไหน ของผู้โจมตี — data กับ instruction อยู่ channel เดียวกัน. ตัวร้ายที่สุดคือ indirect prompt injection — คำสั่งร้ายมาในเนื้อหาที่ agent อ่านอัตโนมัติ (statement memo, support ticket, transaction note) ไม่ใช่พิมพ์ตรงๆ. [SRC: OWASP-LLM-2025]",
+        "ทำไม bank dev สน: prompt injection คือ จุดจุดไฟ (ignition) ที่เปลี่ยน chat box ธรรมดาให้เป็นคันโยกบน tool ทุกตัวที่ agent ถือ. มันไม่ค่อยเป็นการโจมตีทั้งหมด — มันเป็นตัวเริ่ม chain. [SRC: OWASP-LLM-2025]",
+        "The tell: prompt = SYSTEM_PROMPT + userInput (string concat ไม่มี instruction/data boundary).",
+        "สำคัญ: OWASP ระบุชัดว่า prompt injection แก้ไม่ได้สมบูรณ์ด้วยการ filter — mitigation คือ defense-in-depth + least privilege downstream จึงเป็นเหตุที่มัน chain เข้า LLM06. [SRC: OWASP-LLM-2025]",
+        "honest caveat (บนสไลด์): \"Filtering reduces, does not eliminate — that's why we cap agency.\""
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "(TH note: \"โมเดลแยกไม่ออกว่าอันไหนคำสั่งของเรา อันไหนของคนร้าย เพราะอยู่ channel เดียวกัน — และตัวร้ายที่สุดคือคำสั่งที่ซ่อนมาในข้อมูลที่ agent อ่าน\")"
+    },
+    {
+      "kind": "heading",
+      "text": "3.4 — LLM05:2025 Improper Output Handling"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Function: renderAdvice() (เอา text จาก model ไป render ใน web UI)"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "คืออะไร (plain): แอปปฏิบัติกับ output ของ LLM เหมือนเป็นข้อมูลที่เชื่อถือได้ แล้วส่งเข้า downstream interpreter โดยไม่มี destination-appropriate validation/encoding. output ของ model = untrusted input ของ component ถัดไป. [SRC: OWASP-LLM-2025]",
+        "ทำไม bank dev สน: นี่คือสะพานจาก \"AI weirdness\" ไปสู่ XSS / injection sink จริงในแอป internet banking. Demo ใช้ seeded <img onerror> canary และ raw initial-HTML interpolation เพื่อพิสูจน์ browser execution แบบมองเห็นได้; ไม่ persist และไม่พิสูจน์ session theft หรือ action-on-behalf. [SRC: OWASP-LLM-2025]",
+        "The tell ใน build นี้: renderAdvice() return `<div class=\"advice\">${modelOutput}</div> จาก src/lib/render.js` — raw server-side interpolation ลง initial HTML.",
+        "คู่ที่ต้องจำ: Prompt injection อาจเปลี่ยนสิ่งที่ model ส่งออก; LLM05 ทำให้ output ที่ไม่ปลอดภัยไปถึง downstream sink. ทั้งสอง risk เกิดแยกกันได้ และ LLM06 เป็น excessive-authority failure คนละ root cause. [SRC: OWASP-LLM-2025]"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "(TH note: \"output ของโมเดล = ข้อมูลที่ยังไม่เชื่อถือได้; build นี้ interpolate ลง initial HTML ฝั่ง server โดยไม่ encode จึงเปิดทางให้ event handler ทำงาน\")"
+    },
+    {
+      "kind": "heading",
+      "text": "3.5 — LLM06:2025 Excessive Agency"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Fixture path: /ai/assist → runAgent() → deterministic mockLlm prepared transfer branch. ไม่มี generic tool dispatcher."
+    },
+    {
+      "kind": "list",
+      "items": [
+        "คืออะไร (plain): agent ได้รับ capability / permission / autonomy มากกว่าที่งานต้องการ — tool มากเกิน, tool แรงเกิน, หรือ act ได้โดยไม่มี human gate. ความเสียหายไม่ใช่ \"model ตอบผิด\" — มันคือ model ทำได้มากเกินไปตอนที่มันผิดหรือถูก hijack. [SRC: OWASP-LLM-2025]",
+        "ทำไม bank dev สน: นี่คือ ตัวคูณ (multiplier). BOLA + SSRF + prompt injection แต่ละอันจะ ถูกจำกัด ถ้า agent ทำได้แค่ read และต้อง ขอคนก่อน write. excessive agency เอา containment นั้นออก. mitigation ของ OWASP = control ชุดเดียวกับ S1/S2 เป๊ะ: least privilege บน tools, จำกัด autonomy, require human approval สำหรับ state-changing/destructive action, full audit trail. [SRC: OWASP-LLM-2025]",
+        "The tell ใน fixture จริง: runAgent(..., fixed:false) delegate เข้า mock แล้ว prepared transfer branch เรียก toolTransferFunds(..., {approved:true}) ตรง ๆ โดยไม่มี pre-action gate. ไม่มี runtime autoApprove config หรือ generic tool dispatcher.",
+        "Anchor กลับ S1/S2: read-only first → least privilege → human approval before write → audit trail. Excessive Agency คือชื่อ OWASP ของ \"เราข้าม control พวกนั้น\". [SRC: OWASP-LLM-2025]"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "ENRICHMENT B — \"bash is all you need\" hook (เปิด route นี้):"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "เปิดด้วย power statement แล้ว flip ทันที: unconstrained shell access เป็น high-risk LLM06 pattern เพราะขยาย functionality/permission เกินงานและทำให้ least-privilege แยกเป็นราย tool บังคับยากขึ้น. ไม่จัดอันดับว่าเป็นความเสี่ยง #1 โดยไม่มีข้อมูลวัด.",
+        "Safe pattern: agent ไม่ได้ raw bash บน prod. agent ผลิต deterministic, version-controlled script / config ที่ คน review และ pipeline run. การบีบ agent ให้อยู่ใน checklist/procedure = หด action space.",
+        "agent = draft / review / catch flaws ก่อน publish; GATE เป็น deterministic (lint, policy-as-code, test, human review). agent-review ไม่ใช่ approval gate — ห้ามขาย \"AI บอกว่า OK\" เป็น control."
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "(TH note: \"ปัญหาไม่ใช่โมเดลตอบผิด — ปัญหาคือมันมีสิทธิ์ทำมากเกินไปตอนที่มันผิดหรือถูก hijack. นี่คือชื่อ OWASP ของการที่เราข้าม control จาก Session 1 และ 2\")"
+    },
+    {
+      "kind": "heading",
+      "text": "3.6 — LLM02:2025 Sensitive Information Disclosure (cross-cutting)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "เป็น cross-cutting lens — demo #1/#3 มี disclosure evidence; #4 ยังไม่มี"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "คืออะไร (plain): ระบบเปิดเผยข้อมูลที่ไม่ควร — PII, PAN/เลขบัญชีเต็ม, secrets, เนื้อหา system-prompt ภายใน, ข้อมูลลูกค้าคนอื่น — ทั้ง ในคำตอบของ model และ ในข้อมูลที่ model แตะได้. [SRC: OWASP-LLM-2025]",
+        "ทำไม bank dev สน: นี่คือ disclosure outcome ที่ลูกค้าและ regulator รู้สึกได้จริง. BOLA ใน demo เปิดยอดของลูกค้าอีกคน และ prompt injection เปิด internal prompt content. Improper output handling เป็นคนละ root และจะเป็น LLM02 ต่อเมื่อ protected data ไปถึง wrong audience จริง. [SRC: OWASP-LLM-2025]",
+        "The tell: model context มี PII/secrets เต็มๆ โดยไม่มี data minimization, classification, หรือ PII redaction ก่อนถึง model.",
+        "ทำไม teach ท้ายสุด / เป็น lens: เพื่อให้เห็นว่า API bug กับ LLM bug ไม่ใช่คนละโลก — มัน บรรจบ ที่ harm เดียวกัน: คนผิดเห็นข้อมูลผิด. ตัวแก้ root cause อยู่ S5 (data minimization, redaction, classification)."
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "⚠️ CORRECTION (CRITICAL): R4 = LLM05 และ R5 = LLM06 เป็นคนละ root. LLM02 เป็น conditional disclosure harm ไม่ใช่ shared root ของ R4/R5. [SRC: OWASP-LLM-2025]"
+    },
+    {
+      "kind": "paragraph",
+      "text": "(TH note: \"ข้อนี้คือ 'ผลลัพธ์' ที่ลูกค้ากับ regulator รู้สึกได้จริง — เป็นป้ายบอกความเสียหายของอีก 5 ข้อ. ตัวแก้จริงไปอยู่ Session 5: data minimization + PII redaction + classification\")"
+    }
+  ],
+  "attribution": "Course: KTB \"Agentic AI & Secure Implementation for Banking IT Teams\" Session 4 · 14:30–15:45 (75 min) · Activity: Risk Walkthrough on SecureBank Mini Delivery (binding): online, instructor-led demo · slides EN, notes/spoken TH · synthetic data only · no participant hands-on in base scope (ผู้เรียนด",
+  "cheatsheet": [
+    "The tell (บนสไลด์): // no check that accountId belongs to req.user",
+    "The tell: axios.get(req.body.url) ไม่มี allowlist.",
+    "Agentic amplification: หัวใจของ agentic tool คือ \"ดึง resource นี้ให้หน่อย\" — agent ที่มี fetch tool + คำสั่งที่ถูก poison = SSRF engine.",
+    "The tell: prompt = SYSTEM_PROMPT + userInput (string concat ไม่มี instruction/data boundary).",
+    "honest caveat (บนสไลด์): \"Filtering reduces, does not eliminate — that's why we cap agency.\"",
+    "The tell ใน build นี้: renderAdvice() return `<div class=\"advice\">${modelOutput}</div> จาก src/lib/render.js` — raw server-side interpolation ลง initial HTML.",
+    "The tell: model context มี PII/secrets เต็มๆ โดยไม่มี data minimization, classification, หรือ PII redaction ก่อนถึง model."
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for session 4, \"คืออะไร (plain)\" is described as:",
+      "choices": {
+        "A": "read-only first → least privilege → human approval before write → audit trail. Excessive Agency คือชื่อ OWASP ของ \"เราข้าม control พวกนั้น\". [SRC: OWASP-LLM-2025]",
+        "B": "เพื่อให้เห็นว่า API bug กับ LLM bug ไม่ใช่คนละโลก — มัน บรรจบ ที่ harm เดียวกัน: คนผิดเห็นข้อมูลผิด. ตัวแก้ root cause อยู่ S5 (data minimization, redaction, classification).",
+        "C": "ระบบเปิดเผยข้อมูลที่ไม่ควร — PII, PAN/เลขบัญชีเต็ม, secrets, เนื้อหา system-prompt ภายใน, ข้อมูลลูกค้าคนอื่น — ทั้ง ในคำตอบของ model และ ในข้อมูลที่ model แตะได้. [SRC: OWASP-LLM-2025]",
+        "D": "API เช็คว่า คุณ login แล้ว แต่ไม่เช็คว่า object นี้เป็นของคุณไหม. Authentication ≠ authorization. object ID ใน URL ถูกเชื่อราวกับเป็นใบอนุญาต. [SRC: OWASP-API-2023]"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The study guide states: คืออะไร (plain): API เช็คว่า คุณ login แล้ว แต่ไม่เช็คว่า object นี้เป็นของคุณไหม. Authentication ≠ authorization. object ID ใน URL ถูกเชื่อราวกับเป็นใบอนุญาต. [SRC: OWASP-API-2023]"
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for session 4, \"ทำไม bank dev สน\" is described as:",
+      "choices": {
+        "A": "agent สามารถ automate repeated cross-object requests ได้; blast radius จริงขึ้นกับ authorization, rate limit, monitoring และ object set. ownership check เป็น prevention หลัก ส่วน rate limit/monitoring ช่วยจำกัดและตรวจจับความพยายามซ้ำ.",
+        "B": "OWASP จัด BOLA ไว้ที่ API1:2023. ในบริบทธนาคาร การอ่านบัญชี/ยอด/statement ของลูกค้าคนอื่นเป็น disclosure ที่ต้องเข้าสู่กระบวนการ incident และ regulatory assessment ตามนโยบายที่ใช้; เลข API1 ไม่ใช่หลักฐานความถี่ของระบบใดระบบหนึ่ง. [SRC: OWASP-API-2023]",
+        "C": "agent ได้รับ capability / permission / autonomy มากกว่าที่งานต้องการ — tool มากเกิน, tool แรงเกิน, หรือ act ได้โดยไม่มี human gate. ความเสียหายไม่ใช่ \"model ตอบผิด\" — มันคือ model ทำได้มากเกินไปตอนที่มันผิดหรือถูก hijack. [SRC: OWASP-LLM-2025]",
+        "D": "server ยิง HTTP request ไปยัง URL ที่ user คุมได้ โดยไม่ validate ปลายทาง. ผู้โจมตี \"ยืม\" ตำแหน่ง network ของ server ไปถึงสิ่งที่ ตัวเอง เข้าไม่ถึง — internal services, cloud metadata endpoint (169.254.169.254), admin panel ภายใน. [SRC: OWASP-API-2023]"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: ทำไม bank dev สน: OWASP จัด BOLA ไว้ที่ API1:2023. ในบริบทธนาคาร การอ่านบัญชี/ยอด/statement ของลูกค้าคนอื่นเป็น disclosure ที่ต้องเข้าสู่กระบวนการ incident และ regulatory assessment ตามนโยบายที่ใช้; เลข API1 ไม่ใช่หลักฐานความถี่ของระบบใดระบบหนึ่ง. [SRC: OWASP-API-2023]"
+    },
+    {
+      "id": "q3",
+      "prompt": "In the study guide for session 4, \"The tell (บนสไลด์)\" is described as:",
+      "choices": {
+        "A": "// no check that accountId belongs to req.user",
+        "B": "axios.get(req.body.url) ไม่มี allowlist.",
+        "C": "\"Filtering reduces, does not eliminate — that's why we cap agency.\"",
+        "D": "prompt = SYSTEM_PROMPT + userInput (string concat ไม่มี instruction/data boundary)."
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The study guide states: The tell (บนสไลด์): // no check that accountId belongs to req.user"
+    },
+    {
+      "id": "q4",
+      "prompt": "In the study guide for session 4, \"Agentic amplification\" is described as:",
+      "choices": {
+        "A": "แอปปฏิบัติกับ output ของ LLM เหมือนเป็นข้อมูลที่เชื่อถือได้ แล้วส่งเข้า downstream interpreter โดยไม่มี destination-appropriate validation/encoding. output ของ model = untrusted input ของ component ถัดไป. [SRC: OWASP-LLM-2025]",
+        "B": "agent สามารถ automate repeated cross-object requests ได้; blast radius จริงขึ้นกับ authorization, rate limit, monitoring และ object set. ownership check เป็น prevention หลัก ส่วน rate limit/monitoring ช่วยจำกัดและตรวจจับความพยายามซ้ำ.",
+        "C": "agent ได้รับ capability / permission / autonomy มากกว่าที่งานต้องการ — tool มากเกิน, tool แรงเกิน, หรือ act ได้โดยไม่มี human gate. ความเสียหายไม่ใช่ \"model ตอบผิด\" — มันคือ model ทำได้มากเกินไปตอนที่มันผิดหรือถูก hijack. [SRC: OWASP-LLM-2025]",
+        "D": "OWASP จัด BOLA ไว้ที่ API1:2023. ในบริบทธนาคาร การอ่านบัญชี/ยอด/statement ของลูกค้าคนอื่นเป็น disclosure ที่ต้องเข้าสู่กระบวนการ incident และ regulatory assessment ตามนโยบายที่ใช้; เลข API1 ไม่ใช่หลักฐานความถี่ของระบบใดระบบหนึ่ง. [SRC: OWASP-API-2023]"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: Agentic amplification: agent สามารถ automate repeated cross-object requests ได้; blast radius จริงขึ้นกับ authorization, rate limit, monitoring และ object set. ownership check เป็น prevention หลัก ส่วน rate limit/monitoring ช่วยจำกัดและตรวจจับความพยายามซ้ำ."
+    }
+  ]
+}

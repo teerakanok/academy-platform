@@ -1,0 +1,223 @@
+{
+  "nodeId": "l21-threat-intelligence-mitre-attack-5-mitre-att-and-ck-st",
+  "locale": "en",
+  "title": "5. MITRE ATT&CK — Structure & Tactics",
+  "objective": "Study-guide review — ICCS423 v2 — L21: Threat Intelligence & MITRE ATT&CK: 5. MITRE ATT&CK — Structure & Tactics.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "What is ATT&CK?"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "MITRE ATT&CK = Adversarial Tactics, Techniques, and Common Knowledge",
+        "Curated, globally-accessible knowledge base of adversary behavior, built from real-world observations",
+        "Created by MITRE (US non-profit FFRDC); released publicly 2015; free + open use (CC BY-SA)",
+        "Core idea: describe attacks by behaviors (tactics + techniques), not static signatures"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "ATT&CK Matrices"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Matrix",
+        "Scope"
+      ],
+      "rows": [
+        [
+          "Enterprise",
+          "Windows, macOS, Linux, cloud (AWS/Azure/GCP/M365), network infra, containers"
+        ],
+        [
+          "Mobile",
+          "Android, iOS"
+        ],
+        [
+          "ICS",
+          "Industrial Control Systems (SCADA, PLC, HMI)"
+        ]
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Structure: Tactics → Techniques → Sub-techniques"
+    },
+    {
+      "kind": "paragraph",
+      "text": "`` Tactic (TA0001 — Initial Access) └── Technique (T1566 — Phishing) └── Sub-technique (T1566.001 — Spearphishing Attachment) └── Procedure (specific implementation) ``"
+    },
+    {
+      "kind": "paragraph",
+      "text": "ID format:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "TA#### — Tactic",
+        "T#### — Technique",
+        "T####.### — Sub-technique"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "14 Enterprise Tactics"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "TA ID",
+        "Name",
+        "Attacker goal"
+      ],
+      "rows": [
+        [
+          "TA0043",
+          "Reconnaissance",
+          "Gather info before attack"
+        ],
+        [
+          "TA0042",
+          "Resource Development",
+          "Build/buy infrastructure"
+        ],
+        [
+          "TA0001",
+          "Initial Access",
+          "Get foothold"
+        ],
+        [
+          "TA0002",
+          "Execution",
+          "Run code"
+        ],
+        [
+          "TA0003",
+          "Persistence",
+          "Survive reboot / credential change"
+        ],
+        [
+          "TA0004",
+          "Privilege Escalation",
+          "Get higher permissions"
+        ],
+        [
+          "TA0005",
+          "Defense Evasion",
+          "Avoid detection"
+        ],
+        [
+          "TA0006",
+          "Credential Access",
+          "Steal credentials"
+        ],
+        [
+          "TA0007",
+          "Discovery",
+          "Explore environment"
+        ],
+        [
+          "TA0008",
+          "Lateral Movement",
+          "Move to other systems"
+        ],
+        [
+          "TA0009",
+          "Collection",
+          "Gather target data"
+        ],
+        [
+          "TA0011",
+          "Command and Control",
+          "Communicate with implant"
+        ],
+        [
+          "TA0010",
+          "Exfiltration",
+          "Steal data out"
+        ],
+        [
+          "TA0040",
+          "Impact",
+          "Damage availability/integrity"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Important: tactics are NOT strictly sequential. Attackers loop (Discovery → Lateral Movement → Discovery again) and skip phases."
+    }
+  ],
+  "attribution": "Course: ICCS423 | Source: Thoth + RAG | Target: 3rd-4th year CS | Date: 2026-05-03",
+  "cheatsheet": [
+    "Enterprise: Windows, macOS, Linux, cloud (AWS/Azure/GCP/M365), network infra, containers",
+    "ICS: Industrial Control Systems (SCADA, PLC, HMI)",
+    "TA0042: Resource Development",
+    "TA0004: Privilege Escalation",
+    "TA0005: Defense Evasion",
+    "TA0006: Credential Access",
+    "TA0008: Lateral Movement",
+    "TA0011: Command and Control"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for L21 Threat Intelligence MITRE ATTACK, \"Enterprise\" is described as:",
+      "choices": {
+        "A": "Privilege Escalation",
+        "B": "Windows, macOS, Linux, cloud (AWS/Azure/GCP/M365), network infra, containers",
+        "C": "Resource Development",
+        "D": "Industrial Control Systems (SCADA, PLC, HMI)"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: Enterprise: Windows, macOS, Linux, cloud (AWS/Azure/GCP/M365), network infra, containers"
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for L21 Threat Intelligence MITRE ATTACK, \"ICS\" is described as:",
+      "choices": {
+        "A": "Resource Development",
+        "B": "Privilege Escalation",
+        "C": "Command and Control",
+        "D": "Industrial Control Systems (SCADA, PLC, HMI)"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The study guide states: ICS: Industrial Control Systems (SCADA, PLC, HMI)"
+    },
+    {
+      "id": "q3",
+      "prompt": "In the study guide for L21 Threat Intelligence MITRE ATTACK, \"TA0042\" is described as:",
+      "choices": {
+        "A": "Privilege Escalation",
+        "B": "Resource Development",
+        "C": "Command and Control",
+        "D": "Credential Access"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: TA0042: Resource Development"
+    },
+    {
+      "id": "q4",
+      "prompt": "In the study guide for L21 Threat Intelligence MITRE ATTACK, \"TA0004\" is described as:",
+      "choices": {
+        "A": "Privilege Escalation",
+        "B": "Credential Access",
+        "C": "Command and Control",
+        "D": "Resource Development"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The study guide states: TA0004: Privilege Escalation"
+    }
+  ]
+}

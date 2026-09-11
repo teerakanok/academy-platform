@@ -1,0 +1,162 @@
+{
+  "nodeId": "l12-recon-scanning-network-attacks-3-active-reconnaissance",
+  "locale": "th",
+  "title": "3. Active Reconnaissance — Nmap",
+  "objective": "Study-guide review — ICCS423 v2 — L12: Recon, Scanning & Network Attacks: 3. Active Reconnaissance — Nmap.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "Active = traffic touches target = logs and IDS alerts. Requires authorization."
+    },
+    {
+      "kind": "heading",
+      "text": "Key Nmap Flags"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Flag",
+        "Meaning"
+      ],
+      "rows": [
+        [
+          "-sn",
+          "Ping sweep (host discovery)"
+        ],
+        [
+          "-sS",
+          "TCP SYN scan (\"half-open\"); fast, default for root"
+        ],
+        [
+          "-sT",
+          "TCP Connect scan; non-root fallback"
+        ],
+        [
+          "-sU",
+          "UDP scan; slow but finds DNS/SNMP/TFTP"
+        ],
+        [
+          "-sV",
+          "Service/version detection"
+        ],
+        [
+          "-O",
+          "OS fingerprinting"
+        ],
+        [
+          "-A",
+          "Aggressive: -sV -O -sC --traceroute"
+        ],
+        [
+          "-p-",
+          "All 65535 ports"
+        ],
+        [
+          "--top-ports 100",
+          "Most-likely-open ports"
+        ],
+        [
+          "-T0..-T5",
+          "Timing template (T4 normal, T0 paranoid for IDS evasion)"
+        ],
+        [
+          "--script vuln",
+          "Run NSE vuln scripts"
+        ]
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Common Workflows"
+    },
+    {
+      "kind": "paragraph",
+      "text": "```bash # Stage 1 — host discovery nmap -sn 192.168.1.0/24"
+    },
+    {
+      "kind": "paragraph",
+      "text": "# Stage 2 — fast scan, top ports + version + default scripts nmap -sV -sC --top-ports 1000 -oA scan1 192.168.1.10"
+    },
+    {
+      "kind": "paragraph",
+      "text": "# Stage 3 — full port scan nmap -p- -sV 192.168.1.10 -oA scan_full"
+    },
+    {
+      "kind": "paragraph",
+      "text": "# Stage 4 — vuln scripts nmap --script vuln 192.168.1.10 ```"
+    },
+    {
+      "kind": "paragraph",
+      "text": "📋 Capture: in tmux, run the Stage 2 command on a CTF target like scanme.nmap.org and screenshot the resulting service table for the slide."
+    }
+  ],
+  "attribution": "Course: ICCS423 | Source: Thoth Library + RAG | Target: 3rd-4th year CS | Date: 2026-05-03",
+  "cheatsheet": [
+    "-sn: Ping sweep (host discovery)",
+    "-sS: TCP SYN scan (\"half-open\"); fast, default for root",
+    "-sT: TCP Connect scan; non-root fallback",
+    "-sU: UDP scan; slow but finds DNS/SNMP/TFTP",
+    "-sV: Service/version detection",
+    "-O: OS fingerprinting",
+    "-A: Aggressive: -sV -O -sC --traceroute",
+    "-p-: All 65535 ports"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for L12 Recon Scanning Network Attacks, \"-sn\" is described as:",
+      "choices": {
+        "A": "Service/version detection",
+        "B": "Ping sweep (host discovery)",
+        "C": "Most-likely-open ports",
+        "D": "Run NSE vuln scripts"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: -sn: Ping sweep (host discovery)"
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for L12 Recon Scanning Network Attacks, \"-sS\" is described as:",
+      "choices": {
+        "A": "TCP Connect scan; non-root fallback",
+        "B": "UDP scan; slow but finds DNS/SNMP/TFTP",
+        "C": "Timing template (T4 normal, T0 paranoid for IDS evasion)",
+        "D": "TCP SYN scan (\"half-open\"); fast, default for root"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The study guide states: -sS: TCP SYN scan (\"half-open\"); fast, default for root"
+    },
+    {
+      "id": "q3",
+      "prompt": "In the study guide for L12 Recon Scanning Network Attacks, \"-sT\" is described as:",
+      "choices": {
+        "A": "Ping sweep (host discovery)",
+        "B": "UDP scan; slow but finds DNS/SNMP/TFTP",
+        "C": "TCP Connect scan; non-root fallback",
+        "D": "Aggressive: -sV -O -sC --traceroute"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The study guide states: -sT: TCP Connect scan; non-root fallback"
+    },
+    {
+      "id": "q4",
+      "prompt": "In the study guide for L12 Recon Scanning Network Attacks, \"-sU\" is described as:",
+      "choices": {
+        "A": "Ping sweep (host discovery)",
+        "B": "Aggressive: -sV -O -sC --traceroute",
+        "C": "UDP scan; slow but finds DNS/SNMP/TFTP",
+        "D": "TCP Connect scan; non-root fallback"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The study guide states: -sU: UDP scan; slow but finds DNS/SNMP/TFTP"
+    }
+  ]
+}

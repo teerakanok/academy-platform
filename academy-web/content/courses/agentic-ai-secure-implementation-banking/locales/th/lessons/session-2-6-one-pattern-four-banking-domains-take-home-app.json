@@ -1,0 +1,129 @@
+{
+  "nodeId": "session-2-6-one-pattern-four-banking-domains-take-home-app",
+  "locale": "th",
+  "title": "6. One pattern, four banking domains (take-home applicability)",
+  "objective": "Study-guide review — Study Guide — Session 2: Practical Agentic Workflow Controls: 6. One pattern, four banking domains (take-home applicability).",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "Map the four controls onto four operational domains so every role in the room sees themselves. [SRC: design/S2_workflow_controls.md §2 Beat 6] [SRC: COMMITTED_SCOPE.md — S2 \"apply to coding/CI-CD/log-triage/IR\"]"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Domain",
+        "Task Card scopes…",
+        "Approval Gate triggers on…",
+        "Execution Proof =",
+        "Audit Trail feeds…"
+      ],
+      "rows": [
+        [
+          "Coding",
+          "repo + branch + which files",
+          "merge to main / prod config change",
+          "diff + passing tests + reviewer note",
+          "PR history, change record"
+        ],
+        [
+          "CI/CD",
+          "which pipeline + which env",
+          "promote to prod / release tag",
+          "build log + deploy receipt",
+          "release / change-management log"
+        ],
+        [
+          "Log triage",
+          "which log scope, read-only",
+          "any action beyond \"summarize\" (open ticket, block IP)",
+          "the findings + queries run",
+          "SOC case notes"
+        ],
+        [
+          "Incident Response",
+          "one incident, scoped systems",
+          "containment action that changes state (isolate host, revoke key)",
+          "the timeline + commands proposed",
+          "IR case file / post-incident review"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Config-as-code fold-in (C3). Across all four domains, the strongest form of these controls is configuration / infrastructure as code in version control: the Task Card becomes a reviewable script/procedure; Execution Proof and the Audit Trail become diffable, revertable VCS history; rollback = git revert. The agent drafts and flaw-checks pre-publish; the deterministic CI + human review is the gate — never the agent's own opinion. [SRC: design/ENRICHMENTS_v1.1.md — Theme B fold-in across S2/S5]"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Deterministic-gate + variance note (C4/C6). Why insist the gate is deterministic and not \"ask the model if it's ok\"? Because models differ in skill, carefulness, and hallucination rate depending on how they were trained — model variance / reliability (the course term; not \"bias\" — we do not open the fairness topic here). You evaluate a model for your task; you do not assume. A second model adversarially reviewing the first (trying to refute, not \"do you agree?\") is a useful model-risk mitigation — but it has cost and shares correlated blind spots, so it complements, never replaces, deterministic checks and human approval. (Taught in depth at S3 as the root of hallucination and at S5 as an output control.) [SRC: design/ENRICHMENTS_v1.1.md — Theme A LOCKED FRAMING: variance/reliability not bias; adversarial > redundant; agent≠gate]"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Spoken (TH): \"ไม่ว่าจะ coding, CI/CD, log triage หรือ IR — โครงเดียวกันหมด. นี่คือสิ่งที่เอาไปใช้ในทีมจริงได้พรุ่งนี้.\""
+    }
+  ],
+  "attribution": "KTB · Agentic AI & Secure Implementation for Banking IT Teams Time: 10:45–12:00 (75 min) · Format: Online, instructor-led, demo-driven · ~50 participants Activity: Control Walkthrough (vendor-neutral) — Task Card → Approval Gate → Execution Proof → Audit Trail Slides: FULL ENGLISH · Spoken delivery ",
+  "cheatsheet": [
+    "Coding: repo + branch + which files",
+    "CI/CD: which pipeline + which env",
+    "Log triage: which log scope, read-only",
+    "Incident Response: one incident, scoped systems"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for session 2, \"Coding\" is described as:",
+      "choices": {
+        "A": "which pipeline + which env",
+        "B": "repo + branch + which files",
+        "C": "which log scope, read-only",
+        "D": "one incident, scoped systems"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: Coding: repo + branch + which files"
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for session 2, \"CI/CD\" is described as:",
+      "choices": {
+        "A": "one incident, scoped systems",
+        "B": "repo + branch + which files",
+        "C": "which pipeline + which env",
+        "D": "which log scope, read-only"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The study guide states: CI/CD: which pipeline + which env"
+    },
+    {
+      "id": "q3",
+      "prompt": "In the study guide for session 2, \"Log triage\" is described as:",
+      "choices": {
+        "A": "which pipeline + which env",
+        "B": "which log scope, read-only",
+        "C": "repo + branch + which files",
+        "D": "one incident, scoped systems"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: Log triage: which log scope, read-only"
+    },
+    {
+      "id": "q4",
+      "prompt": "In the study guide for session 2, \"Incident Response\" is described as:",
+      "choices": {
+        "A": "which log scope, read-only",
+        "B": "which pipeline + which env",
+        "C": "repo + branch + which files",
+        "D": "one incident, scoped systems"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The study guide states: Incident Response: one incident, scoped systems"
+    }
+  ]
+}

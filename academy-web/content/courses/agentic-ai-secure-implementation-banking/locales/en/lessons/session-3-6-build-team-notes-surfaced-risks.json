@@ -1,0 +1,135 @@
+{
+  "nodeId": "session-3-6-build-team-notes-surfaced-risks",
+  "locale": "en",
+  "title": "6. Build-team notes / surfaced risks (ไม่ขึ้นสไลด์)",
+  "objective": "Study-guide review — Study Guide — Session 3: Case Study — AI/Agentic Risk in Financial Services: 6. Build-team notes / surfaced risks (ไม่ขึ้นสไลด์).",
+  "blocks": [
+    {
+      "kind": "list",
+      "items": [
+        "Two card sets exist. S3 design file (S3_case_study_quiz.md Part B) มี 9-card set ดั้งเดิม; RUN_OF_SHOW_v1.2"
+      ],
+      "ordered": true
+    },
+    {
+      "kind": "paragraph",
+      "text": "มี 9-card set ที่ refined (3-micro-round, gate-diagnostic, depth-in-vote). Study guide นี้ยึด v1.2 card set ตามคำสั่ง \"apply v1.2 corrections\". ตอน build quiz asset (T7) ให้ใช้ v1.2 table (§3) เป็น source of truth. [src: task brief — apply v1.2]"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Cards 6 & 8 ต้อง NAMED + DATED ด้วย freshest financial-sector incident ตอน build (fail-closed currency gate);"
+      ],
+      "ordered": true
+    },
+    {
+      "kind": "paragraph",
+      "text": "ตอนนี้ design ระบุ requirement แต่ยังไม่ fix เคสตายตัว → [VERIFY] ก่อน promote. [src: RUN_OF_SHOW lines 239-244]"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Scale stat ของ supply-chain (2.23M / 19.7% / 440,445 / 43%) มาจาก S3 design F1 RESOLVED แต่ยังไม่มี chip URL ของ"
+      ],
+      "ordered": true
+    },
+    {
+      "kind": "paragraph",
+      "text": "paper ตรง ๆ → fact-check + ใส่ chip ก่อนขึ้นสไลด์ ([VERIFY]). [src: S3 design F1 RESOLVED scale stat]"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Vendor/survey figures (LayerX, UpGuard) ติด source-caution banner บนสไลด์เสมอ — present direction ไม่ใช่ stat เป๊ะ."
+      ],
+      "ordered": true
+    },
+    {
+      "kind": "paragraph",
+      "text": "[src: COURSE_BUILD_SPEC §3 F2; S3 design cautions]"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "C-1 enforcement: ตอน foreshadow ให้แยก R4 = LLM05 และ R5 = LLM06; ใช้ LLM02 เฉพาะ demonstrated disclosure. (scope-critic จะตรวจ.)",
+        "No-overclaim: cards 3/8/excessive-agency framing = \"design the gate\" ไม่ใช่ \"AI autonomously deploys / AI is dangerous, ban it\"."
+      ],
+      "ordered": true
+    },
+    {
+      "kind": "paragraph",
+      "text": "[src: COMMITTED_SCOPE.md Hard constraints; S3 design notes]"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "No-Baton: governance pattern เรียก generic (\"the 4 S2 gates\" / \"Governance Console\") — ห้าม name Baton. [src: COMMITTED_SCOPE.md]"
+      ],
+      "ordered": true
+    }
+  ],
+  "attribution": "Session: S3 · 13:00–14:15 (75 min) · When Agents Go Wrong Format: Online · instructor-led · ~50 participants · Interactive Quiz (vote-then-reveal) Language contract: สไลด์ = English · พูด + speaker notes = ภาษาไทย · visual-first Vote options (ทุกการ์ด, fixed wording): Allowed · Needs approval · Bloc",
+  "cheatsheet": [
+    "C-1 enforcement: ตอน foreshadow ให้แยก R4 = LLM05 และ R5 = LLM06; ใช้ LLM02 เฉพาะ demonstrated disclosure. (scope-critic จะตรวจ.)",
+    "No-overclaim: cards 3/8/excessive-agency framing = \"design the gate\" ไม่ใช่ \"AI autonomously deploys / AI is dangerous, ban it\".",
+    "No-Baton: governance pattern เรียก generic (\"the 4 S2 gates\" / \"Governance Console\") — ห้าม name Baton. [src: COMMITTED_SCOPE.md]"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for session 3, \"C-1 enforcement\" is described as:",
+      "choices": {
+        "A": "cards 3/8/excessive-agency framing = \"design the gate\" ไม่ใช่ \"AI autonomously deploys / AI is dangerous, ban it\".",
+        "B": "governance pattern เรียก generic (\"the 4 S2 gates\" / \"Governance Console\") — ห้าม name Baton. [src: COMMITTED_SCOPE.md]",
+        "C": "ผู้ใช้ทั่วไป inject คำสั่งใส่ chatbot ของดีลเลอร์จนมัน \"ตกลงขายรถ $1\" — นี่คือ **untrusted input ที่คุณคุมไม่ได้",
+        "D": "ตอน foreshadow ให้แยก R4 = LLM05 และ R5 = LLM06; ใช้ LLM02 เฉพาะ demonstrated disclosure. (scope-critic จะตรวจ.)"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The study guide states: C-1 enforcement: ตอน foreshadow ให้แยก R4 = LLM05 และ R5 = LLM06; ใช้ LLM02 เฉพาะ demonstrated disclosure. (scope-critic จะตรวจ.)"
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for session 3, \"No-overclaim\" is described as:",
+      "choices": {
+        "A": "ตอน foreshadow ให้แยก R4 = LLM05 และ R5 = LLM06; ใช้ LLM02 เฉพาะ demonstrated disclosure. (scope-critic จะตรวจ.)",
+        "B": "cards 3/8/excessive-agency framing = \"design the gate\" ไม่ใช่ \"AI autonomously deploys / AI is dangerous, ban it\".",
+        "C": "governance pattern เรียก generic (\"the 4 S2 gates\" / \"Governance Console\") — ห้าม name Baton. [src: COMMITTED_SCOPE.md]",
+        "D": "ผลสำรวจชี้ว่าพนักงานส่วนใหญ่ใช้ AI ที่ IT ไม่เคยอนุมัติ — shadow AI ไม่ใช่ความเสี่ยงในอนาคต มันเกิดขึ้นแล้ววันนี้."
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: No-overclaim: cards 3/8/excessive-agency framing = \"design the gate\" ไม่ใช่ \"AI autonomously deploys / AI is dangerous, ban it\"."
+    },
+    {
+      "id": "q3",
+      "prompt": "In the study guide for session 3, \"No-Baton\" is described as:",
+      "choices": {
+        "A": "cards 3/8/excessive-agency framing = \"design the gate\" ไม่ใช่ \"AI autonomously deploys / AI is dangerous, ban it\".",
+        "B": "ตอน foreshadow ให้แยก R4 = LLM05 และ R5 = LLM06; ใช้ LLM02 เฉพาะ demonstrated disclosure. (scope-critic จะตรวจ.)",
+        "C": "governance pattern เรียก generic (\"the 4 S2 gates\" / \"Governance Console\") — ห้าม name Baton. [src: COMMITTED_SCOPE.md]",
+        "D": "\"Engineers pasted semiconductor source code & internal meeting notes into ChatGPT → data left the corporate boundary.\""
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The study guide states: No-Baton: governance pattern เรียก generic (\"the 4 S2 gates\" / \"Governance Console\") — ห้าม name Baton. [src: COMMITTED_SCOPE.md]"
+    },
+    {
+      "id": "q4",
+      "prompt": "Which term does the study guide for session 3 define as: \"ตอน foreshadow ให้แยก R4 = LLM05 และ R5 = LLM06; ใช้ LLM02 เฉพาะ demonstrated disclosure. (scope-critic จะตรวจ.)\"?",
+      "choices": {
+        "A": "No-overclaim",
+        "B": "No-Baton",
+        "C": "C-1 enforcement",
+        "D": "Translate to KTB"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The study guide states: C-1 enforcement: ตอน foreshadow ให้แยก R4 = LLM05 และ R5 = LLM06; ใช้ LLM02 เฉพาะ demonstrated disclosure. (scope-critic จะตรวจ.)"
+    }
+  ]
+}

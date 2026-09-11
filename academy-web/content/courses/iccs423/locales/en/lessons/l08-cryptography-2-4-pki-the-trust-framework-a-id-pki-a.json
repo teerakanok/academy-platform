@@ -1,0 +1,149 @@
+{
+  "nodeId": "l08-cryptography-2-4-pki-the-trust-framework-a-id-pki-a",
+  "locale": "en",
+  "title": "4. PKI — The Trust Framework <a id=\"pki\"></a>",
+  "objective": "Study-guide review — ICCS423 v2 — L08: Cryptography 2 (Asymmetric, PKI, TLS, Signatures): 4. PKI — The Trust Framework <a id=\"pki\"></a>.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "The Problem PKI Solves"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Alice receives \"Bob's public key.\" How does she know it really belongs to Bob and not Mallory? Answer: a trusted Certificate Authority (CA) signs Bob's key + identity into a certificate."
+    },
+    {
+      "kind": "heading",
+      "text": "Components"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Component",
+        "Role"
+      ],
+      "rows": [
+        [
+          "Root CA",
+          "Top trust anchor; kept offline; pre-installed in OS/browser"
+        ],
+        [
+          "Intermediate CA",
+          "Issues end-entity certificates online"
+        ],
+        [
+          "Registration Authority (RA)",
+          "Verifies identity before CA issues"
+        ],
+        [
+          "CRL",
+          "Certificate Revocation List (download periodically)"
+        ],
+        [
+          "OCSP",
+          "Real-time revocation check (per cert)"
+        ],
+        [
+          "OCSP Stapling",
+          "Server attaches fresh OCSP response to handshake"
+        ],
+        [
+          "CT Log",
+          "Public append-only log of every issued cert"
+        ]
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Hierarchical Topology"
+    },
+    {
+      "kind": "paragraph",
+      "text": "`` Root CA (offline) / \\ Intermediate 1 Intermediate 2 / | | \\ Server certs User certs ``"
+    },
+    {
+      "kind": "heading",
+      "text": "Real-World Disasters"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "DigiNotar (2011) — CA hacked; 531 fraudulent certs incl. *.google.com; CA bankrupt within 6 weeks",
+        "Symantec (2017) — misissuance crisis; Chrome distrusted entire PKI"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "If a CA's private key leaks, every cert it ever signed is suspect. That's why root CAs are stored in offline HSMs in vaults."
+    }
+  ],
+  "attribution": "Course: ICCS423 | Source: Thoth Library (cryptography/) + RAG | Target: 3rd-4th year CS | Date: 2026-05-03",
+  "cheatsheet": [
+    "Root CA: Top trust anchor; kept offline; pre-installed in OS/browser",
+    "Intermediate CA: Issues end-entity certificates online",
+    "Registration Authority (RA): Verifies identity before CA issues",
+    "CRL: Certificate Revocation List (download periodically)",
+    "OCSP: Real-time revocation check (per cert)",
+    "OCSP Stapling: Server attaches fresh OCSP response to handshake",
+    "CT Log: Public append-only log of every issued cert",
+    "DigiNotar (2011): CA hacked; 531 fraudulent certs incl. *.google.com; CA bankrupt within 6 weeks"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for L08 Cryptography 2, \"Root CA\" is described as:",
+      "choices": {
+        "A": "Certificate Revocation List (download periodically)",
+        "B": "Server attaches fresh OCSP response to handshake",
+        "C": "Top trust anchor; kept offline; pre-installed in OS/browser",
+        "D": "misissuance crisis; Chrome distrusted entire PKI"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The study guide states: Root CA: Top trust anchor; kept offline; pre-installed in OS/browser"
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for L08 Cryptography 2, \"Intermediate CA\" is described as:",
+      "choices": {
+        "A": "Public append-only log of every issued cert",
+        "B": "Issues end-entity certificates online",
+        "C": "Verifies identity before CA issues",
+        "D": "Real-time revocation check (per cert)"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: Intermediate CA: Issues end-entity certificates online"
+    },
+    {
+      "id": "q3",
+      "prompt": "In the study guide for L08 Cryptography 2, \"Registration Authority (RA)\" is described as:",
+      "choices": {
+        "A": "Issues end-entity certificates online",
+        "B": "Real-time revocation check (per cert)",
+        "C": "Verifies identity before CA issues",
+        "D": "Public append-only log of every issued cert"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The study guide states: Registration Authority (RA): Verifies identity before CA issues"
+    },
+    {
+      "id": "q4",
+      "prompt": "In the study guide for L08 Cryptography 2, \"CRL\" is described as:",
+      "choices": {
+        "A": "Server attaches fresh OCSP response to handshake",
+        "B": "misissuance crisis; Chrome distrusted entire PKI",
+        "C": "Certificate Revocation List (download periodically)",
+        "D": "Top trust anchor; kept offline; pre-installed in OS/browser"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The study guide states: CRL: Certificate Revocation List (download periodically)"
+    }
+  ]
+}

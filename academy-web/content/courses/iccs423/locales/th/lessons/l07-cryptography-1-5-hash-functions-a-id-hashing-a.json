@@ -1,0 +1,163 @@
+{
+  "nodeId": "l07-cryptography-1-5-hash-functions-a-id-hashing-a",
+  "locale": "th",
+  "title": "5. Hash Functions <a id=\"hashing\"></a>",
+  "objective": "Study-guide review — ICCS423 v2 — L07: Cryptography 1 (Symmetric, Hashing, Encoding): 5. Hash Functions <a id=\"hashing\"></a>.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "Properties"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Variable input → fixed output (e.g., SHA-256 always 256 bits)",
+        "Deterministic — same input → same output",
+        "One-way (preimage resistance)",
+        "Collision-resistant (different inputs → different outputs)",
+        "Avalanche effect — flipping 1 bit in input changes ~50% of output bits"
+      ],
+      "ordered": true
+    },
+    {
+      "kind": "heading",
+      "text": "Birthday Bound (the trap)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "For n-bit hash, collisions cost ~2^(n/2) operations, not 2^n. So a 128-bit hash gives only 64-bit collision resistance. Hence: 256-bit hash for 128-bit security."
+    },
+    {
+      "kind": "heading",
+      "text": "Algorithm Status"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Algorithm",
+        "Output",
+        "Status",
+        "Year broken"
+      ],
+      "rows": [
+        [
+          "MD5",
+          "128",
+          "❌ Broken",
+          "2004 (Wang); 2008 chosen-prefix"
+        ],
+        [
+          "SHA-1",
+          "160",
+          "❌ Deprecated",
+          "2017 SHAttered (Google)"
+        ],
+        [
+          "SHA-256",
+          "256",
+          "✅ Standard",
+          "—"
+        ],
+        [
+          "SHA-3",
+          "variable",
+          "✅ Standard (sponge)",
+          "—"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Hash gives you integrity, not confidentiality. Anyone can hash. The verifier can detect change but cannot recover the original."
+    },
+    {
+      "kind": "heading",
+      "text": "Password Storage — NOT Plain Hash"
+    },
+    {
+      "kind": "paragraph",
+      "text": "GPUs hash SHA-256 ~10 billion times/second. For passwords use:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Argon2id (preferred, OWASP 2023)",
+        "bcrypt / scrypt — acceptable",
+        "PBKDF2 — legacy/FIPS"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Always salt per user. Pepper optional (HSM-stored)."
+    }
+  ],
+  "attribution": "Course: ICCS423 | Source: Thoth Library (cryptography/) + RAG | Target: 3rd-4th year CS | Date: 2026-05-03",
+  "cheatsheet": [
+    "Deterministic: same input → same output",
+    "Avalanche effect: flipping 1 bit in input changes ~50% of output bits",
+    "Variable input → fixed output (e.g., SHA-256 always 256 bits)",
+    "Deterministic — same input → same output",
+    "One-way (preimage resistance)",
+    "Collision-resistant (different inputs → different outputs)",
+    "Avalanche effect — flipping 1 bit in input changes ~50% of output bits",
+    "Argon2id (preferred, OWASP 2023)"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for L07 Cryptography 1, \"Deterministic\" is described as:",
+      "choices": {
+        "A": "flipping 1 bit in input changes ~50% of output bits",
+        "B": "row shifting (diffusion)",
+        "C": "Argon2id / bcrypt + salt",
+        "D": "same input → same output"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The study guide states: Deterministic — same input → same output"
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for L07 Cryptography 1, \"Avalanche effect\" is described as:",
+      "choices": {
+        "A": "same input → same output",
+        "B": "AES-128-GCM, AES-256-GCM, ChaCha20-Poly1305",
+        "C": "binary → 64-character alphabet (3 bytes → 4 chars)",
+        "D": "flipping 1 bit in input changes ~50% of output bits"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The study guide states: Avalanche effect — flipping 1 bit in input changes ~50% of output bits"
+    },
+    {
+      "id": "q3",
+      "prompt": "Which term does the study guide for L07 Cryptography 1 define as: \"same input → same output\"?",
+      "choices": {
+        "A": "Deterministic",
+        "B": "Avalanche effect",
+        "C": "HTTPS / TLS 1.3",
+        "D": "AddRoundKey"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The study guide states: Deterministic — same input → same output"
+    },
+    {
+      "id": "q4",
+      "prompt": "Which term does the study guide for L07 Cryptography 1 define as: \"flipping 1 bit in input changes ~50% of output bits\"?",
+      "choices": {
+        "A": "Deterministic",
+        "B": "Password storage",
+        "C": "HTTPS / TLS 1.3",
+        "D": "Avalanche effect"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The study guide states: Avalanche effect — flipping 1 bit in input changes ~50% of output bits"
+    }
+  ]
+}

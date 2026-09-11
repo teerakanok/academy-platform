@@ -1,0 +1,451 @@
+{
+  "nodeId": "session-3-2-part-a-verified-case-studies-4-categories",
+  "locale": "en",
+  "title": "2. PART A — Verified Case Studies (4 categories)",
+  "objective": "Study-guide review — Study Guide — Session 3: Case Study — AI/Agentic Risk in Financial Services: 2. PART A — Verified Case Studies (4 categories).",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "Framing rules (อ่านครั้งเดียว ใช้ทุกเคส):"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Slide = English, visual-first, หนึ่งเคสต่อสไลด์: headline strip + 3-step \"what happened\" mini-timeline (icons)",
+        "\"translate to KTB\" callout + source chip ล่างสไลด์. พูด TH. [src: S3 design Part A framing]",
+        "Source-caution banner (พูดออกเสียงครั้งแรก, แล้วมี icon เล็กซ้ำ):"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "\"เคสเหล่านี้เป็นเหตุการณ์ที่มีรายงานสาธารณะ / คำพิพากษา / รายงานของผู้ขาย — ไม่ใช่เหตุการณ์ของกรุงไทย และตัวเลขบางส่วน เป็นการประเมินของผู้รายงาน เรานำมาถอดบทเรียน ไม่ใช่กล่าวหาองค์กรใด.\" [src: S3 design Part A; COMMITTED_SCOPE.md Hard constraints]"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Translate, don't just report: ทุกเคสจบด้วยบรรทัด \"At a bank, this same gap looks like ___\" map ไป SecureBank Mini"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "surface หรือ workflow ที่ KTB เจอจริง. [src: S3 design Part A framing]"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Vendor/survey figures (LayerX, UpGuard): บนสไลด์ติด source-caution → นำเสนอ ทิศทาง ของ finding ไม่ใช่"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "เปอร์เซ็นต์เป๊ะ ๆ เป็นความจริง audited. [src: S3 design Part A Case 1.2 / 3.1 cautions; COURSE_BUILD_SPEC F2]"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Slide-budget (F3): S3 cap = 16 slides. ถ้าต้อง trim case slides 8→6 ให้เก็บตัวที่แรงสุดต่อ category (Samsung, Air Canada, US-House ban, huggingface-cli/Chevrolet). [src: COURSE_BUILD_SPEC §4 F3; ENRICHMENTS slide-budget table]"
+    },
+    {
+      "kind": "heading",
+      "text": "Category 1 — DATA LEAKAGE"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Case 1.1 — Samsung source-code leak into ChatGPT"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Slide (EN): \"Engineers pasted semiconductor source code & internal meeting notes into ChatGPT → data left the corporate boundary.\"",
+        "พูด (TH): วิศวกรเอา source code + โน้ตประชุมไปวางใน ChatGPT เพื่อให้ช่วย debug/สรุป — ข้อมูลความลับออกนอกองค์กรทันที"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "โดยไม่มีใครอนุมัติ. Missing control: read/write boundary + DLP. [src: RUN_OF_SHOW line 204]"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Translate to KTB: developer เอา stored procedure ที่มี account logic จริงไปวางใน public chatbot เพื่อ \"ถามว่าทำไมช้า\""
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "→ จุดเดียวกับ shadow-AI + sensitive-info-disclosure (LLM02:2025) boundary."
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Source chip: AI Incident Database — incidentdatabase.ai/cite/768",
+        "Source-caution: publicly reported incident; เนื้อหาที่รั่วเป็นไปตามรายงาน เรา audit เองไม่ได้.",
+        "[src: S3 design Case 1.1; COURSE_BUILD_SPEC §3 S3 row]"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Case 1.2 — LayerX 2025 Enterprise AI report (shadow data flow)"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Slide (EN): \"Most enterprise AI usage flows through personal accounts; a large share of pasted data contains PII/PCI.\"",
+        "พูด (TH): รายงานปี 2025 ชี้ว่าการใช้ AI ส่วนใหญ่ผ่านบัญชีส่วนตัว ไม่ใช่บัญชีองค์กร และข้อมูลที่ถูก paste จำนวนมากมี"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "PII/PCI — แปลว่า DLP ขององค์กร มองไม่เห็น."
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Translate to KTB: customer KYC fields หรือ card PAN ถูก paste เข้า AI tab ที่ไม่ได้ควบคุม → invisible ต่อ bank DLP.",
+        "Source chip: LayerX Enterprise AI/SaaS report 2025 (via theregister.com/2025/10/07) — vendor-reported telemetry",
+        "Source-caution (พูด TH บนสไลด์): เป็น vendor telemetry — นำเสนอ ทิศทาง ไม่ใช่ตัวเลขเป๊ะเป็น fact.",
+        "[src: S3 design Case 1.2]"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Category 2 — HALLUCINATION / WRONG BUSINESS LOGIC"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Case 2.1 — Mata v. Avianca (fake legal citations)"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Slide (EN): \"Lawyers filed ChatGPT-invented case citations → court sanctions.\"",
+        "พูด (TH): ทนายใช้ ChatGPT ร่างคำร้อง แล้วมันแต่งคดีอ้างอิงปลอมขึ้นมา ศาลลงโทษ — บทเรียน: output ของ AI ต้องมี"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "human verification ก่อนใช้จริง."
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Translate to KTB: agent \"สรุปกฎ ธปท./AML ที่เกี่ยวข้อง\" แล้วอ้าง clause ที่ไม่มีอยู่จริง → compliance officer ต้อง verify"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "กับ primary source."
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Source chip: Mata v. Avianca, Inc. — S.D.N.Y., 2023 (court sanctions order; Wikipedia summary)",
+        "[src: S3 design Case 2.1]"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Case 2.2 — Moffatt v. Air Canada (องค์กรรับผิดต่อสิ่งที่ bot พูด) — strongest \"why we need an approval gate\" anchor"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Slide (EN): \"Airline's chatbot invented a refund policy → airline held legally liable.\"",
+        "พูด (TH): chatbot ของสายการบินกุนโยบายคืนเงินขึ้นมาเอง ลูกค้าฟ้อง — ศาล (BC Civil Resolution Tribunal) ตัดสินว่า"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "บริษัทต้องรับผิดต่อสิ่งที่ bot พูด. ถ้า KTB เปิด AI assistant ให้ลูกค้า ธนาคารรับผิดต่อทุกคำตอบ."
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Translate to KTB: customer-facing AI ตอบกฎค่าธรรมเนียม/ดอกเบี้ยผิด → ธนาคารเป็นเจ้าของคำพูดนั้น.",
+        "Source chip: Moffatt v. Air Canada — BC Civil Resolution Tribunal, 2024 CRST 149 (via mccarthy.ca techlex)",
+        "[src: S3 design Case 2.2]"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Case 2.3 — NYC MyCity chatbot (แนะนำให้ทำผิดกฎหมาย)"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Slide (EN): \"Government chatbot advised actions that were actually illegal — still live after reports.\"",
+        "พูด (TH): chatbot ของรัฐนิวยอร์กแนะนำสิ่งที่ผิดกฎหมาย และยังออนไลน์อยู่หลังมีรายงาน — \"hallucination ที่ฟังดูน่าเชื่อถือ\""
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "อันตรายเป็นพิเศษในงาน regulated."
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Translate to KTB: confident-but-wrong AML/eligibility guidance ที่ส่งให้ relationship manager.",
+        "Source chip: The Markup, 2024-04-02 — NYC \"MyCity\" chatbot reporting",
+        "[src: S3 design Case 2.3]"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Beat: \"Why does the AI get it confidently wrong?\" — MODEL VARIANCE / RELIABILITY (bounded explanation) (ENRICHMENTS Theme A fold-in — term-disciplined)"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Slide (EN): \"Same prompt, run twice → two different confidently-wrong answers. Output is non-deterministic.\"",
+        "พูด (TH): model ถูก train ต่างกัน (data, tuning, system prompt) → ฝีมือ/ความระมัดระวัง/อัตรา hallucination ต่างกัน;"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "อย่า assume — ต้องประเมินสำหรับงานของคุณ. อธิบายว่า output อาจ vary ระหว่าง run และ temperature/sampling เป็นแหล่งหนึ่งของ variance. อย่าพูดว่าห้องได้ดูคลิปหรือ captured run เพราะ current asset ยังไม่มี."
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Hard rule: ใช้คำ \"model variance / reliability\" — ห้าม \"bias\" (คนละเรื่อง, regulated, ใหญ่กว่า ไม่เปิดในคอร์สนี้);"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "ห้าม name-shame ว่ารุ่นไหน careful/sloppy (เปลี่ยนเร็ว, sensitive, dates badly)."
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Bridge forward: *\"run it 3× surfaces variance แต่ไม่ fix — เพราะงั้น gate ต้องเป็น human/structure ไม่ใช่ second opinion"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "จากระบบแบบเดียวกัน. มาตรการ mitigation หนึ่งจะเห็นใน S5 — independent model adversarially reviewing the first.\"*"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "D1 callback (math consistency, C-2): *\"agent อาจ 'fix' calculateInterest ให้ return 267.00 แล้วเขียน test ที่ดูเหมือนผ่าน"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "— gap 267.13 (correct) vs 267.00 (buggy) คือ confident error ที่ human gate จับได้ และคือ GREEN-but-wrong test ที่คุณเห็นใน S1.\"* (true interest = 267.125, fix = round-half-up to 2dp → 267.13; ค่าเหมือน S1 เป๊ะ.)"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "[src: ENRICHMENTS_v1.1.md Theme A; RUN_OF_SHOW lines 206, 220, 246, 248, 252, 255; BUILD_PLAN #2]"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Category 3 — SHADOW AI"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Case 3.1 — UpGuard survey: พนักงานส่วนใหญ่ใช้ AI ที่ IT ไม่อนุมัติ"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Slide (EN): \"A majority of staff already use AI tools IT never approved.\"",
+        "พูด (TH): ผลสำรวจชี้ว่าพนักงานส่วนใหญ่ใช้ AI ที่ IT ไม่เคยอนุมัติ — shadow AI ไม่ใช่ความเสี่ยงในอนาคต มันเกิดขึ้นแล้ววันนี้.",
+        "Source chip: UpGuard survey (via cybersecuritydive.com) — survey/vendor figure",
+        "Source-caution: นำเสนอเป็น \"prevalence สูง\" ไม่ใช่ตัวเลขเป๊ะเป็น audited truth.",
+        "[src: S3 design Case 3.1]"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Case 3.2 — US House banned staff Microsoft Copilot (governance, not hype)"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Slide (EN): \"A major institution banned a mainstream AI tool for staff over data-leak risk — governance, not hype.\"",
+        "พูด (TH): สภาผู้แทนสหรัฐสั่งห้ามเจ้าหน้าที่ใช้ Copilot เพราะกลัวข้อมูลรั่ว — องค์กรใหญ่เลือก \"ควบคุมก่อน เปิดทีหลัง\".",
+        "Translate to KTB: คำตอบของธนาคาร ไม่ใช่ \"ban ทุกอย่าง\" — แต่คือ \"ให้ทางใช้ AI ที่ sanctioned + governed เพื่อให้"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "shadow AI หมดเหตุผลที่จะมีอยู่.\" (allow-list + sanctioned tool แทน ห้ามหมด หรือ ปล่อยหมด.)"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Source chip: Axios, 2024-03-29 — US House staff Microsoft Copilot ban",
+        "[src: S3 design Case 3.2]"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "เชื่อม S2: shadow AI = ภาคสนามของ \"shadow automation\" ที่ S2 ตั้งชื่อไว้ — detection คือวิธีจับมันได้ (คุณเห็นมัน fire ใน S2). [src: RUN_OF_SHOW line 207; COURSE_BUILD_SPEC §1 S2 spine]"
+    },
+    {
+      "kind": "heading",
+      "text": "Category 4 — SUPPLY-CHAIN / PACKAGE HALLUCINATION"
+    },
+    {
+      "kind": "paragraph",
+      "text": "F1 RESOLVED: category นี้สอนทั้ง mechanism + verified cited incident (founder decision = do BOTH). [src: S3 design F1 RESOLVED block; COURSE_BUILD_SPEC §3 F1]"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Mechanism — \"slopsquatting\" / AI package hallucination"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Slide (EN): \"AI suggests a plausible-sounding library that doesn't exist → attacker pre-registers that exact name → your build pulls malware.\"",
+        "พูด (TH): เวลา coding agent แนะนำ package ที่ \"ฟังดูถูก\" แต่ไม่มีจริง ผู้โจมตีไปจดชื่อนั้นใน registry แล้วใส่ malware —"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "พอ build ดึงเข้ามา = ติดทันที. เหตุผลที่ต้องมี dependency allow-list + lockfile + private registry mirror + human review of AI-suggested deps."
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Source chip: \"Slopsquatting\" / package hallucination — documented mechanism (Wikipedia: Slopsquatting)",
+        "[src: S3 design F1 RESOLVED — mechanism]"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Verified incident — huggingface-cli (Bar Lanyado / Lasso Security, early 2024)"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Slide (EN): \"AI models repeatedly hallucinated a non-existent PyPI package huggingface-cli. A researcher registered an empty package under that name → 30,000+ authentic downloads in 3 months; a major vendor copy-pasted the hallucinated install command into a public repo README.\"",
+        "พูด (TH): model หลายตัวแนะนำ pip install huggingface-cli ซ้ำ ๆ (ของจริงคือ pip install -U \"huggingface_hub[cli]\")."
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "นักวิจัยจด package เปล่าชื่อนั้น → ได้ 30,000+ downloads ใน 3 เดือน และ Alibaba copy-paste คำสั่งติดตั้งที่ hallucinate เข้า public repo README. ถ้าเป็น malware แทน empty package = supply-chain compromise."
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Source chip: AI Incident Database #731 — incidentdatabase.ai/cite/731 (corroborating: Lasso Security / Aikido / Snyk)",
+        "Scale stat (source-caution = research, ไม่ใช่ vendor claim): การศึกษาที่ generate 2.23M code samples ข้าม"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "16 code models พบ 19.7% (440,445) มี hallucinated package name ≥1 ตัว และ 43% ของ hallucination กลับมาซ้ำทุก re-run. → นำเสนอเป็น research finding. [VERIFY: ตัวเลข 2.23M / 19.7% / 440,445 / 43% — ระบุใน S3 design F1 RESOLVED แต่ยังไม่มี chip URL ของ paper ตรง ๆ; fact-check ก่อน promote บนสไลด์]"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Translate to KTB: developer vibe-codes microservice, AI แนะนำ package ที่ฟัง \"internal-sounding\" แต่ไม่ verify →"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "เข้าไปอยู่ใน requirements.txt/package.json แล้วไหลผ่าน CI เข้า build ของธนาคาร."
+    },
+    {
+      "kind": "list",
+      "items": [
+        "[src: S3 design F1 RESOLVED — verified incident + scale stat]"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Adjacent verified case — Chevrolet dealership chatbot prompt-injected (\"$1 Tahoe\")"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Slide (EN): \"Public users manipulated a dealership's AI bot into 'agreeing' to sell a car for $1.\"",
+        "พูด (TH): ผู้ใช้ทั่วไป inject คำสั่งใส่ chatbot ของดีลเลอร์จนมัน \"ตกลงขายรถ $1\" — นี่คือ **untrusted input ที่คุณคุมไม่ได้"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "ไหลเข้า agent โดยตรง.** ที่ธนาคาร = ลูกค้า/attacker ส่ง prompt injection เข้า POST /ai/assist."
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Source chip: cybernews.com — Chevrolet dealership chatbot incident, 2023",
+        "Bridge to S4: นี่คือ live lead-in เข้า LLM01:2025 Prompt Injection บน SecureBank Mini.",
+        "[src: S3 design Case 4.2]"
+      ]
+    }
+  ],
+  "attribution": "Session: S3 · 13:00–14:15 (75 min) · When Agents Go Wrong Format: Online · instructor-led · ~50 participants · Interactive Quiz (vote-then-reveal) Language contract: สไลด์ = English · พูด + speaker notes = ภาษาไทย · visual-first Vote options (ทุกการ์ด, fixed wording): Allowed · Needs approval · Bloc",
+  "cheatsheet": [
+    "Slide = English, visual-first, หนึ่งเคสต่อสไลด์: headline strip + 3-step \"what happened\" mini-timeline (icons)",
+    "Translate, don't just report: ทุกเคสจบด้วยบรรทัด \"At a bank, this same gap looks like ___\" map ไป SecureBank Mini",
+    "Vendor/survey figures (LayerX, UpGuard): บนสไลด์ติด source-caution → นำเสนอ ทิศทาง ของ finding ไม่ใช่",
+    "Slide (EN): \"Engineers pasted semiconductor source code & internal meeting notes into ChatGPT → data left the corporate boundary.\"",
+    "พูด (TH): วิศวกรเอา source code + โน้ตประชุมไปวางใน ChatGPT เพื่อให้ช่วย debug/สรุป — ข้อมูลความลับออกนอกองค์กรทันที",
+    "Translate to KTB: developer เอา stored procedure ที่มี account logic จริงไปวางใน public chatbot เพื่อ \"ถามว่าทำไมช้า\"",
+    "Source chip: AI Incident Database — incidentdatabase.ai/cite/768",
+    "Source-caution: publicly reported incident; เนื้อหาที่รั่วเป็นไปตามรายงาน เรา audit เองไม่ได้."
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for session 3, \"Slide = English, visual-first, หนึ่งเคสต่อสไลด์\" is described as:",
+      "choices": {
+        "A": "นำเสนอเป็น \"prevalence สูง\" ไม่ใช่ตัวเลขเป๊ะเป็น audited truth.",
+        "B": "headline strip + 3-step \"what happened\" mini-timeline (icons)",
+        "C": "บนสไลด์ติด source-caution → นำเสนอ ทิศทาง ของ finding ไม่ใช่",
+        "D": "\"A majority of staff already use AI tools IT never approved.\""
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: Slide = English, visual-first, หนึ่งเคสต่อสไลด์: headline strip + 3-step \"what happened\" mini-timeline (icons)"
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for session 3, \"Translate, don't just report\" is described as:",
+      "choices": {
+        "A": "*\"agent อาจ 'fix' calculateInterest ให้ return 267.00 แล้วเขียน test ที่ดูเหมือนผ่าน",
+        "B": "Mata v. Avianca, Inc. — S.D.N.Y., 2023 (court sanctions order; Wikipedia summary)",
+        "C": "ทุกเคสจบด้วยบรรทัด \"At a bank, this same gap looks like ___\" map ไป SecureBank Mini",
+        "D": "\"Public users manipulated a dealership's AI bot into 'agreeing' to sell a car for $1.\""
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The study guide states: Translate, don't just report: ทุกเคสจบด้วยบรรทัด \"At a bank, this same gap looks like ___\" map ไป SecureBank Mini"
+    },
+    {
+      "id": "q3",
+      "prompt": "In the study guide for session 3, \"Vendor/survey figures (LayerX, UpGuard)\" is described as:",
+      "choices": {
+        "A": "cybernews.com — Chevrolet dealership chatbot incident, 2023",
+        "B": "\"A majority of staff already use AI tools IT never approved.\"",
+        "C": "บนสไลด์ติด source-caution → นำเสนอ ทิศทาง ของ finding ไม่ใช่",
+        "D": "headline strip + 3-step \"what happened\" mini-timeline (icons)"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The study guide states: Vendor/survey figures (LayerX, UpGuard): บนสไลด์ติด source-caution → นำเสนอ ทิศทาง ของ finding ไม่ใช่"
+    },
+    {
+      "id": "q4",
+      "prompt": "In the study guide for session 3, \"Slide (EN)\" is described as:",
+      "choices": {
+        "A": "chatbot ของรัฐนิวยอร์กแนะนำสิ่งที่ผิดกฎหมาย และยังออนไลน์อยู่หลังมีรายงาน — \"hallucination ที่ฟังดูน่าเชื่อถือ\"",
+        "B": "\"Engineers pasted semiconductor source code & internal meeting notes into ChatGPT → data left the corporate boundary.\"",
+        "C": "ผู้ใช้ทั่วไป inject คำสั่งใส่ chatbot ของดีลเลอร์จนมัน \"ตกลงขายรถ $1\" — นี่คือ **untrusted input ที่คุณคุมไม่ได้",
+        "D": "ผลสำรวจชี้ว่าพนักงานส่วนใหญ่ใช้ AI ที่ IT ไม่เคยอนุมัติ — shadow AI ไม่ใช่ความเสี่ยงในอนาคต มันเกิดขึ้นแล้ววันนี้."
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: Slide (EN): \"Engineers pasted semiconductor source code & internal meeting notes into ChatGPT → data left the corporate boundary.\""
+    }
+  ]
+}

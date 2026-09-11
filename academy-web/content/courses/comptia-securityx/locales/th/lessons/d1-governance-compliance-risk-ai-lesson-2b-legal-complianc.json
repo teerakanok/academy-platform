@@ -1,0 +1,293 @@
+{
+  "nodeId": "d1-governance-compliance-risk-ai-lesson-2b-legal-complianc",
+  "locale": "th",
+  "title": "Lesson 2B — Legal Compliance",
+  "objective": "Study-guide review — Day 1 — Governance, Compliance, Risk, and AI Governance: Lesson 2B — Legal Compliance.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "Compliance as a Security Strategy Constraint"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Legal compliance affects information security strategy because it can dictate required controls, reporting timelines, retention obligations, privacy protections, and audit evidence. The official source emphasizes industry-specific compliance, industry standards, security/reporting frameworks, audits, assessments, certifications, privacy regulations, and cross-jurisdictional requirements."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Teach compliance as \"mandatory context.\" A design that is technically elegant can still fail if it violates privacy, retention, contractual, or sector-specific obligations."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Source: CertMaster Study Lesson 2B; M02 slides \"Explain Legal Compliance\"."
+    },
+    {
+      "kind": "heading",
+      "text": "Industry-Specific Compliance"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Industry-specific compliance changes the security strategy because different sectors protect different combinations of data, safety, availability, and reporting obligations. A healthcare setting emphasizes patient privacy and continuity of care. A financial services setting emphasizes customer data, transaction integrity, auditability, and fraud-related controls. A public-sector or education environment may add procurement, retention, and reporting expectations."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Teaching cue: do not let students answer every compliance question with the same control. The correct control follows the regulated data and the regulated process."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Decision prompts:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "What industry is named in the stem?",
+        "What data type is regulated?",
+        "What business process is critical?",
+        "What evidence would prove compliance?",
+        "What third parties process or store the regulated data?",
+        "Does the scenario require notification, retention, audit evidence, or access control?"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Mini scenario: a hospital wants to use a SaaS analytics platform with patient records. The first answer is not \"encrypt the database\" alone. The governance answer includes data classification, vendor due diligence, privacy review, contract terms, access control, logging, retention, and breach notification obligations."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Source: CertMaster Study Lesson 2B; M02 slides \"Industry-specific Compliance\"."
+    },
+    {
+      "kind": "heading",
+      "text": "Industry Standards and Reporting Frameworks"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Industry standards and reporting frameworks give external structure to what the organization reports and how it proves control operation. A standard can define expected control behavior. A reporting framework can define how the organization communicates posture, compliance, or risk to stakeholders."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Use this distinction in class:"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Need",
+        "Better teaching answer"
+      ],
+      "rows": [
+        [
+          "Define expected security practice",
+          "Industry standard"
+        ],
+        [
+          "Organize control evidence",
+          "Reporting framework or GRC workflow"
+        ],
+        [
+          "Show independent assurance",
+          "Audit, certification, or attestation"
+        ],
+        [
+          "Track remediation",
+          "Risk register, issue tracker, or GRC task"
+        ],
+        [
+          "Communicate posture to leadership",
+          "Metrics and reporting model"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Exam trap: \"reporting\" is not the same as \"remediation.\" A report can surface a gap, but the organization still needs owners, due dates, retesting, and risk decisions."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Source: CertMaster Study Lesson 2B; M02 slides \"Industry Standards\" and \"Reporting Frameworks\"."
+    },
+    {
+      "kind": "heading",
+      "text": "Audits, Assessments, and Certifications"
+    },
+    {
+      "kind": "paragraph",
+      "text": "These terms are common distractors:"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Term",
+        "Practical meaning"
+      ],
+      "rows": [
+        [
+          "Assessment",
+          "Evaluation against criteria; may be internal or external"
+        ],
+        [
+          "Audit",
+          "Formal review of controls, evidence, and compliance posture"
+        ],
+        [
+          "Certification",
+          "Recognition that an organization/system meets a defined standard"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "SecurityX cue: if the stem asks for independent proof, certification or third-party audit is stronger than self-assessment. If the stem asks for gap discovery before formal review, assessment fits better than certification."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Source: CertMaster Study Lesson 2B; M02 slide \"Audits vs. Assessments vs. Certifications\"."
+    },
+    {
+      "kind": "heading",
+      "text": "Privacy and Cross-Jurisdiction Compliance"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Privacy regulations add obligations around personal data collection, use, storage, disclosure, retention, and deletion. Cross-jurisdiction requirements matter when an organization operates across regions or uses cloud/third-party providers that process data in multiple locations."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Teaching prompts:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "What data is collected?",
+        "Why is it collected?",
+        "Where is it processed and stored?",
+        "Who can access it?",
+        "How long is it retained?",
+        "What happens if a subject requests access/deletion?",
+        "What breach notification obligations apply?"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Source: CertMaster Study Lesson 2B; M02 slides \"Privacy Regulations\" and \"Cross-Jurisdictional Compliance\"."
+    },
+    {
+      "kind": "heading",
+      "text": "Privacy Regulations as Data-Lifecycle Rules"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Privacy is easiest to teach as lifecycle governance. The question is not only whether personal data is encrypted. The organization must know why the data is collected, whether collection is allowed, who can use it, where it is processed, how long it is retained, how it is deleted, and how requests or incidents are handled."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Data-lifecycle prompts:"
+    },
+    {
+      "kind": "paragraph",
+      "text": "``text collect -> classify -> use -> share -> retain -> delete -> evidence ``"
+    },
+    {
+      "kind": "paragraph",
+      "text": "SecurityX scenarios may describe a technically secure system that still creates privacy risk. Examples include copying production data into staging, sending logs containing personal data to an external AI service, retaining records longer than allowed, or moving data to a cloud region without review. The best answer should address governance and process, not only encryption."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Source: CertMaster Study Lesson 2B; M02 slides \"Privacy Regulations\"."
+    },
+    {
+      "kind": "heading",
+      "text": "Best-Practice Hardening"
+    },
+    {
+      "kind": "paragraph",
+      "text": "The lesson includes best-practice hardening configurations and device hardening options. Teach this as the bridge between compliance and operations: a standard may require secure configuration; hardening baselines turn that requirement into enforceable system state."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Hardening examples:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Disable unnecessary services.",
+        "Enforce strong authentication and least privilege.",
+        "Apply secure logging and audit settings.",
+        "Configure encryption where required.",
+        "Maintain approved patch levels.",
+        "Remove default credentials and insecure defaults."
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Source: CertMaster Study Lesson 2B."
+    }
+  ],
+  "attribution": "Course: SecurityX CAS-005 Primary source: CertMaster Study Lessons 2A, 2B, 2C Slide source: SecurityX_M02_PPT.pptx Teaching goal: give students the decision language for governance, compliance, and risk before architecture topics begin.",
+  "cheatsheet": [
+    "Define expected security practice: Industry standard",
+    "Organize control evidence: Reporting framework or GRC workflow",
+    "Show independent assurance: Audit, certification, or attestation",
+    "Track remediation: Risk register, issue tracker, or GRC task",
+    "Communicate posture to leadership: Metrics and reporting model",
+    "Assessment: Evaluation against criteria; may be internal or external",
+    "Audit: Formal review of controls, evidence, and compliance posture",
+    "Certification: Recognition that an organization/system meets a defined standard"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for D1 Governance Compliance Risk AI, \"Define expected security practice\" is described as:",
+      "choices": {
+        "A": "Metrics and reporting model",
+        "B": "Reporting framework or GRC workflow",
+        "C": "Audit, certification, or attestation",
+        "D": "Industry standard"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The study guide states: Define expected security practice: Industry standard"
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for D1 Governance Compliance Risk AI, \"Organize control evidence\" is described as:",
+      "choices": {
+        "A": "Reporting framework or GRC workflow",
+        "B": "Metrics and reporting model",
+        "C": "Risk register, issue tracker, or GRC task",
+        "D": "Audit, certification, or attestation"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The study guide states: Organize control evidence: Reporting framework or GRC workflow"
+    },
+    {
+      "id": "q3",
+      "prompt": "In the study guide for D1 Governance Compliance Risk AI, \"Show independent assurance\" is described as:",
+      "choices": {
+        "A": "Audit, certification, or attestation",
+        "B": "Metrics and reporting model",
+        "C": "Risk register, issue tracker, or GRC task",
+        "D": "Reporting framework or GRC workflow"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The study guide states: Show independent assurance: Audit, certification, or attestation"
+    },
+    {
+      "id": "q4",
+      "prompt": "In the study guide for D1 Governance Compliance Risk AI, \"Track remediation\" is described as:",
+      "choices": {
+        "A": "Risk register, issue tracker, or GRC task",
+        "B": "Metrics and reporting model",
+        "C": "Reporting framework or GRC workflow",
+        "D": "Audit, certification, or attestation"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The study guide states: Track remediation: Risk register, issue tracker, or GRC task"
+    }
+  ]
+}

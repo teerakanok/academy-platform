@@ -1,0 +1,510 @@
+{
+  "nodeId": "session-1-3-teaching-content-source-backed",
+  "locale": "th",
+  "title": "3. Teaching content (source-backed)",
+  "objective": "Study-guide review — Study Guide — Session 1: Agentic AI for Dev & IT Ops in Banking: 3. Teaching content (source-backed).",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "A. Hook — from autocomplete to agent (09:00–09:08)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Teaching prose (Thai delivery): เปิดด้วยความจริงที่ห้องสัมผัสได้ — ทุกคนเคยใช้ autocomplete / code-completion มาแล้ว นั่นคือ \"AI ที่เติมโค้ดให้ทีละบรรทัด\" แต่ agentic AI ไปไกลกว่านั้น มันไม่ได้เดาบรรทัดถัดไป มัน รับโจทย์ → วางแผน → เรียกเครื่องมือ → ลงมือทำ → ตรวจผล เหมือนมี junior engineer ที่ทำงานเร็วมาก แต่ \"ต้องมีคนเซ็นอนุมัติ\" เสมอ. ในธนาคารเราสนใจสองอย่างพร้อมกัน: เร็วขึ้น และ คุมได้ / ตรวจสอบย้อนได้. [DESIGN-S1 §A]"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Slide key points (English):"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Autocomplete suggests the next line. An agent completes the whole task. The jump is agency, not magic. [ROS-1.2 §S1 09:00]",
+        "Agentic AI = reason → plan → use tools → execute → verify — a loop, not one shot. [DESIGN-S1 §A]",
+        "Banking lens: speed is worthless without control + auditability. [DESIGN-S1 §A] [SCOPE: Hard constraints]",
+        "Today: watch one agent fix a real bug — then see exactly where a human must stay in the loop. [DESIGN-S1 §A]"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Defender-lens (mandatory spoken aside, ~20s, whole room): \"Look at these four as a defender, not a developer. Reason and plan — you cannot make those repeatable; the agent's judgment changes run to run. Tool-use and execute — that's the only place a human or a gate can stand. So your whole job today is: watch the two you can't control, and put your controls on the two you can.\" This gives the non-coding SOC/blue-team learner a stake from minute 8. [ROS-1.2 §S1 SAY-ALOUD #1]"
+    },
+    {
+      "kind": "heading",
+      "text": "B. The four capabilities — what \"agentic\" means (09:08–09:20)"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Capability",
+        "What it means (developer-legible)",
+        "Where capability and risk are born"
+      ],
+      "rows": [
+        [
+          "Reason",
+          "Interpret the task + context (ticket, stack trace, repo).",
+          "Judgment — non-deterministic (see §6 model variance)."
+        ],
+        [
+          "Plan",
+          "Decompose into ordered steps (reproduce → locate → patch → verify).",
+          "Judgment — non-deterministic."
+        ],
+        [
+          "Tool-use",
+          "Call real tools (read files, run tests, query logs, call APIs).",
+          "A tool = a real permission. This is where capability and risk are born together. [DESIGN-S1 §B]"
+        ],
+        [
+          "Execute → verify",
+          "Make the change, then re-check itself (re-run tests, read the diff).",
+          "The only place a human or a gate can stand. [ROS-1.2 §S1]"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Key teaching line: The power is the loop. The risk is the tools the loop can touch. [DESIGN-S1 §B]"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Visual: a clean 4-node cycle (Reason → Plan → Tool-use → Execute → back to Reason), with a small lock icon on \"Tool-use\" labeled \"permissioned + logged.\" [DESIGN-S1 §B]"
+    },
+    {
+      "kind": "paragraph",
+      "text": "On-slide sharp caption (lands at the 10:12 recap, after the room has a frame — not on the cold open): \"Reason + Plan are non-deterministic; Tool-use + Execute are where you re-impose determinism.\" [ROS-1.2 §S1 ★ ON-SLIDE SHARP, Mid-B3 fix]"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Why \"non-deterministic\" matters (forward hook): repeated runs can vary, so a re-run is not independent verification. S3 explains this as model variance / reliability, not \"bias.\" No current recording or clip is claimed; optional future media must be produced and verified first. [ENRICH-1.1 Theme A] [ROS-1.2 §S1 SAY-ALOUD #2] See §6."
+    },
+    {
+      "kind": "heading",
+      "text": "C. Tool groups × banking use cases (09:20–09:34)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Map the tool-groups an agent can call to concrete bank tasks, and tier them by risk. The principle planted here pays off in S2. [DESIGN-S1 §C]"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Tool group",
+        "What it touches",
+        "Banking use case (agent assists)",
+        "Risk tier"
+      ],
+      "rows": [
+        [
+          "Coding",
+          "repo, files, tests",
+          "bug fix · write unit tests · secure code review",
+          "Low–Med (read-first)"
+        ],
+        [
+          "Workspace",
+          "docs, tickets, wiki",
+          "summarize a ticket · draft a change note",
+          "Low"
+        ],
+        [
+          "CI/CD",
+          "pipelines, deploy",
+          "run a pipeline · propose (never auto-approve) a release",
+          "High"
+        ],
+        [
+          "Monitoring",
+          "logs, metrics, traces",
+          "log summarization · anomaly triage",
+          "Med (read-only)"
+        ],
+        [
+          "IR / Incident",
+          "alerts, runbooks",
+          "RCA draft · incident-timeline assembly",
+          "High"
+        ],
+        [
+          "Compliance",
+          "policy, controls",
+          "check code against a control checklist",
+          "Med"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "[DESIGN-S1 §C] [SCOPE: S1 key topics — tool groups + banking use cases]"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Committed use-case shortlist to name aloud: bug fix · unit tests · secure code review · compliance checks · log summarization · root-cause analysis (RCA). [SCOPE: S1]"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Principle to plant (pays off in S2): the higher the tier, the more the agent must be read-only by default, and the more a human must approve before any write. [DESIGN-S1 §C]"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Depth-in-vote (forced-rank poll, ~30s silent commit) — the expert hook in the first hour: \"Rank these tool-groups by which you'd gate FIRST: (a) call external APIs · (b) run tests · (c) read prod logs · (d) read code.\" The trap: \"read prod logs\" looks read-only-safe but grants access to secrets, PII, and tokens. Reading is sensitive exposure, not exfiltration by itself; exfiltration requires transmission outside the approved boundary. Classify by blast radius and permitted data flow, not only the read/write verb. [ROS-1.2 §S1 09:20, Senior-B1 fix] This is not yet an OWASP exploit; it foreshadows S4 (a leaked secret = [OWASP-LLM-2025: LLM02] Sensitive Information Disclosure surface, taught later). Keep S1 framing as posture, not exploit. [ROS-1.2] [SCOPE: no overclaim]"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Demo set-up (still in this block): state the rules of engagement on screen before any demo: repo = SecureBank Mini (synthetic, no real data); mode = agent proposes, instructor approves; every action is logged. [DESIGN-S1 §D]"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Defender poll (silent commit, ~20s): \"Before it writes anything — what's the ONE thing you'd want logged?\" (good answers: the diff · the approver · the test result · the tool calls). This seeds the audit-entry hero shot in the demo and the 6 review questions — the defender commits a prediction about logging before they watch the audit entry appear. [ROS-1.2 §S1 09:30, Blue-team-B1 fix]"
+    },
+    {
+      "kind": "heading",
+      "text": "D. Workflow Walkthrough — the live demo (09:34–09:58)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Demo objective: show a coding agent take a failing golden test on a synthetic banking bug, reason about it, propose a patch, run tests to green, and present a clean diff for human approval — so the \"wow\" lands AND the control story is visible in the same flow. [DESIGN-S1 §(b)]"
+    },
+    {
+      "kind": "heading",
+      "text": "The repo (pre-seeded, synthetic)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "`` securebank-mini/ src/interest.js # calculateInterest(principal, annualRatePct, days) test/interest.test.js # golden test with known-correct expected values → currently FAILING (RED) AGENT_RULES.md # rules of engagement: read-only first · human-approves-writes · log on CHANGELOG.md ` [DESIGN-S1 §(b)] [SCOPE: SecureBank Mini — calculateInterest()]`"
+    },
+    {
+      "kind": "heading",
+      "text": "The seeded bug — D1 numbers (BINDING, satang-consistent)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "The seeded calculateInterest() is \"AI-generated\" code that looks plausible but is wrong — it drops the satang (whole-baht truncation instead of round-half-up to 2 decimals). The locked values, identical in S1 and re-cited in S3:"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Quantity",
+        "Value",
+        "Note"
+      ],
+      "rows": [
+        [
+          "Buggy output (on screen)",
+          "267.00",
+          "truncation drops the fractional satang"
+        ],
+        [
+          "Correct output (golden)",
+          "267.13",
+          "round-half-up to 2 decimals"
+        ],
+        [
+          "True (pre-round) interest",
+          "267.125",
+          "rounds to 267.13 at 2dp"
+        ],
+        [
+          "Rounding method (golden)",
+          "round-half-up, 2 dp",
+          "the bank's documented rule"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "CORRECTION APPLIED (binding): Use buggy 267.00 vs correct 267.13 (raw 267.125). The executable bug is whole-baht truncation: Math.floor(267.125) = 267, displayed as 267.00. The fixed branch keeps ACT/360 and applies deterministic round-half-up to two decimal places, producing 267.13. The gap is 13 satang, and a banker in the room can reproduce it from the prepared inputs. [BUILD_PLAN correction #2] [ROS-1.2 §S1 carried-math fix] [DEMOS_PLAIN_LANGUAGE Demo 1]"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Narration (Thai): บั๊กคือ \"เราทำสตางค์หาย\" (ปัดถ้วนเป็นบาทเต็ม) — ลูกค้าได้ดอกเบี้ยขาดไป 13 สตางค์ต่อรอบ × บัญชีเป็นล้าน; วิธีแก้คือ round-half-up ที่ 2 ทศนิยม → 267.13. [ROS-1.2 §S1]"
+    },
+    {
+      "kind": "heading",
+      "text": "The ticket handed to the agent (on screen, English)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "BUG-4471: \"Interest postings are a few satang short on the month-end batch. Finance flagged a reconciliation mismatch. Fix calculateInterest() and prove it with the golden tests.\" [DESIGN-S1 §(b)]"
+    },
+    {
+      "kind": "heading",
+      "text": "The choreographed flow (what the room sees)"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Show the failing test FIRST (truth before AI). Run npm test → RED. Say: \"AI didn't find this — our test did. The test is the guardrail.\" [DESIGN-S1 §(b) step 1]",
+        "Hand the agent the ticket in read-only mode. [DESIGN-S1 step 2]",
+        "Agent REASONS (on screen): reads interest.js, the failing test, CHANGELOG.md; states the hypothesis: whole-baht truncation instead of round-half-up. [DESIGN-S1 step 3]",
+        "Agent PLANS: prints an ordered plan (reproduce → locate → propose patch → re-run golden tests → summarize diff). Pause point: ask the room \"Is this plan safe to let it write?\" [DESIGN-S1 step 4]",
+        "Agent PROPOSES a patch (does NOT auto-apply): replace Math.floor(rawInterest) with deterministic round-half-up to 2 dp; ACT/360 is unchanged. [DESIGN-S1 step 5]",
+        "HUMAN APPROVAL GATE (the money moment): instructor reviews the diff and approves before the write lands. \"This is the control: nothing is written until I say so.\" [DESIGN-S1 step 6] [SCOPE: Hard constraints — human approval before write]",
+        "Agent EXECUTES + self-verifies: applies the approved patch, re-runs npm test → GREEN (267.13). [DESIGN-S1 step 7]",
+        "Agent shows the DIFF + plain-language summary. [DESIGN-S1 step 8]",
+        "Agent shows the DEMO AUDIT ROW: what was read · what was proposed · who approved · what was written · test result. It is mutable/resettable in memory and demonstrates linkage only. Production must export the record to access-controlled, tamper-evident logging outside the agent's control. [DESIGN-S1 step 9]"
+      ],
+      "ordered": true
+    },
+    {
+      "kind": "heading",
+      "text": "Live UI → bounded recovery walkthrough (delivery resilience)"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Run the real UI: show the vulnerable interest output 267.00, then the fixed output 267.13 using the same golden case. [ROS-1.2 §S1 09:34]",
+        "Use validated screenshots if live UI fails. The fallback must match the observed build state; do not substitute an unverified media claim. [ROS-1.2 §S1 09:46]",
+        "Recovery walkthrough: explain a later green-but-wrong change → human-run git revert → recovery evidence using the timeline slide. Label this an illustrative workflow, not captured runtime proof. [ROS-1.2 §S1 09:54]"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Why \"green-but-wrong\" is true (not a trick): a passing test proves the test's assertion, not the code's correctness — an agent can write a test that asserts the buggy behavior. This is exactly why the gate must be a human / structural check, not a re-run. [ROS-1.2 §S1 ↳ DEEPER]"
+    },
+    {
+      "kind": "paragraph",
+      "text": "CORRECTION — the revert is a HUMAN-RUN recovery, NOT autonomous action. The git revert is operator-driven and itself logged. Never frame any beat as \"the AI rolled back production by itself.\" [SCOPE: no overclaim] [ROS-1.2 binding-constraint check]"
+    },
+    {
+      "kind": "heading",
+      "text": "Breadth poll (~3m)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Use log summarization (\"200 lines of error log → 3-line root-cause\") as a second-task example without claiming an unavailable clip exists. [ROS-1.2 §S1 09:58]"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Defender poll: \"What must never leave the approved boundary?\" (answer: sensitive log content). Reading/summarizing is not exfiltration; sending that content outside the approved boundary is. [ROS-1.2 §S1 09:58] [DESIGN-S1 ↳ DEEPER]"
+    },
+    {
+      "kind": "heading",
+      "text": "Delivery fallback (mandatory — online, ~50 people)"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Validated static UI set: vulnerable interest result · fixed interest result · approval state · demo audit row. [DESIGN-S1]",
+        "Decision rule: attempt the local UI; on failure switch to the matching screenshots and state that they are captured evidence from the same build. [DESIGN-S1]",
+        "Pre-seed the repo to a known-good state and rehearse the UI run same-day. [DESIGN-S1]",
+        "A captioned recording is an optional future fallback only after it is produced and verified; none is assumed available now."
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "E. The 6 secure-review questions — \"what YOU check\" (09:58–10:12)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "These are the reviewer-reflex participation hooks — verbal / show-of-hands / chat poll, no hands-on. Framed as what YOU, the reviewer, check before approving any agent change (defender stake). [DESIGN-S1 §(b)] [ROS-1.2 §S1 10:01]"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "#",
+        "Question",
+        "What it trains",
+        "Forward map"
+      ],
+      "rows": [
+        [
+          "1",
+          "Scope — did it stay in the ticket, or touch files it shouldn't?",
+          "least privilege",
+          "→ S2"
+        ],
+        [
+          "2",
+          "Truth source — do we trust the agent's claim, or the golden test?",
+          "tests-as-truth",
+          "→ S2 / S4"
+        ],
+        [
+          "3",
+          "Logic vs plausibility — the code looked correct; where would a confident-but-wrong fix hide, and what catches it?",
+          "hallucination",
+          "→ S3 / S4"
+        ],
+        [
+          "4",
+          "Day-count assumption — the agent assumed a basis; who confirms it, the agent or a human + the spec?",
+          "human approval",
+          "→ S2"
+        ],
+        [
+          "5",
+          "Blast radius — if this were transferFunds() not a pure calc, would you let it run the same way?",
+          "risk tiering",
+          "→ S5; the literal S4 [OWASP-LLM-2025: LLM06] climax"
+        ],
+        [
+          "6",
+          "Audit — six months from now, how do we prove who approved this interest-math change?",
+          "audit trail",
+          "→ S2"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "[DESIGN-S1 §(b) review questions]"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Expert feed (mandatory spoken aside, ~20s, whole room) on Q6: \"'Could it have lied?' is the question that separates a junior reviewer from a senior one. A test can be GREEN and still wrong — you'll watch that exact thing in the revert beat, and after lunch you'll watch the same prompt give two different confident answers. A passing check is evidence, not proof. The senior reviewer assumes the agent could be confidently wrong and looks for the gate that catches it anyway.\" [ROS-1.2 §S1 SAY-ALOUD #2, Blue-team-B3 fix]"
+    },
+    {
+      "kind": "paragraph",
+      "text": "CORRECTION — agent-review is NOT the gate. Q6 trains skepticism, not a control. \"The AI said it's fine\" is never an approval gate; the deterministic / human gate stands. This is the agent-review ≠ gate rule, taught explicitly in S5. [ENRICH-1.1 Theme A & B — agent-review is not the approval gate]"
+    },
+    {
+      "kind": "heading",
+      "text": "F. Map the demo → 4 safe-adoption principles (10:12–10:24)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "The four committed safe-adoption principles were demonstrated physically on screen, not merely stated. [DESIGN-S1 §(c)] [SCOPE: S1 — safe adoption]"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Principle",
+        "Where the room SAW it",
+        "One-line takeaway (English, on slide)"
+      ],
+      "rows": [
+        [
+          "Read-only first",
+          "Agent started read-only (steps 2–3): read code/test/changelog before proposing",
+          "Let the agent look before it touches. Most value (triage, review, summaries) needs read-only only."
+        ],
+        [
+          "Least privilege",
+          "Agent scoped to the repo + ticket; could not reach CI/CD or prod (Q1, Q5)",
+          "Give the agent the smallest set of tools the task needs — nothing more."
+        ],
+        [
+          "Human approves writes / destructive",
+          "The explicit approval gate at step 6 — the patch did not land until approved",
+          "AI proposes, a human disposes. Every write/destructive action passes a human gate."
+        ],
+        [
+          "Audit trail",
+          "The readable log at step 9 (read → proposed → approved-by → written → result)",
+          "If you can't audit it, you can't run it in a bank. Log what was read, proposed, approved, and changed."
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "[DESIGN-S1 §(c)]"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Backdrop standard (say-aloud, optional depth): these four principles align with established AI-governance practice — the NIST AI Risk Management Framework organizes responsible AI around Govern · Map · Measure · Manage, and \"human-approves-writes + audit-everything\" is the operational expression of that posture for a bank. [NIST-AI-RMF] [SCOPE: Reference standards]"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Safe-adoption ladder (visual, ascending steps):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Read-only → Least privilege → Human approves writes → Everything audited caption: \"Start at the bottom. Earn each step up.\" [DESIGN-S1 §(c)]"
+    },
+    {
+      "kind": "heading",
+      "text": "G. Recap + bridge to S2 (10:24–10:30)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Slide key points (English):"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "An agent reasoned, planned, used tools, executed — and a human still decided. [DESIGN-S1 §G]",
+        "Speed came with a diff to review and a log to audit — not instead of them. [DESIGN-S1 §G]",
+        "Next (S2): turn this posture into a repeatable control — task card → approval gate → execution proof → audit trail. [DESIGN-S1 §G] [ROS-1.2 §S2]"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "WHY → HOW callback (seeds the S2 open): S1 gives the posture (WHY); S2 gives the mechanism (HOW). Same idea, two altitudes — reinforcement, not repeat. [ROS-1.2 §S2 10:49 callback] [BUILD_PLAN correction relevant to S1↔S2]"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Closing framing (Thai): สิ่งที่เห็นวันนี้ไม่ใช่ \"AI ขึ้น production เอง\" — แต่คือ assisted triage + human approval gate + audit trail. agent เร่งงานให้ (reason/plan/patch/test) แต่ \"คนเซ็น\" และ \"ระบบจดทุกอย่าง\" ยังอยู่ครบ. นี่คือรูปแบบเดียวที่ใช้ได้จริงในธนาคาร — และ S2 จะทำให้ guardrail นี้เป็น control ที่ทำซ้ำได้. [DESIGN-S1 §(c)] [SCOPE: Hard constraints]"
+    }
+  ],
+  "attribution": "Course: Agentic AI & Secure Implementation for Banking IT Teams (KTB) · Session 1 of 5 · 09:00–10:30 (90 min) Format: Online, instructor-led, demo-driven · ~50 participants · WATCH + VOTE only (no participant hands-on) Language contract: This guide feeds Thai speaker notes; teaching prose may be Tha",
+  "cheatsheet": [
+    "Reason: Interpret the task + context (ticket, stack trace, repo).",
+    "Plan: Decompose into ordered steps (reproduce → locate → patch → verify).",
+    "Tool-use: Call real tools (read files, run tests, query logs, call APIs).",
+    "Execute → verify: Make the change, then re-check itself (re-run tests, read the diff).",
+    "Coding: repo, files, tests",
+    "Workspace: docs, tickets, wiki",
+    "CI/CD: pipelines, deploy",
+    "Monitoring: logs, metrics, traces"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for session 1, \"Reason\" is described as:",
+      "choices": {
+        "A": "Make the change, then re-check itself (re-run tests, read the diff).",
+        "B": "Interpret the task + context (ticket, stack trace, repo).",
+        "C": "Decompose into ordered steps (reproduce → locate → patch → verify).",
+        "D": "Call real tools (read files, run tests, query logs, call APIs)."
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: Reason: Interpret the task + context (ticket, stack trace, repo)."
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for session 1, \"Plan\" is described as:",
+      "choices": {
+        "A": "Make the change, then re-check itself (re-run tests, read the diff).",
+        "B": "Call real tools (read files, run tests, query logs, call APIs).",
+        "C": "Decompose into ordered steps (reproduce → locate → patch → verify).",
+        "D": "Agent scoped to the repo + ticket; could not reach CI/CD or prod (Q1, Q5)"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The study guide states: Plan: Decompose into ordered steps (reproduce → locate → patch → verify)."
+    },
+    {
+      "id": "q3",
+      "prompt": "In the study guide for session 1, \"Tool-use\" is described as:",
+      "choices": {
+        "A": "Interpret the task + context (ticket, stack trace, repo).",
+        "B": "Make the change, then re-check itself (re-run tests, read the diff).",
+        "C": "Call real tools (read files, run tests, query logs, call APIs).",
+        "D": "Decompose into ordered steps (reproduce → locate → patch → verify)."
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The study guide states: Tool-use: Call real tools (read files, run tests, query logs, call APIs)."
+    },
+    {
+      "id": "q4",
+      "prompt": "In the study guide for session 1, \"Execute → verify\" is described as:",
+      "choices": {
+        "A": "Agent scoped to the repo + ticket; could not reach CI/CD or prod (Q1, Q5)",
+        "B": "Make the change, then re-check itself (re-run tests, read the diff).",
+        "C": "Call real tools (read files, run tests, query logs, call APIs).",
+        "D": "Decompose into ordered steps (reproduce → locate → patch → verify)."
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: Execute → verify: Make the change, then re-check itself (re-run tests, read the diff)."
+    }
+  ]
+}

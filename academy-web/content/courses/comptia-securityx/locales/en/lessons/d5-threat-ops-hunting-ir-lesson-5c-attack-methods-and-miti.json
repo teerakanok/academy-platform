@@ -1,0 +1,259 @@
+{
+  "nodeId": "d5-threat-ops-hunting-ir-lesson-5c-attack-methods-and-miti",
+  "locale": "en",
+  "title": "Lesson 5C — Attack Methods and Mitigations",
+  "objective": "Study-guide review — Day 5 — Threat Modeling, Monitoring, Hunting, and Incident Response: Lesson 5C — Attack Methods and Mitigations.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "Input and Output Manipulation"
+    },
+    {
+      "kind": "paragraph",
+      "text": "The official source includes injection attacks such as SQL injection, command injection, LDAP injection, XPath injection, and related input/output manipulation. The general pattern is untrusted input influencing an interpreter, query, command, or output context."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Mitigation themes:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Input validation.",
+        "Output encoding where appropriate.",
+        "Parameterized queries.",
+        "Least privilege for application accounts.",
+        "Secure error handling.",
+        "Testing and code review."
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Source: CertMaster Study Lesson 5C; M05 slides \"Vulnerabilities: Input and Output Manipulation\"."
+    },
+    {
+      "kind": "heading",
+      "text": "Secure Coding and Patching"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Secure coding reduces vulnerabilities before release. Patching reduces known vulnerabilities after release. Both are required, but they solve different timing problems."
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Scenario clue",
+        "Better answer"
+      ],
+      "rows": [
+        [
+          "New feature accepts untrusted input",
+          "Secure coding, validation, review, testing"
+        ],
+        [
+          "Known vulnerable library is deployed",
+          "Patch or upgrade dependency"
+        ],
+        [
+          "Repeated injection flaws",
+          "Improve secure coding standard and review process"
+        ],
+        [
+          "Emergency exploit against deployed system",
+          "Patch, mitigate, monitor, and validate"
+        ],
+        [
+          "Unsupported software cannot be patched",
+          "Compensating controls and replacement plan"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Teaching cue: patching is reactive to known issues. Secure coding and assurance are proactive controls that reduce defect introduction. SecurityX scenarios often expect both: fix the current issue and improve the process that allowed it."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Source: CertMaster Study Lesson 5C; M05 slides \"Mitigations: Secure Coding Practices\" and \"Patching\"."
+    },
+    {
+      "kind": "heading",
+      "text": "XSS and SSRF"
+    },
+    {
+      "kind": "paragraph",
+      "text": "The official slides explicitly call out Cross-Site Scripting and Server-Side Request Forgery."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Cross-Site Scripting happens when an application allows untrusted content to execute in a user's browser context. Teach the decision cue: the attack abuses output rendered to a user, so mitigations focus on output encoding, input handling, content controls, and secure framework use."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Server-Side Request Forgery tricks a server-side application into making unauthorized requests. Teach the decision cue: the server becomes the requester, so mitigation reasoning must focus on validating destinations, limiting unintended outbound requests, and monitoring unexpected server-side request behavior."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Source: CertMaster Study Lesson 5C; M05 slide \"Vulnerabilities: Input and Output Manipulation\"."
+    },
+    {
+      "kind": "heading",
+      "text": "Memory and Execution Vulnerabilities"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Memory and execution vulnerabilities can allow crashes, arbitrary code execution, privilege misuse, or control-flow manipulation. The official source groups them under known attack methods and associated mitigations. Teach high-level reasoning unless the source provides deeper implementation detail."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Mitigation themes:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Secure coding practices.",
+        "Compiler/runtime protections where available.",
+        "Patch management.",
+        "Code review and testing.",
+        "Least privilege and sandboxing."
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Source: CertMaster Study Lesson 5C; M05 slides \"Vulnerabilities: Memory and Execution Vulnerabilities\"."
+    },
+    {
+      "kind": "heading",
+      "text": "Cryptographic Issues"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Cryptographic attack methods include weak algorithms, poor key management, expired certificates, insecure protocol choices, or missing integrity protection. The Day 4 crypto concepts support this lesson; Day 5 asks students to analyze the vulnerability and recommend mitigation."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Source: CertMaster Study Lesson 5C; M05 slides \"Vulnerabilities: Cryptographic Issues\"."
+    },
+    {
+      "kind": "heading",
+      "text": "Configuration, Supply Chain, and External Dependencies"
+    },
+    {
+      "kind": "paragraph",
+      "text": "The official source includes system configuration/management and supply chain/external dependencies. These are high-value SecurityX topics because advanced practitioners must reason beyond a single application bug."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Mitigation themes:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Secure configuration baselines.",
+        "Patch and vulnerability management.",
+        "Dependency inventory.",
+        "Vendor assessment.",
+        "Build and artifact integrity.",
+        "Monitoring and compensating controls."
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Source: CertMaster Study Lesson 5C; M05 slides \"System Configuration and Management\", \"Supply Chain and External Dependencies\"."
+    },
+    {
+      "kind": "heading",
+      "text": "Data Security and Management Controls"
+    },
+    {
+      "kind": "paragraph",
+      "text": "The official 5C lesson includes mitigations around data security and management. Connect this section back to Day 1 governance and Day 4 data states. Application-layer data controls reduce impact when attacks reach data-handling paths."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Controls:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Classify sensitive data before designing access.",
+        "Enforce least privilege for application and service accounts.",
+        "Mask or tokenize data where full values are not needed.",
+        "Encrypt data at rest and in transit where required.",
+        "Log access to sensitive records.",
+        "Apply retention and disposal rules.",
+        "Use DLP or monitoring where data movement must be controlled."
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Source: CertMaster Study Lesson 5C; M05 slides \"Mitigations: Data Security and Management\"."
+    }
+  ],
+  "attribution": "Course: SecurityX CAS-005 Primary source: CertMaster Study Lessons 5A, 5B, 5C, 5D, 5E Slide source: SecurityX_M05_PPT.pptx Teaching goal: integrate design, operations, attack analysis, threat intelligence, and response into scenario reasoning.",
+  "cheatsheet": [
+    "New feature accepts untrusted input: Secure coding, validation, review, testing",
+    "Known vulnerable library is deployed: Patch or upgrade dependency",
+    "Repeated injection flaws: Improve secure coding standard and review process",
+    "Emergency exploit against deployed system: Patch, mitigate, monitor, and validate",
+    "Unsupported software cannot be patched: Compensating controls and replacement plan"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for D5 Threat Ops Hunting IR, \"New feature accepts untrusted input\" is described as:",
+      "choices": {
+        "A": "Compensating controls and replacement plan",
+        "B": "Patch, mitigate, monitor, and validate",
+        "C": "Improve secure coding standard and review process",
+        "D": "Secure coding, validation, review, testing"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The study guide states: New feature accepts untrusted input: Secure coding, validation, review, testing"
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for D5 Threat Ops Hunting IR, \"Known vulnerable library is deployed\" is described as:",
+      "choices": {
+        "A": "Compensating controls and replacement plan",
+        "B": "Patch or upgrade dependency",
+        "C": "Secure coding, validation, review, testing",
+        "D": "Patch, mitigate, monitor, and validate"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: Known vulnerable library is deployed: Patch or upgrade dependency"
+    },
+    {
+      "id": "q3",
+      "prompt": "In the study guide for D5 Threat Ops Hunting IR, \"Repeated injection flaws\" is described as:",
+      "choices": {
+        "A": "Improve secure coding standard and review process",
+        "B": "Secure coding, validation, review, testing",
+        "C": "Compensating controls and replacement plan",
+        "D": "Patch, mitigate, monitor, and validate"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The study guide states: Repeated injection flaws: Improve secure coding standard and review process"
+    },
+    {
+      "id": "q4",
+      "prompt": "In the study guide for D5 Threat Ops Hunting IR, \"Emergency exploit against deployed system\" is described as:",
+      "choices": {
+        "A": "Patch, mitigate, monitor, and validate",
+        "B": "Secure coding, validation, review, testing",
+        "C": "Compensating controls and replacement plan",
+        "D": "Patch or upgrade dependency"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The study guide states: Emergency exploit against deployed system: Patch, mitigate, monitor, and validate"
+    }
+  ]
+}

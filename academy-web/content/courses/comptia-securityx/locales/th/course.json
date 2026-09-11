@@ -1,0 +1,39 @@
+{
+  "locale": "th",
+  "title": "CompTIA SecurityX (CAS-005)",
+  "subtitle": "Converted from the Crucible CAS-005 v4.1 study guides",
+  "audience": "Security architects and senior engineers preparing for CompTIA SecurityX CAS-005.",
+  "outcomes": [
+    "Review governance, compliance, risk, and AI adoption challenges",
+    "Review secure architecture, cloud, and resilience engineering",
+    "Review zero trust, IAM, endpoint, and network security",
+    "Review automation, cryptography, and data protection",
+    "Review threat modeling, monitoring, hunting, and incident response"
+  ],
+  "skillLabels": {
+    "d1-governance-compliance-risk-ai": "D1 Governance Compliance Risk AI",
+    "d2-secure-architecture-cloud-resilience": "D2 Secure Architecture Cloud Resilience",
+    "d3-zero-trust-iam-endpoint-network": "D3 Zero Trust IAM Endpoint Network",
+    "d4-automation-cryptography-data-protection": "D4 Automation Cryptography Data Protection",
+    "d5-threat-ops-hunting-ir": "D5 Threat Ops Hunting IR"
+  },
+  "nodeTitles": {
+    "d1-governance-compliance-risk-ai-lesson-2a-governance-comp": "Lesson 2A — Governance Components",
+    "d1-governance-compliance-risk-ai-lesson-2b-legal-complianc": "Lesson 2B — Legal Compliance",
+    "d1-governance-compliance-risk-ai-lesson-2c-risk-management": "Lesson 2C — Risk Management",
+    "d1-governance-compliance-risk-ai-instructor-deep-dive-gove": "Instructor Deep Dive — Governance as a Decision System",
+    "d1-governance-compliance-risk-ai-day-1-teaching-lab-govern": "Day 1 Teaching Lab — Governance Decision Tabletop",
+    "d2-secure-architecture-cloud-resilience-lesson-3c-operatio": "Lesson 3C — Operational Resilience",
+    "d2-secure-architecture-cloud-resilience-lesson-3d-cloud-in": "Lesson 3D — Cloud Infrastructure",
+    "d2-secure-architecture-cloud-resilience-day-2-teaching-lab": "Day 2 Teaching Lab — Architecture Review Board",
+    "d3-zero-trust-iam-endpoint-network-lesson-3f-aaa-and-iam": "Lesson 3F — AAA and IAM",
+    "d3-zero-trust-iam-endpoint-network-lesson-4a-endpoint-secu": "Lesson 4A — Endpoint Security",
+    "d3-zero-trust-iam-endpoint-network-day-3-teaching-lab-acce": "Day 3 Teaching Lab — Access Decision and Investigation Chain",
+    "d4-automation-cryptography-data-protection-lesson-4c-secur": "Lesson 4C — Security Automation",
+    "d4-automation-cryptography-data-protection-lesson-4d-crypt": "Lesson 4D — Cryptographic Concepts",
+    "d4-automation-cryptography-data-protection-instructor-deep": "Instructor Deep Dive — Automation and Crypto Tradeoffs",
+    "d5-threat-ops-hunting-ir-lesson-5c-attack-methods-and-miti": "Lesson 5C — Attack Methods and Mitigations",
+    "d5-threat-ops-hunting-ir-lesson-5e-incident-analysis-and-r": "Lesson 5E — Incident Analysis and Response",
+    "d5-threat-ops-hunting-ir-day-5-teaching-lab-from-threat-mo": "Day 5 Teaching Lab — From Threat Model to Incident Improvement"
+  }
+}

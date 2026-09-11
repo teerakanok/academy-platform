@@ -1,0 +1,94 @@
+{
+  "nodeId": "l21-threat-intelligence-mitre-attack-1-what-is-threat-inte",
+  "locale": "en",
+  "title": "1. What is Threat Intelligence (CTI)?",
+  "objective": "Study-guide review — ICCS423 v2 — L21: Threat Intelligence & MITRE ATT&CK: 1. What is Threat Intelligence (CTI)?.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "Definition: CTI is data that has been collected, processed, and analyzed into actionable intelligence to support decisions that reduce risk."
+    },
+    {
+      "kind": "paragraph",
+      "text": "CTI ≠ threat feed. Feeding raw IOCs into a SIEM without analysis gives you data, not intelligence."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Value:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Detect — find attackers using known TTPs in your environment",
+        "Respond — understand attacker motive, capability, next move during an incident",
+        "Predict — know which actors target your sector → prioritize defense",
+        "Strategic — inform board / executive decisions on investment and risk appetite"
+      ]
+    }
+  ],
+  "attribution": "Course: ICCS423 | Source: Thoth + RAG | Target: 3rd-4th year CS | Date: 2026-05-03",
+  "cheatsheet": [
+    "Detect: find attackers using known TTPs in your environment",
+    "Respond: understand attacker motive, capability, next move during an incident",
+    "Predict: know which actors target your sector → prioritize defense",
+    "Strategic: inform board / executive decisions on investment and risk appetite"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for L21 Threat Intelligence MITRE ATTACK, \"Detect\" is described as:",
+      "choices": {
+        "A": "find attackers using known TTPs in your environment",
+        "B": "know which actors target your sector → prioritize defense",
+        "C": "inform board / executive decisions on investment and risk appetite",
+        "D": "understand attacker motive, capability, next move during an incident"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The study guide states: Detect — find attackers using known TTPs in your environment"
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for L21 Threat Intelligence MITRE ATTACK, \"Respond\" is described as:",
+      "choices": {
+        "A": "inform board / executive decisions on investment and risk appetite",
+        "B": "know which actors target your sector → prioritize defense",
+        "C": "find attackers using known TTPs in your environment",
+        "D": "understand attacker motive, capability, next move during an incident"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The study guide states: Respond — understand attacker motive, capability, next move during an incident"
+    },
+    {
+      "id": "q3",
+      "prompt": "In the study guide for L21 Threat Intelligence MITRE ATTACK, \"Predict\" is described as:",
+      "choices": {
+        "A": "understand attacker motive, capability, next move during an incident",
+        "B": "inform board / executive decisions on investment and risk appetite",
+        "C": "find attackers using known TTPs in your environment",
+        "D": "know which actors target your sector → prioritize defense"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The study guide states: Predict — know which actors target your sector → prioritize defense"
+    },
+    {
+      "id": "q4",
+      "prompt": "In the study guide for L21 Threat Intelligence MITRE ATTACK, \"Strategic\" is described as:",
+      "choices": {
+        "A": "inform board / executive decisions on investment and risk appetite",
+        "B": "understand attacker motive, capability, next move during an incident",
+        "C": "know which actors target your sector → prioritize defense",
+        "D": "find attackers using known TTPs in your environment"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The study guide states: Strategic — inform board / executive decisions on investment and risk appetite"
+    }
+  ]
+}

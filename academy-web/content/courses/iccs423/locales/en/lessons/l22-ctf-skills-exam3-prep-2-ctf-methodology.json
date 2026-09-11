@@ -1,0 +1,124 @@
+{
+  "nodeId": "l22-ctf-skills-exam3-prep-2-ctf-methodology",
+  "locale": "en",
+  "title": "2. CTF Methodology",
+  "objective": "Study-guide review — ICCS423 v2 — L22: CTF Skills & Exam 3 Prep: 2. CTF Methodology.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "A repeatable approach saves time and reduces panic when stuck:"
+    },
+    {
+      "kind": "paragraph",
+      "text": "```"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Enumerate → Identify → Exploit → Capture → Write-up"
+      ],
+      "ordered": true
+    },
+    {
+      "kind": "paragraph",
+      "text": "↓ ↓ ↓ ↓ ↓ Recon Find vuln Build PoC Get flag Document ```"
+    },
+    {
+      "kind": "heading",
+      "text": "Step-by-step"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Read the prompt carefully — challenge description often hints at the technique",
+        "Enumerate — gather everything: ports, files, source code, headers, comments, robots.txt, common paths",
+        "Identify the vulnerability — match observed behavior to known classes (SQLi? XSS? path traversal?)",
+        "Exploit — craft a proof-of-concept that triggers the vuln",
+        "Capture flag — extract the flag string",
+        "Write-up — document for your team / future-self / blog"
+      ],
+      "ordered": true
+    },
+    {
+      "kind": "heading",
+      "text": "When stuck (after 30 min)"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Re-read the prompt for hints you missed",
+        "Try the simplest possibility (default credentials, public exploit, common paths)",
+        "Look at the file/page sources, response headers, cookies",
+        "Check if there's a hint mechanism (challenge description, IRC channel)",
+        "Move to another challenge — fresh eyes help"
+      ]
+    }
+  ],
+  "attribution": "Course: ICCS423 | Source: Thoth + RAG | Target: 3rd-4th year CS | Date: 2026-05-03",
+  "cheatsheet": [
+    "Read the prompt carefully: challenge description often hints at the technique",
+    "Enumerate: gather everything: ports, files, source code, headers, comments, robots.txt, common paths",
+    "Identify the vulnerability: match observed behavior to known classes (SQLi? XSS? path traversal?)",
+    "Exploit: craft a proof-of-concept that triggers the vuln",
+    "Capture flag: extract the flag string",
+    "Write-up: document for your team / future-self / blog"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for L22 CTF Skills Exam3 Prep, \"Read the prompt carefully\" is described as:",
+      "choices": {
+        "A": "challenge description often hints at the technique",
+        "B": "match observed behavior to known classes (SQLi? XSS? path traversal?)",
+        "C": "document for your team / future-self / blog",
+        "D": "craft a proof-of-concept that triggers the vuln"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The study guide states: Read the prompt carefully — challenge description often hints at the technique"
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for L22 CTF Skills Exam3 Prep, \"Enumerate\" is described as:",
+      "choices": {
+        "A": "match observed behavior to known classes (SQLi? XSS? path traversal?)",
+        "B": "challenge description often hints at the technique",
+        "C": "craft a proof-of-concept that triggers the vuln",
+        "D": "gather everything: ports, files, source code, headers, comments, robots.txt, common paths"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The study guide states: Enumerate — gather everything: ports, files, source code, headers, comments, robots.txt, common paths"
+    },
+    {
+      "id": "q3",
+      "prompt": "In the study guide for L22 CTF Skills Exam3 Prep, \"Identify the vulnerability\" is described as:",
+      "choices": {
+        "A": "match observed behavior to known classes (SQLi? XSS? path traversal?)",
+        "B": "craft a proof-of-concept that triggers the vuln",
+        "C": "gather everything: ports, files, source code, headers, comments, robots.txt, common paths",
+        "D": "challenge description often hints at the technique"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The study guide states: Identify the vulnerability — match observed behavior to known classes (SQLi? XSS? path traversal?)"
+    },
+    {
+      "id": "q4",
+      "prompt": "In the study guide for L22 CTF Skills Exam3 Prep, \"Exploit\" is described as:",
+      "choices": {
+        "A": "craft a proof-of-concept that triggers the vuln",
+        "B": "challenge description often hints at the technique",
+        "C": "document for your team / future-self / blog",
+        "D": "match observed behavior to known classes (SQLi? XSS? path traversal?)"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The study guide states: Exploit — craft a proof-of-concept that triggers the vuln"
+    }
+  ]
+}

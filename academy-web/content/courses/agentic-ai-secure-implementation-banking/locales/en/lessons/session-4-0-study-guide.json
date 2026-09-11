@@ -1,0 +1,114 @@
+{
+  "nodeId": "session-4-0-study-guide",
+  "locale": "en",
+  "title": "0. วิธีใช้ study guide นี้",
+  "objective": "Study-guide review — Study Guide — Session 4: Actionable OWASP on SecureBank Mini: 0. วิธีใช้ study guide นี้.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "คู่มือนี้เป็น source-backed: ทุก claim ที่ไม่ trivial มี citation chip [SRC: …] ผูกกับแหล่งที่ verify แล้ว (OWASP 2025/2025 titles, OWASP API 2023, NIST AI RMF, เคสที่ verify จาก Session 3, และ SecureBank Mini spec ของหลักสูตรนี้). ที่ไหนไม่มั่นใจจะ mark [VERIFY] — ห้ามแต่งขึ้นเอง."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Citation legend (สำหรับ deck builder):"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Chip",
+        "แหล่ง"
+      ],
+      "rows": [
+        [
+          "[SRC: OWASP-LLM-2025]",
+          "OWASP Top 10 for LLM Applications 2025 edition — https://genai.owasp.org/llm-top-10/ (verified 2026-06)"
+        ],
+        [
+          "[SRC: OWASP-API-2023]",
+          "OWASP API Security Top 10 2023 edition — https://owasp.org/API-Security/editions/2023/en/0x11-t10/ (verified 2026-06)"
+        ],
+        [
+          "[SRC: NIST-AI-RMF]",
+          "NIST AI Risk Management Framework 1.0 — core functions Govern / Map / Measure / Manage — https://www.nist.gov/itl/ai-risk-management-framework (verified 2026-06)"
+        ],
+        [
+          "[SRC: SBM-EXEC]",
+          "securebank-mini/src/lib/interest.js + securebank-mini/test/v6.interest.test.js (authoritative D1 implementation and golden case)"
+        ],
+        [
+          "[SRC: S3-CASE]",
+          "เคสที่ fact-check แล้วใน Session 3 (Samsung→ChatGPT leak, Air Canada chatbot, ฯลฯ) — ใช้เป็น real-world echo เท่านั้น"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "⚠️ CORRECTION HEADER (จาก RIL v1.2 — ต้อง apply ใน session นี้): 1. [CRITICAL · OWASP correctness] R4 และ R5 มีคนละ root แม้ chain กันได้: R4 = LLM05 Improper Output Handling; R5 = LLM06 Excessive Agency. LLM02 Sensitive Information Disclosure เป็น conditional harm เมื่อ protected data ไปถึง wrong audience ไม่ใช่ shared root และ visible R4 canary ไม่ได้พิสูจน์ disclosure. [SRC: OWASP-LLM-2025] 2. D1 (interest demo coherence): raw 267.125 บน ACT/360; vulnerable Math.floor ตัดเป็นบาทเต็มและแสดง 267.00; fixed round-half-up 2 ตำแหน่งได้ 267.13. เลขเดียวกันนี้ reuse จาก S1 demo → S3 reveal. [SRC: SBM-EXEC] — S4 อ้างถึงเฉยๆ เป็น continuity hook ไม่ teach ซ้ำ (ไม่มี OWASP ID). 3. Model variance / reliability — ไม่ใช่ \"bias\": ถ้าพูดถึง second-model review ใช้คำว่า \"model variance/reliability\" เท่านั้น ไม่เปิดประเด็น fairness/bias; ห้าม name-and-shame โมเดลรายตัวบนสไลด์. 4. \"bash is all you need\" → flip ทันที ที่ Route 5 (LLM06) เป็น excessive-agency hook; fix = deterministic / config-as-code gate. 5. agent-review ≠ approval gate: \"AI บอกว่า OK\" ไม่ใช่ control; gate ที่แท้จริงเป็น deterministic (CI/policy/test/human review)."
+    }
+  ],
+  "attribution": "Course: KTB \"Agentic AI & Secure Implementation for Banking IT Teams\" Session 4 · 14:30–15:45 (75 min) · Activity: Risk Walkthrough on SecureBank Mini Delivery (binding): online, instructor-led demo · slides EN, notes/spoken TH · synthetic data only · no participant hands-on in base scope (ผู้เรียนด",
+  "cheatsheet": [
+    "[SRC: OWASP-LLM-2025]: OWASP Top 10 for LLM Applications 2025 edition — https://genai.owasp.org/llm-top-10/ (verified 2026-06)",
+    "[SRC: OWASP-API-2023]: OWASP API Security Top 10 2023 edition — https://owasp.org/API-Security/editions/2023/en/0x11-t10/ (verified 2026-06)",
+    "[SRC: SBM-EXEC]: securebank-mini/src/lib/interest.js + securebank-mini/test/v6.interest.test.js (authoritative D1 implementation and golden case)",
+    "[SRC: S3-CASE]: เคสที่ fact-check แล้วใน Session 3 (Samsung→ChatGPT leak, Air Canada chatbot, ฯลฯ) — ใช้เป็น real-world echo เท่านั้น"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for session 4, \"[SRC: OWASP-LLM-2025]\" is described as:",
+      "choices": {
+        "A": "OWASP Top 10 for LLM Applications 2025 edition — https://genai.owasp.org/llm-top-10/ (verified 2026-06)",
+        "B": "OWASP API Security Top 10 2023 edition — https://owasp.org/API-Security/editions/2023/en/0x11-t10/ (verified 2026-06)",
+        "C": "เคสที่ fact-check แล้วใน Session 3 (Samsung→ChatGPT leak, Air Canada chatbot, ฯลฯ) — ใช้เป็น real-world echo เท่านั้น",
+        "D": "securebank-mini/src/lib/interest.js + securebank-mini/test/v6.interest.test.js (authoritative D1 implementation and golden case)"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The study guide states: [SRC: OWASP-LLM-2025]: OWASP Top 10 for LLM Applications 2025 edition — https://genai.owasp.org/llm-top-10/ (verified 2026-06)"
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for session 4, \"[SRC: OWASP-API-2023]\" is described as:",
+      "choices": {
+        "A": "เคสที่ fact-check แล้วใน Session 3 (Samsung→ChatGPT leak, Air Canada chatbot, ฯลฯ) — ใช้เป็น real-world echo เท่านั้น",
+        "B": "OWASP API Security Top 10 2023 edition — https://owasp.org/API-Security/editions/2023/en/0x11-t10/ (verified 2026-06)",
+        "C": "securebank-mini/src/lib/interest.js + securebank-mini/test/v6.interest.test.js (authoritative D1 implementation and golden case)",
+        "D": "OWASP Top 10 for LLM Applications 2025 edition — https://genai.owasp.org/llm-top-10/ (verified 2026-06)"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: [SRC: OWASP-API-2023]: OWASP API Security Top 10 2023 edition — https://owasp.org/API-Security/editions/2023/en/0x11-t10/ (verified 2026-06)"
+    },
+    {
+      "id": "q3",
+      "prompt": "In the study guide for session 4, \"[SRC: NIST-AI-RMF]\" is described as:",
+      "choices": {
+        "A": "NIST AI Risk Management Framework 1.0 — core functions Govern / Map / Measure / Manage — https://www.nist.gov/itl/ai-risk-management-framework (verified 2026-06)",
+        "B": "securebank-mini/src/lib/interest.js + securebank-mini/test/v6.interest.test.js (authoritative D1 implementation and golden case)",
+        "C": "OWASP API Security Top 10 2023 edition — https://owasp.org/API-Security/editions/2023/en/0x11-t10/ (verified 2026-06)",
+        "D": "เคสที่ fact-check แล้วใน Session 3 (Samsung→ChatGPT leak, Air Canada chatbot, ฯลฯ) — ใช้เป็น real-world echo เท่านั้น"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The study guide states: [SRC: NIST-AI-RMF]: NIST AI Risk Management Framework 1.0 — core functions Govern / Map / Measure / Manage — https://www.nist.gov/itl/ai-risk-management-framework (verified 2026-06)"
+    },
+    {
+      "id": "q4",
+      "prompt": "In the study guide for session 4, \"[SRC: SBM-EXEC]\" is described as:",
+      "choices": {
+        "A": "OWASP API Security Top 10 2023 edition — https://owasp.org/API-Security/editions/2023/en/0x11-t10/ (verified 2026-06)",
+        "B": "securebank-mini/src/lib/interest.js + securebank-mini/test/v6.interest.test.js (authoritative D1 implementation and golden case)",
+        "C": "เคสที่ fact-check แล้วใน Session 3 (Samsung→ChatGPT leak, Air Canada chatbot, ฯลฯ) — ใช้เป็น real-world echo เท่านั้น",
+        "D": "OWASP Top 10 for LLM Applications 2025 edition — https://genai.owasp.org/llm-top-10/ (verified 2026-06)"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: [SRC: SBM-EXEC]: securebank-mini/src/lib/interest.js + securebank-mini/test/v6.interest.test.js (authoritative D1 implementation and golden case)"
+    }
+  ]
+}

@@ -1,0 +1,298 @@
+{
+  "nodeId": "d2-secure-architecture-cloud-resilience-lesson-3d-cloud-in",
+  "locale": "th",
+  "title": "Lesson 3D — Cloud Infrastructure",
+  "objective": "Study-guide review — Day 2 — Secure Architecture, Cloud, and Resilience: Lesson 3D — Cloud Infrastructure.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "CASB and Shadow IT"
+    },
+    {
+      "kind": "paragraph",
+      "text": "A Cloud Access Security Broker provides visibility, data security, threat protection, and compliance enforcement for cloud services. The official source connects CASB to shadow IT detection and policy control. Shadow IT is not only \"unauthorized app use\"; it is ungoverned data movement and unmanaged risk."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Source: CertMaster Study Lesson 3D; M03 slides \"CASB\" and \"Shadow IT Detection\"."
+    },
+    {
+      "kind": "heading",
+      "text": "Shared Responsibility"
+    },
+    {
+      "kind": "paragraph",
+      "text": "The shared responsibility model clarifies what the provider secures and what the customer secures. The exact boundary changes by service model and provider service. SecurityX questions often test whether the organization wrongly assumes the cloud provider handles customer-side configuration, identity, data, or application security."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Teaching rule: cloud changes the boundary; it does not eliminate customer accountability."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Source: CertMaster Study Lesson 3D; M03 slides \"Shared Responsibility Model\"."
+    },
+    {
+      "kind": "heading",
+      "text": "Infrastructure as Code and Automation"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Terraform and Ansible appear in the official slides as automation tools. Teach them as examples of repeatable configuration and deployment, not as product memorization. IaC can improve consistency, reviewability, and rollback, but insecure templates can also scale misconfiguration."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Controls:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Version-controlled templates.",
+        "Review before deployment.",
+        "Secret handling outside templates.",
+        "Consistent environment configuration.",
+        "Change evidence for infrastructure updates."
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Source: CertMaster Study Lesson 3D; M03 slides \"Terraform\" and \"Ansible\"."
+    },
+    {
+      "kind": "heading",
+      "text": "Cloud CI/CD"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Cloud CI/CD extends pipeline risk into cloud control planes. A cloud deployment pipeline may create infrastructure, deploy containers, update serverless functions, change IAM permissions, or publish application artifacts. That means pipeline identities must be treated as privileged identities."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Control checklist:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Separate build, test, and production permissions.",
+        "Limit deployment roles to required resources.",
+        "Protect secrets outside the template or repository.",
+        "Require review for high-risk infrastructure changes.",
+        "Log deployment actions in both pipeline and cloud audit logs.",
+        "Include rollback or redeploy procedures."
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Exam trap: a cloud provider does not secure the customer's pipeline logic, deployment permissions, or application secrets. Shared responsibility still leaves customer-side pipeline governance."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Source: CertMaster Study Lesson 3D; M03 slides \"Cloud Infrastructure\" and \"Continuous Integration/Continuous Deployment\"."
+    },
+    {
+      "kind": "heading",
+      "text": "Terraform and Ansible in Security Reasoning"
+    },
+    {
+      "kind": "paragraph",
+      "text": "The official slides name Terraform and Ansible because repeatable infrastructure and configuration matter in cloud security. Teach them as categories:"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Tool category",
+        "Security value",
+        "Security risk"
+      ],
+      "rows": [
+        [
+          "Infrastructure as Code",
+          "Repeatable infrastructure definitions",
+          "Misconfiguration can be repeated at scale"
+        ],
+        [
+          "Configuration automation",
+          "Consistent system state",
+          "Poor scripts can overwrite secure settings"
+        ],
+        [
+          "Deployment automation",
+          "Faster, auditable changes",
+          "Overprivileged automation can alter production"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Decision cue: if the scenario describes drift between environments, repeatable automation helps. If it describes a bad template deployed everywhere, the answer is review, validation, and rollback rather than more automation."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Source: CertMaster Study Lesson 3D; M03 slides \"Terraform\" and \"Ansible\"."
+    },
+    {
+      "kind": "heading",
+      "text": "Package, Container, Serverless, and API Security"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Cloud-native systems depend on packages, images, orchestration, serverless functions, and APIs. The official source calls out package monitoring, container security, orchestration, serverless, and API security."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Security focus:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Packages: dependency risk and provenance.",
+        "Containers: image vulnerabilities, runtime isolation, secrets, least privilege.",
+        "Orchestration: cluster access, network policy, admission control, configuration.",
+        "Serverless: function permissions, triggers, dependencies, logging.",
+        "APIs: authentication, authorization, input validation, rate limits, schema validation, monitoring."
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Source: CertMaster Study Lesson 3D; M03 slides \"Package Monitoring\", \"Container Security\", \"Serverless\", \"API Security\"."
+    },
+    {
+      "kind": "heading",
+      "text": "Cloud Data Security and Connectivity"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Cloud data security includes encryption, key management, storage configuration, access control, monitoring, and retention. Customer-to-cloud connectivity must be designed for confidentiality, availability, and policy enforcement. Service integration and adoption should include governance, data classification, identity design, and operational readiness."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Source: CertMaster Study Lesson 3D; M03 slides \"Cloud Data Security Considerations\", \"Cloud Control Strategies\", \"Customer-to-Cloud Connectivity\"."
+    },
+    {
+      "kind": "heading",
+      "text": "Cloud Key Management"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Cloud key management controls how encryption keys are created, stored, used, rotated, disabled, and audited. The core teaching point is ownership. The provider may offer the key-management service, but the customer still needs policy for who can use keys, what data keys protect, how rotation works, and how recovery is handled."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Decision cues:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Sensitive cloud storage: verify encryption and key ownership.",
+        "Separation of duties: limit who can administer keys versus read data.",
+        "Incident involving key access: review key-use logs and rotate or disable keys where appropriate.",
+        "Regulatory requirement: confirm whether provider-managed or customer-managed keys fit the obligation.",
+        "Data recovery requirement: protect against accidental key deletion or loss."
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Exam trap: encryption without key governance creates false confidence. If too many identities can use or administer keys, the data remains exposed through authorization failure."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Source: CertMaster Study Lesson 3D; M03 slides \"Cloud Data Security Considerations\" and \"Key Management\"."
+    },
+    {
+      "kind": "heading",
+      "text": "Cloud Adoption Readiness"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Cloud adoption is a governance and operations change, not only a migration. Before moving workloads, the organization needs identity design, logging, network connectivity, data classification, incident response, cost/usage visibility, and shared-responsibility understanding."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Readiness prompts:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Which workloads move first and why?",
+        "What data classifications are involved?",
+        "How will identity and federation work?",
+        "Where are logs collected and retained?",
+        "Who handles incident response in the cloud environment?",
+        "What controls prevent shadow IT?",
+        "How are cloud exceptions reviewed?"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Mini scenario: a team wants to deploy a new serverless application quickly. A SecurityX answer should include permissions, API security, dependency monitoring, logging, secrets handling, and ownership rather than only asking whether the function runs."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Source: CertMaster Study Lesson 3D; M03 slides \"Cloud Control Strategies\", \"Shadow IT Detection\", and \"Shared Responsibility Model\"."
+    }
+  ],
+  "attribution": "Course: SecurityX CAS-005 Primary source: CertMaster Study Lessons 3A, 3B, 3C, 3D Slide source: SecurityX_M03_PPT.pptx Teaching goal: turn governance requirements into secure design decisions across SDLC, architecture, resilience, and cloud.",
+  "cheatsheet": [
+    "Infrastructure as Code: Repeatable infrastructure definitions",
+    "Configuration automation: Consistent system state",
+    "Deployment automation: Faster, auditable changes"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for D2 Secure Architecture Cloud Resilience, \"Infrastructure as Code\" is described as:",
+      "choices": {
+        "A": "Faster, auditable changes",
+        "B": "Consistent system state",
+        "C": "Detect or prevent suspicious traffic",
+        "D": "Repeatable infrastructure definitions"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The study guide states: Infrastructure as Code: Repeatable infrastructure definitions"
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for D2 Secure Architecture Cloud Resilience, \"Configuration automation\" is described as:",
+      "choices": {
+        "A": "Faster, auditable changes",
+        "B": "Repeatable infrastructure definitions",
+        "C": "Consistent system state",
+        "D": "Identify known weaknesses"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The study guide states: Configuration automation: Consistent system state"
+    },
+    {
+      "id": "q3",
+      "prompt": "In the study guide for D2 Secure Architecture Cloud Resilience, \"Deployment automation\" is described as:",
+      "choices": {
+        "A": "Consistent system state",
+        "B": "Repeatable infrastructure definitions",
+        "C": "Identify known weaknesses",
+        "D": "Faster, auditable changes"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The study guide states: Deployment automation: Faster, auditable changes"
+    },
+    {
+      "id": "q4",
+      "prompt": "Which term does the study guide for D2 Secure Architecture Cloud Resilience define as: \"Repeatable infrastructure definitions\"?",
+      "choices": {
+        "A": "Deployment automation",
+        "B": "Infrastructure as Code",
+        "C": "Configuration automation",
+        "D": "Vulnerability scanner"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: Infrastructure as Code: Repeatable infrastructure definitions"
+    }
+  ]
+}

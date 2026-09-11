@@ -1,0 +1,117 @@
+{
+  "nodeId": "l10-web-security-1-3-authentication-attacks-a07",
+  "locale": "th",
+  "title": "3. Authentication Attacks (A07)",
+  "objective": "Study-guide review — ICCS423 v2 — L10: Web Security 1 (Injection · Auth · Access Control · Sessions): 3. Authentication Attacks (A07).",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "Attack Vectors"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Credential Stuffing — replay leaked username/password pairs (works due to password reuse)",
+        "Brute Force — sequential password guessing; mitigated by rate-limit + lockout",
+        "Password Spraying — one weak password across many accounts (evades per-account lockout)",
+        "Default Credentials — admin/admin still everywhere in IoT/OT",
+        "MFA Bypass — push-bombing fatigue, SIM swap, OTP phishing, recovery flow abuse"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Defenses"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Strong password storage: Argon2id (preferred) or bcrypt; never MD5/SHA1",
+        "MFA — TOTP (RFC 6238), WebAuthn (phishing-resistant)",
+        "Have I Been Pwned API — block known-breached passwords on signup",
+        "Rate limiting — per IP and per account; exponential backoff",
+        "Account lockout — temporary, with secure recovery (not security questions)"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "``python # ✅ Argon2id password hashing from argon2 import PasswordHasher ph = PasswordHasher(time_cost=2, memory_cost=65536, parallelism=2) hashed = ph.hash(password) ph.verify(hashed, provided_password) ``"
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Credential stuffing is a numbers game: attackers feed millions of leaked email/password pairs through automation. The defense is layered — block known-breached passwords (HIBP), require MFA on sensitive operations, monitor anomalous login patterns. MFA fatigue (Uber 2022) shows MFA is not magic — push notifications without number-matching are a known weakness."
+    }
+  ],
+  "attribution": "Course: ICCS423 | Source: Thoth Library + RAG | Target: 3rd-4th year CS | Date: 2026-05-03",
+  "cheatsheet": [
+    "Credential Stuffing: replay leaked username/password pairs (works due to password reuse)",
+    "Brute Force: sequential password guessing; mitigated by rate-limit + lockout",
+    "Password Spraying: one weak password across many accounts (evades per-account lockout)",
+    "Default Credentials: admin/admin still everywhere in IoT/OT",
+    "MFA Bypass: push-bombing fatigue, SIM swap, OTP phishing, recovery flow abuse",
+    "MFA: TOTP (RFC 6238), WebAuthn (phishing-resistant)",
+    "Have I Been Pwned API: block known-breached passwords on signup",
+    "Rate limiting: per IP and per account; exponential backoff"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for L10 Web Security 1, \"Credential Stuffing\" is described as:",
+      "choices": {
+        "A": "one weak password across many accounts (evades per-account lockout)",
+        "B": "push-bombing fatigue, SIM swap, OTP phishing, recovery flow abuse",
+        "C": "sequential password guessing; mitigated by rate-limit + lockout",
+        "D": "replay leaked username/password pairs (works due to password reuse)"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The study guide states: Credential Stuffing — replay leaked username/password pairs (works due to password reuse)"
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for L10 Web Security 1, \"Brute Force\" is described as:",
+      "choices": {
+        "A": "one weak password across many accounts (evades per-account lockout)",
+        "B": "sequential password guessing; mitigated by rate-limit + lockout",
+        "C": "replay leaked username/password pairs (works due to password reuse)",
+        "D": "push-bombing fatigue, SIM swap, OTP phishing, recovery flow abuse"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: Brute Force — sequential password guessing; mitigated by rate-limit + lockout"
+    },
+    {
+      "id": "q3",
+      "prompt": "In the study guide for L10 Web Security 1, \"Password Spraying\" is described as:",
+      "choices": {
+        "A": "replay leaked username/password pairs (works due to password reuse)",
+        "B": "push-bombing fatigue, SIM swap, OTP phishing, recovery flow abuse",
+        "C": "sequential password guessing; mitigated by rate-limit + lockout",
+        "D": "one weak password across many accounts (evades per-account lockout)"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The study guide states: Password Spraying — one weak password across many accounts (evades per-account lockout)"
+    },
+    {
+      "id": "q4",
+      "prompt": "In the study guide for L10 Web Security 1, \"Default Credentials\" is described as:",
+      "choices": {
+        "A": "TOTP (RFC 6238), WebAuthn (phishing-resistant)",
+        "B": "admin/admin still everywhere in IoT/OT",
+        "C": "per IP and per account; exponential backoff",
+        "D": "block known-breached passwords on signup"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: Default Credentials — admin/admin still everywhere in IoT/OT"
+    }
+  ]
+}

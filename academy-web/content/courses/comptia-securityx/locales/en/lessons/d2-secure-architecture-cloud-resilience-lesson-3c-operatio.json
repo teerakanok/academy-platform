@@ -1,0 +1,198 @@
+{
+  "nodeId": "d2-secure-architecture-cloud-resilience-lesson-3c-operatio",
+  "locale": "en",
+  "title": "Lesson 3C — Operational Resilience",
+  "objective": "Study-guide review — Day 2 — Secure Architecture, Cloud, and Resilience: Lesson 3C — Operational Resilience.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "Availability and Integrity Design"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Operational resilience designs systems to keep operating and preserve correctness under failure or attack. The official source includes availability and integrity design, network traffic inspection, NAC/VPN, proxies, load balancing, and specialized components."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Resilience patterns:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Redundancy for component failure.",
+        "Load balancing for traffic distribution.",
+        "Backup and restore for data recovery.",
+        "Integrity checks for unauthorized modification.",
+        "Network inspection for malicious activity.",
+        "Access control for trusted connectivity."
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Source: CertMaster Study Lesson 3C; M03 slides \"Availability and Integrity Design Considerations\"."
+    },
+    {
+      "kind": "heading",
+      "text": "Load Balancing and Resilience Boundaries"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Load balancing supports availability by distributing traffic across healthy service instances. It can also support maintenance and failover when systems are designed for it. Teach load balancing as one resilience component, not a full continuity plan."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Questions to ask:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Are back-end instances stateless or stateful?",
+        "How does health checking work?",
+        "What happens if the load balancer itself fails?",
+        "Does traffic distribution preserve session requirements?",
+        "Are logs retained for investigation?",
+        "Is TLS termination handled securely?"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Mini scenario: a web application uses two servers behind a load balancer, but both depend on one database. The load balancer improves web-tier availability but does not remove the database single point of failure."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Source: CertMaster Study Lesson 3C; M03 slides \"Specialized Components\" and \"Availability and Integrity Design Considerations\"."
+    },
+    {
+      "kind": "heading",
+      "text": "Network Traffic Inspection, NAC, VPN, and Proxies"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Network traffic inspection monitors flows for signs of malicious or policy-violating activity. NAC controls which devices can connect. VPNs protect remote communication. Proxies mediate traffic and can enforce policy between users and destinations."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Decision cues:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Unknown device connecting to internal network: NAC.",
+        "Remote user requiring encrypted connection: VPN or zero-trust access pattern.",
+        "Web traffic filtering or mediation: proxy.",
+        "Need to observe packets/flows: traffic inspection."
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Source: CertMaster Study Lesson 3C; M03 slides \"Network Traffic Inspection\", \"Network Access Control & VPN\", \"Proxies\"."
+    },
+    {
+      "kind": "heading",
+      "text": "Specialized Components"
+    },
+    {
+      "kind": "paragraph",
+      "text": "The official slides include specialized components such as firewalls, intrusion detection/prevention, vulnerability scanners, and content delivery networks. Teach them as architecture roles rather than isolated product names."
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Component type",
+        "Architecture purpose"
+      ],
+      "rows": [
+        [
+          "Firewall",
+          "Enforce network traffic policy"
+        ],
+        [
+          "IDS/IPS",
+          "Detect or prevent suspicious traffic"
+        ],
+        [
+          "Vulnerability scanner",
+          "Identify known weaknesses"
+        ],
+        [
+          "CDN",
+          "Improve availability/performance and absorb some traffic load"
+        ],
+        [
+          "Load balancer",
+          "Distribute traffic and support availability"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Source: CertMaster Study Lesson 3C; M03 slides \"Specialized Components\"."
+    }
+  ],
+  "attribution": "Course: SecurityX CAS-005 Primary source: CertMaster Study Lessons 3A, 3B, 3C, 3D Slide source: SecurityX_M03_PPT.pptx Teaching goal: turn governance requirements into secure design decisions across SDLC, architecture, resilience, and cloud.",
+  "cheatsheet": [
+    "Firewall: Enforce network traffic policy",
+    "IDS/IPS: Detect or prevent suspicious traffic",
+    "Vulnerability scanner: Identify known weaknesses",
+    "CDN: Improve availability/performance and absorb some traffic load",
+    "Load balancer: Distribute traffic and support availability"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for D2 Secure Architecture Cloud Resilience, \"Firewall\" is described as:",
+      "choices": {
+        "A": "Enforce network traffic policy",
+        "B": "Identify known weaknesses",
+        "C": "Detect or prevent suspicious traffic",
+        "D": "Distribute traffic and support availability"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The study guide states: Firewall: Enforce network traffic policy"
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for D2 Secure Architecture Cloud Resilience, \"IDS/IPS\" is described as:",
+      "choices": {
+        "A": "Detect or prevent suspicious traffic",
+        "B": "Identify known weaknesses",
+        "C": "Distribute traffic and support availability",
+        "D": "Enforce network traffic policy"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The study guide states: IDS/IPS: Detect or prevent suspicious traffic"
+    },
+    {
+      "id": "q3",
+      "prompt": "In the study guide for D2 Secure Architecture Cloud Resilience, \"Vulnerability scanner\" is described as:",
+      "choices": {
+        "A": "Enforce network traffic policy",
+        "B": "Detect or prevent suspicious traffic",
+        "C": "Identify known weaknesses",
+        "D": "Distribute traffic and support availability"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The study guide states: Vulnerability scanner: Identify known weaknesses"
+    },
+    {
+      "id": "q4",
+      "prompt": "In the study guide for D2 Secure Architecture Cloud Resilience, \"CDN\" is described as:",
+      "choices": {
+        "A": "Distribute traffic and support availability",
+        "B": "Detect or prevent suspicious traffic",
+        "C": "Improve availability/performance and absorb some traffic load",
+        "D": "Enforce network traffic policy"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The study guide states: CDN: Improve availability/performance and absorb some traffic load"
+    }
+  ]
+}

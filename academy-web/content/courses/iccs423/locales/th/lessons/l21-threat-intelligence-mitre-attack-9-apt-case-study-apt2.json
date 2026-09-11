@@ -1,0 +1,131 @@
+{
+  "nodeId": "l21-threat-intelligence-mitre-attack-9-apt-case-study-apt2",
+  "locale": "th",
+  "title": "9. APT Case Study — APT29 (SolarWinds, 2020)",
+  "objective": "Study-guide review — ICCS423 v2 — L21: Threat Intelligence & MITRE ATT&CK: 9. APT Case Study — APT29 (SolarWinds, 2020).",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "Background: Late 2019 to early 2020, APT29 (Cozy Bear, attributed to Russia/SVR) injected the SUNBURST backdoor into SolarWinds Orion's build pipeline. SolarWinds Orion is network management software used by 18,000+ organizations including US Treasury, DHS, Microsoft, FireEye."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Discovered: December 2020 by FireEye, who noticed their own red team tools had been stolen."
+    },
+    {
+      "kind": "heading",
+      "text": "ATT&CK Mapping (excerpt)"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Tactic",
+        "Technique",
+        "What happened"
+      ],
+      "rows": [
+        [
+          "Initial Access",
+          "T1195.002 Supply Chain Compromise: Software",
+          "Backdoor in SolarWinds DLL"
+        ],
+        [
+          "Execution",
+          "T1059.001 PowerShell",
+          "Post-exploitation"
+        ],
+        [
+          "Defense Evasion",
+          "T1036 Masquerading + T1027 Obfuscated Files",
+          "Backdoor disguised as normal SolarWinds component"
+        ],
+        [
+          "C2",
+          "T1071.001 Web Protocols",
+          "HTTPS blended with normal traffic"
+        ],
+        [
+          "Collection",
+          "T1074 Data Staged",
+          "Staged before exfil"
+        ],
+        [
+          "Exfiltration",
+          "T1041 Exfiltration Over C2 Channel",
+          "Data exfiltrated through same channel"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Key takeaway: this single campaign maps across 6+ tactics, demonstrating that real attackers loop and chain techniques. Defenders who detect any one technique (e.g., anomalous DLL signing) can break the chain."
+    }
+  ],
+  "attribution": "Course: ICCS423 | Source: Thoth + RAG | Target: 3rd-4th year CS | Date: 2026-05-03",
+  "cheatsheet": [
+    "Initial Access: T1195.002 Supply Chain Compromise: Software",
+    "Execution: T1059.001 PowerShell",
+    "Defense Evasion: T1036 Masquerading + T1027 Obfuscated Files",
+    "C2: T1071.001 Web Protocols",
+    "Collection: T1074 Data Staged",
+    "Exfiltration: T1041 Exfiltration Over C2 Channel"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for L21 Threat Intelligence MITRE ATTACK, \"Initial Access\" is described as:",
+      "choices": {
+        "A": "T1036 Masquerading + T1027 Obfuscated Files",
+        "B": "T1195.002 Supply Chain Compromise: Software",
+        "C": "T1041 Exfiltration Over C2 Channel",
+        "D": "T1071.001 Web Protocols"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: Initial Access: T1195.002 Supply Chain Compromise: Software"
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for L21 Threat Intelligence MITRE ATTACK, \"Execution\" is described as:",
+      "choices": {
+        "A": "T1071.001 Web Protocols",
+        "B": "T1074 Data Staged",
+        "C": "T1041 Exfiltration Over C2 Channel",
+        "D": "T1059.001 PowerShell"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The study guide states: Execution: T1059.001 PowerShell"
+    },
+    {
+      "id": "q3",
+      "prompt": "In the study guide for L21 Threat Intelligence MITRE ATTACK, \"Defense Evasion\" is described as:",
+      "choices": {
+        "A": "T1071.001 Web Protocols",
+        "B": "T1036 Masquerading + T1027 Obfuscated Files",
+        "C": "T1041 Exfiltration Over C2 Channel",
+        "D": "T1195.002 Supply Chain Compromise: Software"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: Defense Evasion: T1036 Masquerading + T1027 Obfuscated Files"
+    },
+    {
+      "id": "q4",
+      "prompt": "In the study guide for L21 Threat Intelligence MITRE ATTACK, \"C2\" is described as:",
+      "choices": {
+        "A": "T1041 Exfiltration Over C2 Channel",
+        "B": "T1074 Data Staged",
+        "C": "T1071.001 Web Protocols",
+        "D": "T1059.001 PowerShell"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The study guide states: C2: T1071.001 Web Protocols"
+    }
+  ]
+}
