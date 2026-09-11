@@ -10,6 +10,7 @@ import {
   parseAcademySessionCookie,
 } from '@/lib/identity/session-store'
 import { createAcademyIdentityProductionSessionStore } from '@/lib/identity/production-runtime'
+import { APPROVED_ACADEMY_CONSUMER_REGISTRY_V1 } from '@/lib/identity/consumer-policy'
 import { safeErrorMessage } from '@/lib/safe-log'
 
 export const runtime = 'nodejs'
@@ -44,7 +45,17 @@ export async function POST(request: Request) {
     } catch {
       revocation = 'not-confirmed'
     }
-    const response = NextResponse.json({ ok: true, scope: 'local', revocation })
+    // ปิดช่อง shared machine (cross-product review F-1): sign-out ของ product ต้อง
+    // จบ SSO session ของ Identity ด้วย ไม่งั้นคนถัดไปบนเครื่องเดิมเปิด Academy/Crux
+    // แล้วถูก sign-in เงียบ ๆ ผ่าน /v1/authorizations/resume cookie ที่ยังอยู่ 12 ชม.
+    // Server เป็นคนบอก URL (client ไม่ hardcode) และบอกเฉพาะ production branch นี้ —
+    // fixture สาม branch อื่นไม่ได้มี Identity session จริงจึงไม่ต้องส่ง
+    const response = NextResponse.json({
+      ok: true,
+      scope: 'local',
+      revocation,
+      ssoSignoutUrl: `${APPROVED_ACADEMY_CONSUMER_REGISTRY_V1.accountCenter.origin}/v1/sessions/signout`,
+    })
     response.headers.append('set-cookie', expireAcademySessionCookie())
     response.headers.append('set-cookie', expireLegacyAcademySessionCookie())
     return response

@@ -7,6 +7,7 @@ import { isAcademyInternalReturnPath } from '@/lib/auth/internal-return-path'
 const MAX_ACCOUNT_RESPONSE_BYTES = 4 * 1024
 const MAX_ACCOUNT_EMAIL_LENGTH = 254
 const MAX_AUTH_ERROR_LENGTH = 512
+const MAX_SSO_SIGNOUT_URL_LENGTH = 256
 
 export type AccountResponse =
   | { signedIn: false }
@@ -14,6 +15,9 @@ export type AccountResponse =
 
 export type SignOutResponse = {
   revocation: 'confirmed' | 'not-confirmed'
+  /** มีเฉพาะ production — URL ที่ browser เรียกหลัง sign-out เพื่อจบ SSO กลาง (F-1).
+   *  fixture ไม่ส่ง จึงต้อง optional ทั้ง type และ projection */
+  ssoSignoutUrl?: string
 }
 
 export type OtpResponse =
@@ -74,6 +78,15 @@ function boundedError(value: unknown): value is string {
     && value.length <= MAX_AUTH_ERROR_LENGTH
 }
 
+/** URL นี้มาจาก server ของเราเอง (route อ่านจาก consumer-registry) ไม่ใช่ input
+ *  จากภายนอก — bound ไว้เพื่อกัน response ปลอมยัด URL ยาว ๆ เข้า client state.
+ *  null = มีค่ามาแต่ไม่ผ่าน bound (ผู้เรียกเช็ค key set ก่อนเรียกแล้ว) */
+function boundedSsoSignoutUrl(value: unknown): string | null {
+  if (typeof value !== 'string') return null
+  if (value.length > MAX_SSO_SIGNOUT_URL_LENGTH || !value.startsWith('https://')) return null
+  return value
+}
+
 export function projectSignOutResponse(value: unknown): SignOutResponse | null {
   const record = plainRecord(value)
   if (
@@ -86,6 +99,27 @@ export function projectSignOutResponse(value: unknown): SignOutResponse | null {
     return null
   }
   return { revocation: record.revocation }
+}
+
+/** production sign-out response มี ssoSignoutUrl เพิ่ม (F-1); fixture สาม branch
+ *  เก่าไม่มี จึง accept ทั้งสองรูปแบบด้วย key set ตรงตาม branch */
+export function projectSignOutResponseWithSso(value: unknown): SignOutResponse | null {
+  const record = plainRecord(value)
+  if (
+    !record
+    || record.ok !== true
+    || record.scope !== 'local'
+    || (record.revocation !== 'confirmed' && record.revocation !== 'not-confirmed')
+  ) {
+    return null
+  }
+  if (hasExactKeys(record, ['ok', 'scope', 'revocation'])) {
+    return { revocation: record.revocation }
+  }
+  if (!hasExactKeys(record, ['ok', 'scope', 'revocation', 'ssoSignoutUrl'])) return null
+  const url = boundedSsoSignoutUrl(record.ssoSignoutUrl)
+  if (url === null) return null
+  return { revocation: record.revocation, ssoSignoutUrl: url }
 }
 
 export function projectOtpResponse(value: unknown): OtpResponse | null {
@@ -142,7 +176,7 @@ export async function readSignOutResponse(response: Response): Promise<SignOutRe
     cancelResponseBody(response)
     return null
   }
-  return readAuthActionResponse(response, projectSignOutResponse, () => true)
+  return readAuthActionResponse(response, projectSignOutResponseWithSso, () => true)
 }
 
 export async function readOtpResponse(response: Response): Promise<OtpResponse | null> {
