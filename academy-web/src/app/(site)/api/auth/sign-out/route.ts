@@ -11,6 +11,7 @@ import {
 } from '@/lib/identity/session-store'
 import { createAcademyIdentityProductionSessionStore } from '@/lib/identity/production-runtime'
 import { APPROVED_ACADEMY_CONSUMER_REGISTRY_V1 } from '@/lib/identity/consumer-policy'
+import { emitAcademySecurityEvent } from '@/lib/security/security-events'
 import { safeErrorMessage } from '@/lib/safe-log'
 
 export const runtime = 'nodejs'
@@ -27,6 +28,11 @@ export async function POST(request: Request) {
     } catch {
       revocation = 'not-confirmed'
     }
+    emitAcademySecurityEvent({
+      event: 'local_logout',
+      outcome: revocation === 'confirmed' ? 'success' : 'failure',
+      reason: revocation === 'confirmed' ? 'confirmed' : 'not_confirmed',
+    })
     const response = NextResponse.json({ ok: true, scope: 'local', revocation })
     response.headers.append('set-cookie', expireAcademySessionCookie({ secure: false }))
     return response
@@ -45,6 +51,11 @@ export async function POST(request: Request) {
     } catch {
       revocation = 'not-confirmed'
     }
+    emitAcademySecurityEvent({
+      event: 'local_logout',
+      outcome: revocation === 'confirmed' ? 'success' : 'failure',
+      reason: revocation === 'confirmed' ? 'confirmed' : 'not_confirmed',
+    })
     // ปิดช่อง shared machine (cross-product review F-1): sign-out ของ product ต้อง
     // จบ SSO session ของ Identity ด้วย ไม่งั้นคนถัดไปบนเครื่องเดิมเปิด Academy/Crux
     // แล้วถูก sign-in เงียบ ๆ ผ่าน /v1/authorizations/resume cookie ที่ยังอยู่ 12 ชม.
@@ -78,6 +89,11 @@ export async function POST(request: Request) {
     revocation = 'not-confirmed'
     console.error('[auth/sign-out] provider ติดต่อไม่ได้:', safeErrorMessage(error))
   }
+  emitAcademySecurityEvent({
+    event: 'local_logout',
+    outcome: revocation === 'confirmed' ? 'success' : 'failure',
+    reason: revocation === 'confirmed' ? 'confirmed' : 'not_confirmed',
+  })
   // auth-js ล้าง session ก่อนคืน error ในหลายกรณี แต่ทำซ้ำตรงนี้เพื่อให้ contract
   // current-device deterministic แม้ behavior ภายใน provider เปลี่ยน
   await clearRouteAuthCookies()

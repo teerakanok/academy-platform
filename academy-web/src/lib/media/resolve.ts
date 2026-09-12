@@ -10,10 +10,10 @@ interface MediaContext {
   nodeId: string
 }
 
-async function resolveReference(reference: string, context: MediaContext): Promise<string> {
+async function resolveReference(reference: string, context: MediaContext, requireRegistered = false): Promise<string> {
   const asset = privateMediaByLegacyPath(reference)
   if (!asset) {
-    if (reference.startsWith('/media/') && PRIVATE_EXTENSION.test(reference)) {
+    if (requireRegistered || (reference.startsWith('/media/') && PRIVATE_EXTENSION.test(reference))) {
       throw new Error(`private media is not registered: ${reference}`)
     }
     return reference
@@ -36,15 +36,15 @@ export async function resolveAuthorizedLessonMedia(
   const video = node.video
     ? {
         ...node.video,
-        src: node.video.src ? await resolveReference(node.video.src, context) : undefined,
+        src: node.video.src ? await resolveReference(node.video.src, context, true) : undefined,
         audio: node.video.audio
           ? await Promise.all(
-              node.video.audio.map(async (track) => ({ ...track, src: await resolveReference(track.src, context) })),
+              node.video.audio.map(async (track) => ({ ...track, src: await resolveReference(track.src, context, true) })),
             )
           : undefined,
         captions: node.video.captions
           ? await Promise.all(
-              node.video.captions.map(async (track) => ({ ...track, src: await resolveReference(track.src, context) })),
+              node.video.captions.map(async (track) => ({ ...track, src: await resolveReference(track.src, context, true) })),
             )
           : undefined,
       }

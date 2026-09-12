@@ -91,7 +91,7 @@ export function CheckpointQuiz({
     if (draftScope && store) clearCheckpointDraft(store, draftScope)
   }
 
-  // Hydrate หลัง mount เพื่อไม่ให้ SSR กับ browser localStorage ให้ markup เริ่มต้นต่างกัน.
+  // Hydrate หลัง mount เพื่อไม่ให้ SSR กับ current-tab memory ให้ markup เริ่มต้นต่างกัน.
   // เมื่อ attempt เปลี่ยน LessonView จะ remount component ด้วย key ของ attempt นั้น.
   useEffect(() => {
     if (!draftScope || !draftKey) {
@@ -192,10 +192,13 @@ export function CheckpointQuiz({
           {items.length} {items.length === 1 ? 'task' : 'tasks'}
         </span>
       </div>
-      <p className="mb-6 text-sm text-cs-muted">
+      <p className="mb-2 text-sm text-cs-muted">
         {requireAllCorrect
           ? 'This one is required. Answer every question correctly to pass it. You can try again with a fresh task.'
           : 'Getting one wrong is fine. The explanations are the point.'}
+      </p>
+      <p className="mb-6 text-sm text-cs-muted">
+        Unsubmitted answers stay in this tab and clear when you reload or sign out.
       </p>
       <p role="status" aria-live="polite" aria-atomic="true" className="sr-only" data-testid="checkpoint-status">
         {hydrating

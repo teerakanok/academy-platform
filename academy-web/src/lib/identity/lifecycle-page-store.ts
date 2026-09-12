@@ -177,13 +177,45 @@ implements IdentityLifecycleLeasedPageStore {
     const commit = parseCommit(commitValue)
     if (!commit) throw new Error('Identity lifecycle page commit is invalid')
     const fence = parseIdentityLifecyclePullLeaseFence(fenceValue)
-    const { error } = await this.client.rpc('commit_identity_lifecycle_page_under_lease', {
+    const parameters: Record<string, unknown> = {
       p_claim_token: fence.claimToken,
       p_claimed_by: fence.claimedBy,
       ...commitRpcParameters(commit),
-    })
-    if (error) throw new Error('Identity lifecycle page commit under lease failed')
+    }
+    try {
+      const { error } = await this.client.rpc(
+        'commit_identity_lifecycle_page_under_lease',
+        parameters,
+      )
+      if (error) throw error
+    } catch {
+      if (commitRequiresFailureFence(commit)) {
+        let fenceFailureError: unknown
+        try {
+          ({ error: fenceFailureError } = await this.client.rpc(
+            'fence_identity_lifecycle_page_failure',
+            { p_projections: parameters.p_projections },
+          ))
+        } catch {
+          throw new Error('Identity lifecycle page failure could not be fenced')
+        }
+        if (fenceFailureError) {
+          throw new Error('Identity lifecycle page failure could not be fenced')
+        }
+      }
+      throw new Error('Identity lifecycle page commit under lease failed')
+    }
   }
+}
+
+function commitRequiresFailureFence(commit: IdentityLifecyclePageCommit): boolean {
+  return commit.projections.some((projection) => {
+    if (projection.health.status === 'ready') {
+      return projection.current.state !== 'active'
+    }
+    return projection.health.status === 'gap'
+      && projection.health.observed.state !== 'active'
+  })
 }
 
 function commitRpcParameters(commit: IdentityLifecyclePageCommit): Record<string, unknown> {

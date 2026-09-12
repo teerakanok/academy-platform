@@ -20,20 +20,30 @@ export interface MediaWorkerEnv {
   COURSE_MEDIA?: MediaBucket
 }
 
-interface MediaRequest {
+export interface MediaRequest {
   url: string
   method: string
   headers: Headers
 }
 
-export async function servePrivateMedia(request: MediaRequest, env: MediaWorkerEnv): Promise<Response | null> {
+export type PrivateMediaAuthorizer = (request: MediaRequest) => Promise<Response>
+
+function authorizationProbeAccepted(response: Response): boolean {
+  return response.status === 204 && response.headers.get('cache-control')?.trim().toLowerCase() === 'no-store'
+}
+
+export async function servePrivateMedia(
+  request: MediaRequest,
+  env: MediaWorkerEnv,
+  authorizeMedia: PrivateMediaAuthorizer,
+): Promise<Response | null> {
   const url = new URL(request.url)
   if (privateMediaByLegacyPath(url.pathname)) return withEdgeSecurityHeaders(new Response(null, { status: 404 }))
   if (!url.pathname.startsWith('/course-media/')) return null
   if (request.method !== 'GET' && request.method !== 'HEAD') {
     return withEdgeSecurityHeaders(new Response(null, { status: 405 }))
   }
-  if (!env.MEDIA_SIGNING_SECRET || !env.COURSE_MEDIA) {
+  if (!env.MEDIA_SIGNING_SECRET || !env.COURSE_MEDIA || typeof authorizeMedia !== 'function') {
     return withEdgeSecurityHeaders(new Response('Private media is not configured', { status: 503 }))
   }
 
@@ -48,6 +58,16 @@ export async function servePrivateMedia(request: MediaRequest, env: MediaWorkerE
   if (!grant || grant.assetId !== asset.id || asset.courseSlug !== grant.courseSlug || asset.nodeId !== grant.nodeId) return null
   if (!mediaSessionDigestMatches(grant.sessionIdDigest, await createMediaSessionDigest(sessionId))) return null
   if (grant.expiresAt <= Math.floor(Date.now() / 1000)) return null
+
+  let authorization: Response
+  try {
+    authorization = await authorizeMedia(request)
+  } catch {
+    return withEdgeSecurityHeaders(new Response(null, { status: 503 }))
+  }
+  if (!authorizationProbeAccepted(authorization)) {
+    return withEdgeSecurityHeaders(new Response(null, { status: 403 }))
+  }
 
   const requestedRange = request.headers.get('range')
   if (requestedRange) {

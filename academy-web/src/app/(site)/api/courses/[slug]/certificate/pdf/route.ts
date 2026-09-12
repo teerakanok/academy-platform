@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { currentUser } from '@/lib/auth/session'
+import { authorizeCourseResource, deniedAccessStatus } from '@/lib/account/course-access'
 import { getCourse, getCourseStructure } from '@/lib/content/course-source'
 import { academyDb } from '@/lib/db/server'
 import { certificatePdf } from '@/lib/certificate/pdf'
@@ -16,6 +17,13 @@ export async function GET(
   const { slug } = await params
   const structure = getCourseStructure(slug)
   if (!structure) return NextResponse.json({ ok: false, error: 'ไม่พบคอร์สนี้' }, { status: 404 })
+  const access = await authorizeCourseResource(user.account.id, slug)
+  if (!access.allowed) {
+    return NextResponse.json(
+      { ok: false, error: access.reason === 'unavailable' ? 'ตรวจสิทธิ์ไม่สำเร็จ' : 'ไม่มีสิทธิ์เข้าถึงคอร์สนี้' },
+      { status: deniedAccessStatus(access), headers: { 'cache-control': 'private, no-store' } },
+    )
+  }
   try {
     const db = academyDb()
     const { data, error } = await db

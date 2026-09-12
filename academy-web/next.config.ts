@@ -32,6 +32,7 @@ const nextConfig: NextConfig = {
             value: 'camera=(), geolocation=(), microphone=(), payment=(), usb=()',
           },
           { key: 'X-DNS-Prefetch-Control', value: 'off' },
+          { key: 'Cross-Origin-Opener-Policy', value: 'same-origin' },
         ],
       },
     ]

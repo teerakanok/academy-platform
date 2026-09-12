@@ -9,6 +9,12 @@ const signingSecret = process.env.ACADEMY_DATA_API_JWT_SECRET
 // ที่เซ็นด้วย secret ไปหา origin ที่ตัว production client เองปฏิเสธ จึง pin ด้วย
 // rule เดียวกับ src/lib/db/server.ts (HTTPS หรือ HTTP loopback 127.0.0.1, origin เปล่า)
 const hasDedicatedApi = Boolean(apiUrl && signingSecret && isSafeAcademyDataApiUrl(apiUrl))
+if (process.env.ACADEMY_REQUIRE_BOUNDARY_TESTS === '1') {
+  const target = apiUrl && isSafeAcademyDataApiUrl(apiUrl) ? new URL(apiUrl) : null
+  if (!hasDedicatedApi || target?.protocol !== 'http:' || target.hostname !== '127.0.0.1') {
+    throw new Error('Required boundary gate needs a configured disposable local Academy runtime API; refusing skipped or live-target verification')
+  }
+}
 
 function tokenFor(role: string): string {
   if (!signingSecret) throw new Error('dedicated API test configuration is missing')

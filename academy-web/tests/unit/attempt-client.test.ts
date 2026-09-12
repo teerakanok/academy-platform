@@ -286,12 +286,12 @@ describe('attempt client response boundary', () => {
     })
   })
 
-  it.each([401, 403])('maps HTTP %i to stable access-lost without trusting a body', async (status) => {
+  it.each([[401, 'signed-out'], [403, 'access-lost']] as const)('maps HTTP %i without trusting a body', async (status, reason) => {
     stubResponse(new Response('not-json', { status }))
 
     await expect(requestLessonAttempt('course', 'capstone')).resolves.toEqual({
       status: 'failed',
-      reason: 'access-lost',
+      reason,
     })
   })
 

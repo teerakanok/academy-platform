@@ -1,9 +1,10 @@
-import { getPublicCourse } from '@/lib/content/course-source'
+import { getCourse } from '@/lib/content/course-source'
 import { publicPage } from '@/lib/seo'
 import { toPublicCourseCatalogItem } from '@/lib/content/public-course'
 import type { Locale } from '@/lib/content/course-types'
 import { PublicCourseCatalog } from '@/components/course/PublicCourseCatalog'
-import { getVisiblePublicCourses } from '@/lib/course/visibility'
+import { applyCourseAvailability } from '@/lib/course/visibility'
+import { loadAllCourseOverrides } from '@/lib/course/settings'
 
 // หน้าร้านสาธารณะ — แยกจาก /dashboard ("My learning") โดยตั้งใจ. ข้อมูลที่ข้าม
 // ไป client ถูกตัดเป็น catalog DTO ใน toPublicCourseCatalogItem เสมอ.
@@ -18,17 +19,23 @@ export const metadata = publicPage({
 export const dynamic = 'force-dynamic'
 
 export default async function CoursesPage() {
-  const visibleCourses = await getVisiblePublicCourses()
-  const courses = visibleCourses.flatMap((course) => {
-    const slug = course.structure.slug
-    const copies = Object.fromEntries(
-      course.structure.availableLocales.flatMap((locale: Locale) => {
-        const localized = getPublicCourse(slug, locale)
-        return localized ? [[locale, { title: localized.copy.title, subtitle: localized.copy.subtitle }]] : []
-      }),
-    ) as Partial<Record<Locale, { title: string; subtitle: string }>>
-    return [toPublicCourseCatalogItem(course, copies)]
-  })
+  const availability = await loadAllCourseOverrides()
+  const courses = [...availability.entries()]
+    .filter(([, settings]) => settings.visibility === 'published')
+    .flatMap(([slug, settings]) => {
+      const defaultCourse = getCourse(slug)
+      if (!defaultCourse) return []
+      const course = applyCourseAvailability(defaultCourse, settings)
+      const copies = Object.fromEntries(
+        course.structure.availableLocales.flatMap((locale: Locale) => {
+          const localized = getCourse(slug, locale)
+          if (!localized) return []
+          const localizedCopy = applyCourseAvailability(localized, settings).copy
+          return [[locale, { title: localizedCopy.title, subtitle: localizedCopy.subtitle }]]
+        }),
+      ) as Partial<Record<Locale, { title: string; subtitle: string }>>
+      return [toPublicCourseCatalogItem(course, copies)]
+    })
 
   return <PublicCourseCatalog courses={courses} />
 }

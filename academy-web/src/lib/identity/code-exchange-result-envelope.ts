@@ -1,3 +1,4 @@
+import { isAcceptableIdentityAuthenticationReceipt, IDENTITY_AUTHENTICATION_FUTURE_SKEW_SECONDS } from './authentication-assurance'
 import { parseStrictJsonText } from '../http/strict-json-response'
 import type { ExchangeResult } from './adapter'
 import { verifyIdentityCodeExchangeResult } from './code-exchange-result'
@@ -114,7 +115,7 @@ function parseEnvelope(value: unknown, policy: VerificationPlan): ParsedEnvelope
     || !hasExactKeys(header, HEADER_KEYS)
     || !hasExactKeys(claims, CLAIM_KEYS)
     || header.alg !== 'ES256'
-    || header.typ !== 'identity-code-exchange-result+jwt'
+    || header.typ !== 'identity-code-exchange-result-v2+jwt'
     || typeof header.kid !== 'string'
     || !RESULT_KEY_ID.test(header.kid)
     || claims.iss !== policy.expectedIssuer
@@ -137,7 +138,9 @@ function parseEnvelope(value: unknown, policy: VerificationPlan): ParsedEnvelope
   const now = Math.floor(policy.verificationTimeMs / 1_000)
   const issuedAt = claims.iat as number
   const expiresAt = claims.exp as number
-  if (expiresAt <= now
+  if (!isAcceptableIdentityAuthenticationReceipt(verifiedResult.result.authentication, now)
+    || verifiedResult.result.authentication.auth_time > issuedAt + IDENTITY_AUTHENTICATION_FUTURE_SKEW_SECONDS
+    || expiresAt <= now
     || issuedAt > now + policy.clockSkewSeconds
     || expiresAt <= issuedAt
     || expiresAt - issuedAt > policy.maximumLifetimeSeconds) return null

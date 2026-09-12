@@ -5,6 +5,8 @@ import { EdgeRateLimiter } from './worker/edge-rate-limiter-do'
 import { isServedHost, unservedHostResponse, type HostPolicyEnv } from './src/lib/edge-host-policy'
 import { enforceEdgeRateLimit } from './src/lib/edge-rate-limit-enforcement'
 import { runAcademyIdentityLifecyclePull } from './worker/identity-lifecycle-runtime'
+import { createOpenNextMediaAuthorizer } from './src/lib/media/open-next-authorizer'
+import { admissionResponse, type AdmissionEnv } from './src/lib/edge-admission'
 
 export { EdgeRateLimiter }
 
@@ -13,7 +15,7 @@ export { EdgeRateLimiter }
 // ส่งต่อ export ของ OpenNext ให้ครบ ไม่เช่นนั้น Durable Object/cache ที่มันประกาศจะหาย.
 export * from './.open-next/worker.js'
 
-interface AcademyWorkerEnv extends MediaWorkerEnv, HostPolicyEnv {
+interface AcademyWorkerEnv extends MediaWorkerEnv, HostPolicyEnv, AdmissionEnv {
   EDGE_RATE_LIMITER?: DurableObjectNamespace<EdgeRateLimiter>
   RATE_LIMIT_KEY_SECRET?: string
   IDENTITY_LIFECYCLE_ENABLED?: string
@@ -45,10 +47,17 @@ export default {
     // The raw workers.dev route bypasses the Access policy on the canonical host.
     if (!isServedHost(request, env)) return unservedHostResponse()
 
+    const admission = admissionResponse(env)
+    if (admission) return admission
+
     const protectedRequest = await enforceEdgeRateLimit(request, env)
     if (protectedRequest instanceof Response) return protectedRequest
 
-    const media = await servePrivateMedia(protectedRequest, env)
+    const media = await servePrivateMedia(
+      protectedRequest,
+      env,
+      createOpenNextMediaAuthorizer(openNextHandler.fetch.bind(openNextHandler), env, ctx),
+    )
     if (media) return withEdgeSecurityHeaders(withJsonCharset(media))
     return withJsonCharset(
       withEdgeSecurityHeaders(await openNextHandler.fetch(protectedRequest, env, ctx)),

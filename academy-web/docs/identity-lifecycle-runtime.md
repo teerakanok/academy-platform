@@ -4,8 +4,10 @@
 
 Academy consumes account lifecycle by authenticated pull. It exposes no inbound
 lifecycle webhook and never accepts lifecycle state from a browser session.
-The canonical producer snapshot is Identity Control `ab958ee`; its approved
-registry still leaves the private publisher endpoint, client-assertion
+The canonical producer contract is
+`controller/docs/integration/lifecycle-pull-consumer-contract.md` at SHA-256
+`94efbe171b16662381f77b678c9058ff81cf1402a6bc266c2c9450826b0889dc`; its
+approved registry still leaves the private publisher endpoint, client-assertion
 audience, event audience, and verification keys unpublished. This deployment
 therefore remains disabled until those exact values are provisioned and released.
 Do not substitute a guessed endpoint, audience, issuer, key, or digest.
@@ -44,6 +46,25 @@ The durable principal issuer is exactly
 and configuration changes are adjudicated by the existing verified reducer and
 page-store contract before any authorization effect is applied.
 
+## First-login catchup
+
+Account creation atomically emits active lifecycle revision 1. A signed
+authorization exchange proves the Academy service relationship but carries no
+lifecycle revision, so Academy never synthesizes a projection from an exchange.
+Before profile activation, the production callback composes the same leased
+verified puller and durable cursor used by scheduled reconciliation. Catchup is
+bounded to at most twenty pages, stops only on an exact ready active projection
+for the callback issuer and subject, and is idempotent once that projection is
+durable.
+
+Missing data, a revision gap or conflict, disabled or deleted state, an
+unreconciled producer configuration, publisher outage, backlog exhaustion, or
+lease contention returns a retryable unavailable result without profile
+activation or a usable session. Scheduled pulls may finish a backlog and the
+same callback may then retry. Existing session reads take the same principal
+lifecycle fence and fail closed on missing checkpoint, missing projection, or
+claim/projection mismatch.
+
 ## Authorization effects
 
 Migration `0032` is surgical and is not executed by this repository. It adds an
@@ -79,6 +100,20 @@ callback activation paths:
 
 Manual course entitlement remains an Academy operator decision. Identity
 lifecycle carries no product entitlement, staff role, or resource authority.
+
+## Rollout and recovery
+
+Keep `IDENTITY_LIFECYCLE_ENABLED` disabled until producer values, the consumer
+registration, source-pinned configuration revision, and release approval are
+complete. Apply forward migrations only after rehearsing them inside a
+transaction rollback; never rewrite migration history. Preseed or reconcile
+existing Academy accounts, then exercise the real first-login acceptance flow
+with multi-page backlog, lease contention, publisher outage, retry after
+catchup, and disable/delete races. If catchup or enforcement fails, leave the
+flag disabled (or turn it back off), preserve the durable cursor and projection
+evidence, repair the producer/configuration issue, and retry the same cursor.
+Roll back application code while retaining migration 0041 and its fail-closed
+guards; do not remove the migration to restore access.
 
 ## Local verification boundary
 

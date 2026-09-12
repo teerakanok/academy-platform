@@ -1,18 +1,22 @@
-import { describe, expect, it } from 'vitest'
-import { generateMetadata, generateStaticParams } from '@/app/(localized)/courses/[slug]/[locale]/page'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { dynamic, generateMetadata } from '@/app/(localized)/courses/[slug]/[locale]/page'
 import { legacyCourseRedirectPath } from '@/lib/content/legacy-public-course-route'
-import { getCourseStructure, listPublicCourseSlugs } from '@/lib/content/course-source'
 import { getCourse } from '@/lib/content/course-source'
 
+const mocks = vi.hoisted(() => ({ getVisiblePublicCourse: vi.fn() }))
+
+vi.mock('@/lib/course/visibility', () => ({ getVisiblePublicCourse: mocks.getVisiblePublicCourse }))
+
 describe('public course route', () => {
-  it('pre-renders each available locale of public courses only', () => {
-    // ผูกกับกติกา: ทุกคอร์สที่ประกาศ syllabus-preview คูณทุกภาษาที่มันประกาศไว้
-    // เกตจึงยังจับคอร์ส internal ที่หลุดออกสาธารณะได้ แม้ catalog จะโตขึ้น
-    const expected = listPublicCourseSlugs().flatMap((slug) =>
-      (getCourseStructure(slug)?.availableLocales ?? []).map((locale) => ({ slug, locale })),
-    )
-    expect(expected.length).toBeGreaterThan(0)
-    expect(generateStaticParams()).toEqual(expected)
+  beforeEach(() => {
+    mocks.getVisiblePublicCourse.mockImplementation(async (slug: string, locale?: 'en' | 'th') => {
+      const course = getCourse(slug, locale)
+      return course?.structure.publicAvailability === 'syllabus-preview' ? course : null
+    })
+  })
+
+  it('resolves public course visibility at request time', () => {
+    expect(dynamic).toBe('force-dynamic')
   })
 
   it('uses the path locale for canonical, language, and share metadata', async () => {
@@ -35,36 +39,36 @@ describe('public course route', () => {
     )
   })
 
-  it('canonicalizes legacy locales without retaining lang while keeping other query fields', () => {
+  it('canonicalizes legacy locales without retaining lang while keeping other query fields', async () => {
     expect(
-      legacyCourseRedirectPath({
+      await legacyCourseRedirectPath({
         slug: 'basic-os-linux',
         searchParams: { lang: 'th', utm_source: 'newsletter', utm_medium: ['email', 'follow-up'] },
       }),
     ).toBe('/courses/basic-os-linux/th?utm_source=newsletter&utm_medium=email&utm_medium=follow-up')
     expect(
-      legacyCourseRedirectPath({
+      await legacyCourseRedirectPath({
         slug: 'basic-os-linux',
         searchParams: { lang: ['th', 'en'] },
       }),
     ).toBe('/courses/basic-os-linux/en')
     expect(
-      legacyCourseRedirectPath({
+      await legacyCourseRedirectPath({
         slug: 'basic-os-linux',
         searchParams: { lang: 'de' },
       }),
     ).toBe('/courses/basic-os-linux/en')
   })
 
-  it('returns null for an internal or unknown legacy course', () => {
+  it('returns null for an internal or unknown legacy course', async () => {
     expect(
-      legacyCourseRedirectPath({
+      await legacyCourseRedirectPath({
         slug: 'content-formats-demo',
         searchParams: { lang: 'en' },
       }),
     ).toBeNull()
     expect(
-      legacyCourseRedirectPath({
+      await legacyCourseRedirectPath({
         slug: 'missing-course',
         searchParams: {},
       }),

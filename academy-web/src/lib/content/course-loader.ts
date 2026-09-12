@@ -4,6 +4,7 @@ import type { CourseCopy, CourseStructure, LessonContent } from './course-types'
 import { isSafeContentUrl, isSafeExternalContentUrl } from './content-url-policy'
 import { placeholdersIn } from '@/lib/simulation/variables'
 import { SIMULATION_SURFACE_INPUT_FIELDS } from '@/lib/simulation/types'
+import { privateMediaByLegacyPath } from '@/lib/media/registry'
 
 // Validation ของโครงคอร์ส — นอกจากชนิดข้อมูล ต้องกันความพังเชิงความหมายที่ทำให้
 // ผู้เรียนติดตาย: prerequisite ชี้ node ที่ไม่มี, กราฟวน (deadlock ถาวร),
@@ -129,6 +130,16 @@ export function loadCourseStructure(file: string, data: unknown): CourseStructur
   for (const node of structure.nodes) {
     if (ids.has(node.id)) throw new ContentValidationError(file, `node id ซ้ำ: ${node.id}`)
     ids.add(node.id)
+    const mediaReferences = [node.video?.src,
+      ...(node.video?.audio ?? []).map((track) => track.src),
+      ...(node.video?.captions ?? []).map((track) => track.src),
+    ].filter((reference): reference is string => reference !== undefined)
+    for (const reference of mediaReferences) {
+      const asset = privateMediaByLegacyPath(reference)
+      if (!asset || asset.courseSlug !== structure.slug || asset.nodeId !== node.id) {
+        throw new ContentValidationError(file, `node ${node.id}: video media must belong to this course and node in the private media registry`)
+      }
+    }
   }
 
   const skillIds = new Set(structure.skills.map((s) => s.id))

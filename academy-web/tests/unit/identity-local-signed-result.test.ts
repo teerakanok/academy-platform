@@ -40,6 +40,8 @@ function base64Url(value: Uint8Array): string {
 
 function resultFor(overrides: ResultOverrides = {}) {
   return {
+    version: 2 as const,
+    authentication: { method: 'webauthn_uv' as const, auth_time: Math.floor(Date.now() / 1_000) },
     issuer: overrides.issuer ?? PRINCIPAL_ISSUER,
     subject: 'learner-1',
     verifiedEmail: 'learner@example.test',
@@ -106,7 +108,7 @@ describe('Academy local signed Identity Control results', () => {
     const headerPart = base64Url(encoder.encode(JSON.stringify({
       alg: 'ES256',
       kid: overrides.keyId ?? KEY_ID,
-      typ: 'identity-code-exchange-result+jwt',
+      typ: 'identity-code-exchange-result-v2+jwt',
     })))
     const claimsPart = base64Url(encoder.encode(JSON.stringify({
       aud: overrides.audience ?? AUDIENCE,
@@ -166,7 +168,7 @@ describe('Academy local signed Identity Control results', () => {
       const headerPart = base64Url(encoder.encode(JSON.stringify({
         alg: 'none',
         kid: KEY_ID,
-        typ: 'identity-code-exchange-result+jwt',
+        typ: 'identity-code-exchange-result-v2+jwt',
       })))
       return { signedResult: `${headerPart}.${claimsPart}.${signaturePart}` }
     }],
@@ -176,7 +178,7 @@ describe('Academy local signed Identity Control results', () => {
       const headerPart = base64Url(encoder.encode(JSON.stringify({
         alg: 'HS256',
         kid: KEY_ID,
-        typ: 'identity-code-exchange-result+jwt',
+        typ: 'identity-code-exchange-result-v2+jwt',
       })))
       return { signedResult: `${headerPart}.${claimsPart}.${signaturePart}` }
     }],

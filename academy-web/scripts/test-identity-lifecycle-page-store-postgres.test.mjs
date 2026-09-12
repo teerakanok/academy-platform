@@ -8,6 +8,7 @@ import {
   createDockerInvoker,
   installTerminationHandlers,
   inspectPinnedPostgresImage,
+  probeFinalPostgresServer,
   verifyOwnedDisposablePostgresInspection,
 } from './test-identity-lifecycle-page-store-postgres.mjs'
 
@@ -97,6 +98,34 @@ describe('disposable PostgreSQL Docker authority', () => {
     assert.equal(args.includes(pinnedImage), false)
     assert.equal(args.includes('postgres:17.5'), false)
     assert.equal(args.filter((value) => value === '--pull').length, 1)
+  })
+
+  test('accepts only the final TCP listener after an exact target database round trip', () => {
+    const calls = []
+    const invoke = (args, options) => {
+      calls.push({ args, options })
+      if (args[2] === 'pg_isready') return result(0)
+      return result(0, '', 'academy_identity_lifecycle_test|academy_identity_lifecycle_test\n')
+    }
+    const environment = {
+      POSTGRES_DB: 'academy_identity_lifecycle_test',
+      POSTGRES_USER: 'academy_identity_lifecycle_test',
+      POSTGRES_PASSWORD: 'ephemeral',
+    }
+
+    assert.equal(probeFinalPostgresServer(invoke, 'owned-postgres', environment), true)
+    assert.deepEqual(calls.map(({ args }) => args), [
+      ['exec', 'owned-postgres', 'pg_isready', '--host', '127.0.0.1',
+        '--username', 'academy_identity_lifecycle_test', '--dbname', 'academy_identity_lifecycle_test'],
+      ['exec', 'owned-postgres', 'psql', '--host', '127.0.0.1',
+        '--username', 'academy_identity_lifecycle_test', '--dbname', 'academy_identity_lifecycle_test',
+        '--tuples-only', '--no-align', '--command', 'select current_database(), current_user'],
+    ])
+    assert.equal(calls.every(({ options }) => options.env === environment), true)
+
+    assert.equal(probeFinalPostgresServer((args) => args[2] === 'pg_isready'
+      ? result(0)
+      : result(0, '', 'wrong_database|wrong_user\n'), 'owned-postgres', environment), false)
   })
 
   test('rejects every ambient Docker, TLS, context, config, and Compose authority', () => {

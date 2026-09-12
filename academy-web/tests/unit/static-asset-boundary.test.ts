@@ -26,7 +26,7 @@ describe('deployed static-asset boundary', () => {
     const wrangler = readFileSync('wrangler.jsonc', 'utf8')
     const buildScript = readFileSync('scripts/build-cloudflare.sh', 'utf8')
 
-    expect(wrangler).toContain('"run_worker_first": ["/media/*"]')
+    expect(wrangler).toContain('"run_worker_first": true')
     expect(buildScript).toContain('asset-guard')
   })
 

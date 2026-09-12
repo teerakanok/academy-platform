@@ -13,7 +13,7 @@
 | @opennextjs/cloudflare | `^1.20.2` | 1.20.2 | adapter รัน Next.js บน Cloudflare Workers (ยังเป็นตัวเลือก — ดู reports/reviews) |
 | @supabase/ssr | `^0.12.4` | 0.12.4 | session ผ่าน cookie ฝั่ง server (M3 auth) |
 | @supabase/supabase-js | `^2.111.0` | 2.111.0 | DB client (server-only, service role) |
-| next | `^15.5.22` | 15.5.22 | framework (App Router) |
+| next | `15.5.24` | 15.5.24 | framework (App Router) |
 | react | `^18.3.1` | 18.3.1 | UI runtime |
 | react-dom | `^18.3.1` | 18.3.1 | UI runtime (DOM) |
 | server-only | `^0.0.1` | 0.0.1 | ทำให้ build **แดง** ถ้าโมดูลที่ถือเฉลยถูก import จาก client component (W0-1) — ไม่มี transitive dependency |
@@ -34,10 +34,10 @@
 | autoprefixer | `^10.5.4` | 10.5.4 | CSS postprocess |
 | @cloudflare/workers-types | `^5.20260801.1` | 5.20260801.1 | types ของ workerd สำหรับ worker.ts (cron) — ใช้เฉพาะตอน typecheck |
 | eslint | `^9.39.5` | 9.39.5 | linter |
-| eslint-config-next | `^15.5.22` | 15.5.22 | lint rules ของ Next |
+| eslint-config-next | `15.5.24` | 15.5.24 | lint rules ของ Next |
 | pg | `^8.22.0` | 8.22.0 | Postgres client สำหรับ RLS hardening tests |
 | postcss | `^8.5.25` | 8.5.26 | CSS pipeline |
 | supabase | `^2.111.0` | 2.111.0 | Supabase CLI (local stack + migrations) — ตรึงใน lockfile |
 | tailwindcss | `^3.4.19` | 3.4.19 | utility CSS (ตรึงตาม cyberskills-web) |
 | typescript | `^5.9.3` | 5.9.3 | type checker |
-| vitest | `^3.2.7` | 3.2.7 | unit/integration runner |
+| vitest | `4.1.11` | 4.1.11 | unit/integration runner |

@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto'
 import { readdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest'
@@ -84,6 +85,16 @@ async function activate(
   email: string,
   revision = 1,
 ): Promise<string> {
+  await admin.query(`insert into academy.identity_lifecycle_consumer_checkpoint (
+    consumer_id, cursor_sequence, approved_config_revision, configuration_health,
+    observed_config_revision
+  ) values ('academy-web', null, 1, 'ready', null)
+  on conflict (consumer_id) do nothing`)
+  await admin.query(`insert into academy.identity_lifecycle_projection (
+    consumer_id, issuer, subject_key, state, revision, health,
+    highest_known_revision, observed_state, observed_revision, conflict_reason
+  ) values ('academy-web', $1, $2, 'active', 1, 'ready', 1, null, null, null)
+  on conflict (consumer_id, issuer, subject_key) do nothing`, [ISSUER, subjectKey(subject)])
   const result = await admin.query(`select academy.commit_identity_profile_activation(
     $1, $2, $3, 'active', $4
   ) as account_id`, [ISSUER, subject, email, revision])
@@ -151,7 +162,10 @@ beforeAll(async () => {
   const bootstrap = roles + '\n' + bootstrapPaths.map((file) =>
     readFileSync(join(process.cwd(), file), 'utf8')
       .replace(/^\s*(?:begin|commit);\s*$/gmi, ''),
-  ).join('\n')
+  ).join('\n') + '\nalter schema academy owner to postgres;'
+  // Production migrations run with the postgres schema owner. The disposable
+  // harness uses its own login; mirror schema ownership for the postgres-owned
+  // certificate/settings FK triggers without widening academy_runtime privileges.
   await admin.query('BEGIN;\n' + bootstrap + '\nROLLBACK;')
   await admin.query('BEGIN;\n' + bootstrap + '\nCOMMIT;')
 })
@@ -159,6 +173,8 @@ beforeAll(async () => {
 afterEach(async () => {
   await admin.query('delete from academy.course_entitlement_audit')
   await admin.query(`truncate table academy.identity_session,
+    academy.identity_authorization_transaction,
+    academy.identity_lifecycle_authorization_fences,
     academy.identity_lifecycle_projection,
     academy.identity_lifecycle_consumer_checkpoint,
     academy.identity_lifecycle_pull_leases, academy.users cascade`)
@@ -258,7 +274,7 @@ describe('Academy Identity lifecycle runtime enforcement', () => {
     const runtime = new Client({ connectionString: databaseUrl })
     await runtime.connect()
     try {
-      await commitUnderLease(null, 'runtime-effective', [
+      await commitUnderLease(null, '1', [
         readyProjection('runtime-effective-subject', 'active', 1),
         readyProjection('runtime-canonical-subject', 'active', 1),
       ])
@@ -576,5 +592,259 @@ describe('Academy Identity lifecycle runtime enforcement', () => {
       await lifecycle.query('rollback').catch(() => undefined)
       await Promise.all([lifecycle.end(), callback.end()])
     }
+  })
+})
+
+
+describe('Academy v2 assurance and authoritative session lifetime', () => {
+  const bearer = 'V'.repeat(43)
+  const digest = createHash('sha256').update(bearer).digest('base64url')
+  const subject = 'assurance-session-fixture'
+  const email = 'assurance-session@example.test'
+  async function createV2(client = admin, authTime?: number) {
+    if (authTime === undefined) {
+      const clock = await admin.query('select floor(extract(epoch from clock_timestamp()))::bigint as now')
+      authTime = Number(clock.rows[0].now)
+    }
+    const result = await client.query(`select academy.create_identity_session_digest_v2(
+      $1,$2,$3,$4,'active',1,43200,$5::bigint) as result`,
+    [digest, ISSUER, subjectKey(subject), email, authTime])
+    return result.rows[0].result
+  }
+  async function read(client = admin) {
+    return (await client.query('select academy.read_identity_session_digest($1) as result', [digest])).rows[0].result
+  }
+  it('persists exact verified seconds and limits a v2 session to twelve hours', async () => {
+    await activate(subject, email)
+    const now = Number((await admin.query('select floor(extract(epoch from clock_timestamp()))::bigint as now')).rows[0].now)
+    const created = await createV2(admin, now - 300)
+    expect(created.session.claims.authentication).toEqual({ method: 'webauthn_uv', auth_time: now - 300 })
+    expect(Date.parse(created.session.claims.expiresAt) - Date.parse(created.session.claims.createdAt)).toBe(43_200_000)
+    expect((await read()).session.claims.authentication).toEqual(created.session.claims.authentication)
+  })
+  it('rejects stale authentication atomically without leaving a usable inserted session', async () => {
+    await activate(subject, email)
+    await expect(createV2(admin, 1)).rejects.toThrow(/fresh identity authentication/)
+    expect(await countSessions(subject)).toBe(0)
+  })
+  it('returns explicit legacy unknown without inventing historical authentication', async () => {
+    await activate(subject, email)
+    await createSession(bearer, subject, email)
+    expect((await read()).session.claims.authentication).toEqual({ method: 'legacy_unknown' })
+  })
+  it.each(['idle', 'absolute'] as const)('never resurrects an expired %s session', async (kind) => {
+    await activate(subject, email)
+    await createV2()
+    if (kind === 'idle') {
+      await admin.query(`update academy.identity_session set created_at = clock_timestamp() - interval '31 minutes',
+        last_seen_at = clock_timestamp() - interval '30 minutes' where id = $1`, [digest])
+    } else {
+      await admin.query(`update academy.identity_session set created_at = clock_timestamp() - interval '12 hours',
+        last_seen_at = clock_timestamp() where id = $1`, [digest])
+    }
+    expect(await read()).toEqual({ status: 'expired' })
+    expect(await read()).toEqual({ status: 'unknown' })
+  })
+  it('touches active activity while preserving the absolute ceiling and authentication', async () => {
+    await activate(subject, email)
+    await createV2()
+    await admin.query(`update academy.identity_session set created_at = clock_timestamp() - interval '20 minutes',
+      last_seen_at = clock_timestamp() - interval '10 minutes' where id = $1`, [digest])
+    const before = (await admin.query('select expires_at, authentication_time, last_seen_at from academy.identity_session where id=$1', [digest])).rows[0]
+    expect((await read()).status).toBe('active')
+    const after = (await admin.query('select expires_at, authentication_time, last_seen_at from academy.identity_session where id=$1', [digest])).rows[0]
+    expect(after.expires_at).toEqual(before.expires_at)
+    expect(after.authentication_time).toBe(before.authentication_time)
+    expect(after.last_seen_at.getTime()).toBeGreaterThan(before.last_seen_at.getTime())
+  })
+  it('does not record activity when the durable projection is unhealthy', async () => {
+    await activate(subject, email)
+    await createV2()
+    const before = (await admin.query('select last_seen_at from academy.identity_session where id=$1', [digest])).rows[0].last_seen_at
+    await admin.query(`update academy.identity_lifecycle_consumer_checkpoint set configuration_health='config_revision_changed',
+      observed_config_revision=2 where consumer_id='academy-web'`)
+    expect(await read()).toEqual({ status: 'unknown' })
+    const after = (await admin.query('select last_seen_at from academy.identity_session where id=$1', [digest])).rows[0].last_seen_at
+    expect(after).toEqual(before)
+  })
+  it('rechecks idle expiry after waiting for the principal lock', async () => {
+    await activate(subject, email)
+    await createV2()
+    const blocker = new Client({ connectionString: databaseUrl })
+    const reader = new Client({ connectionString: databaseUrl })
+    await blocker.connect(); await reader.connect()
+    try {
+      const blockerPid = (await blocker.query('select pg_backend_pid() as pid')).rows[0].pid
+      const readerPid = (await reader.query('select pg_backend_pid() as pid')).rows[0].pid
+      await blocker.query('begin')
+      await blocker.query('select pg_advisory_xact_lock(hashtextextended(jsonb_build_array($1::text,$2::text)::text,0))', [ISSUER, subjectKey(subject)])
+      const pending = read(reader)
+        .then((value) => ({ value }), (error: unknown) => ({ error }))
+      let blocked = false
+      for (let attempt = 0; attempt < 100 && !blocked; attempt += 1) {
+        blocked = (await admin.query(
+          'select $1::int = any(pg_blocking_pids($2::int)) as blocked',
+          [blockerPid, readerPid],
+        )).rows[0]?.blocked === true
+        if (!blocked) await new Promise((resolve) => setTimeout(resolve, 10))
+      }
+      expect(blocked).toBe(true)
+      await blocker.query(`update academy.identity_session set created_at=clock_timestamp()-interval '31 minutes',
+        last_seen_at=clock_timestamp()-interval '30 minutes' where id=$1`, [digest])
+      await blocker.query('commit')
+      const settled = await pending
+      if ('error' in settled) throw settled.error
+      expect(settled.value).toEqual({ status: 'expired' })
+    } finally { await blocker.query('rollback'); await blocker.end(); await reader.end() }
+  })
+  async function checkpointFixture() {
+    const state = 'S'.repeat(43), binding = 'B'.repeat(43), claim = 'C'.repeat(43)
+    const now = Number((await admin.query('select floor(extract(epoch from clock_timestamp()))::bigint as now')).rows[0].now)
+    await admin.query(`select academy.create_identity_authorization_transaction(
+      $1,$2,$3,$4,'academy-web','https://academy.example.test/auth/callback','academy',
+      'https://academy.example.test',$5,'https://accounts.example.test/v1/code/exchange','/dashboard',600)`,
+    [state, 'P'.repeat(43), 'N'.repeat(43), binding, ISSUER])
+    await admin.query(`select academy.claim_identity_authorization_transaction_digest($1,$2,$3,$4,60)`, [state,binding,claim,digest])
+    const response = await admin.query(`select academy.checkpoint_identity_authorization_exchange_v2(
+      $1,$2,$3,$4,$5,'active',1,$6::bigint) as result`, [state,claim,ISSUER,subject,email,now-300])
+    expect(response.rows[0].result).toEqual({ status: 'checkpointed' })
+    return { state, binding, claim, authTime: now-300 }
+  }
+  it('preserves auth_time on checkpoint retry and refuses replacing it with a newer time', async () => {
+    const fixture = await checkpointFixture()
+    const mismatch = await admin.query(`select academy.checkpoint_identity_authorization_exchange_v2(
+      $1,$2,$3,$4,$5,'active',1,$6::bigint) as result`,
+    [fixture.state,fixture.claim,ISSUER,subject,email,fixture.authTime+1])
+    expect(mismatch.rows[0].result).toEqual({ status: 'result_mismatch' })
+    await admin.query(`select academy.release_identity_authorization_transaction_claim($1,$2,'profile_activation')`, [fixture.state, fixture.claim])
+    const resumed = await admin.query(`select academy.claim_identity_authorization_transaction_digest($1,$2,$3,$4,60) as result`,
+      [fixture.state,fixture.binding,fixture.claim,digest])
+    expect(resumed.rows[0].result.exchangeResult.authentication).toEqual({ method: 'webauthn_uv', auth_time: fixture.authTime })
+    expect(resumed.rows[0].result.exchangeResult.version).toBe(2)
+  })
+  it('requires explicit reauthentication for stale or legacy checkpoint resume', async () => {
+    const fixture = await checkpointFixture()
+    for (const oldTime of [1, null]) {
+      await admin.query('update academy.identity_authorization_transaction set result_authentication_time=$2 where state=$1', [fixture.state,oldTime])
+      const resumed = await admin.query(`select academy.claim_identity_authorization_transaction_digest($1,$2,$3,$4,60) as result`,
+        [fixture.state,fixture.binding,fixture.claim,digest])
+      expect(resumed.rows[0].result).toEqual({ status: 'reauthentication_required' })
+    }
+  })
+  it('atomically finalizes only the exact checkpoint authentication and a usable session', async () => {
+    const accountId = await activate(subject, email)
+    const fixture = await checkpointFixture()
+    await createV2(admin, fixture.authTime)
+    const completed = await admin.query(`select academy.finalize_identity_authorization_transaction_digest($1,$2,$3,$4,$5) as result`,
+      [fixture.state,fixture.claim,accountId,digest,subjectKey(subject)])
+    expect(completed.rows[0].result).toEqual({ status: 'completed' })
+  })
+  it('refuses a validly shaped subject key which is not bound to the checkpoint result subject', async () => {
+    const accountId = await activate(subject, email)
+    const fixture = await checkpointFixture()
+    await createV2(admin, fixture.authTime)
+    const completed = await admin.query(`select academy.finalize_identity_authorization_transaction_digest($1,$2,$3,$4,$5) as result`,
+      [fixture.state, fixture.claim, accountId, digest, subjectKey('different-subject')])
+    expect(completed.rows[0].result).toEqual({ status: 'result_mismatch' })
+    expect((await admin.query('select completed_at from academy.identity_authorization_transaction where state=$1', [fixture.state])).rows[0].completed_at).toBeNull()
+  })
+  it('refuses stale checkpoint finalization while leaving its timestamp unchanged', async () => {
+    const accountId = await activate(subject, email)
+    const fixture = await checkpointFixture()
+    await createV2(admin, fixture.authTime)
+    await admin.query('update academy.identity_authorization_transaction set result_authentication_time=1 where state=$1', [fixture.state])
+    const completed = await admin.query(`select academy.finalize_identity_authorization_transaction_digest($1,$2,$3,$4,$5) as result`,
+      [fixture.state,fixture.claim,accountId,digest,subjectKey(subject)])
+    expect(completed.rows[0].result).toEqual({ status: 'reauthentication_required' })
+    const stored = (await admin.query('select result_authentication_time,completed_at from academy.identity_authorization_transaction where state=$1', [fixture.state])).rows[0]
+    expect(stored).toEqual({ result_authentication_time: '1', completed_at: null })
+  })
+  it('rejects a UV session row with null authentication time as a table invariant', async () => {
+    await activate(subject,email); await createV2()
+    await expect(admin.query('update academy.identity_session set authentication_time=null where id=$1',[digest])).rejects.toThrow(/identity_session_authentication_check/)
+  })
+  it('peeks without recording authenticated activity and fails closed on expiry', async () => {
+    await activate(subject, email); await createV2()
+    await admin.query("update academy.identity_session set last_seen_at=clock_timestamp()-interval '10 minutes' where id=$1", [digest])
+    const before=(await admin.query('select last_seen_at from academy.identity_session where id=$1',[digest])).rows[0].last_seen_at
+    expect((await admin.query('select academy.peek_identity_session_digest($1) as result',[digest])).rows[0].result.status).toBe('active')
+    expect((await admin.query('select last_seen_at from academy.identity_session where id=$1',[digest])).rows[0].last_seen_at).toEqual(before)
+    await admin.query("update academy.identity_session set last_seen_at=clock_timestamp()-interval '30 minutes' where id=$1",[digest])
+    expect((await admin.query('select academy.peek_identity_session_digest($1) as result',[digest])).rows[0].result).toEqual({status:'expired'})
+  })
+  it('does not finalize a session which expires while waiting for its row lock', async () => {
+    const accountId=await activate(subject,email), fixture=await checkpointFixture()
+    await createV2(admin,fixture.authTime)
+    const blocker=new Client({connectionString:databaseUrl}), finalizer=new Client({connectionString:databaseUrl})
+    await blocker.connect(); await finalizer.connect()
+    try {
+      await blocker.query('begin')
+      await blocker.query('select id from academy.identity_session where id=$1 for update',[digest])
+      const pid=(await finalizer.query('select pg_backend_pid() as pid')).rows[0].pid
+      const pending=finalizer.query('select academy.finalize_identity_authorization_transaction_digest($1,$2,$3,$4,$5) as result',
+        [fixture.state,fixture.claim,accountId,digest,subjectKey(subject)])
+        .then((value) => ({ value }), (error: unknown) => ({ error }))
+      let waiting=false
+      for(let n=0;n<100&&!waiting;n++) {
+        waiting=(await admin.query('select wait_event_type from pg_stat_activity where pid=$1',[pid])).rows[0]?.wait_event_type==='Lock'
+        if(!waiting) await new Promise(r=>setTimeout(r,10))
+      }
+      expect(waiting).toBe(true)
+      await blocker.query("update academy.identity_session set created_at=clock_timestamp()-interval '2 seconds', expires_at=clock_timestamp()-interval '1 second' where id=$1",[digest])
+      await blocker.query('commit')
+      const settled = await pending
+      if ('error' in settled) throw settled.error
+      expect(settled.value.rows[0].result).toEqual({status:'session_mismatch'})
+      expect((await admin.query('select completed_at from academy.identity_authorization_transaction where state=$1',[fixture.state])).rows[0].completed_at).toBeNull()
+    } finally { await blocker.query('rollback'); await blocker.end(); await finalizer.end() }
+  })
+  it('denies runtime legacy creation/checkpoint while permitting the exact v2 RPC', async () => {
+    await activate(subject, email)
+    const runtime = new Client({ connectionString: databaseUrl }); await runtime.connect()
+    try {
+      await runtime.query('set role academy_runtime')
+      await expect(createSession(bearer, subject, email, 1, runtime)).rejects.toThrow(/permission denied/)
+      expect((await createV2(runtime)).status).toBe('created')
+      const privileges = await runtime.query(`select
+        has_function_privilege(current_user,'academy.checkpoint_identity_authorization_exchange(text,text,text,text,text,text,bigint)','execute') as legacy,
+        has_function_privilege(current_user,'academy.checkpoint_identity_authorization_exchange_v2(text,text,text,text,text,text,bigint,bigint)','execute') as v2`)
+      expect(privileges.rows[0]).toEqual({ legacy: false, v2: true })
+    } finally { await runtime.end() }
+  })
+})
+
+describe('attempt recovery remains bound to the same owner and attempt', () => {
+  const attemptId='a844e5f5-9f60-46dc-9cf9-a2c5d6d41521'
+  async function fixture() {
+    const account=await activate('attempt-recovery-owner','attempt-recovery@example.test')
+    await admin.query(`insert into academy.attempt(attempt_id,user_id,course_slug,node_id,challenge_id,params,challenge_version,expires_at)
+      values($1,$2,'fixture-course','fixture-node','checkpoint','{"private":"fixture"}', 'v1',clock_timestamp()+interval '60 minutes')`,[attemptId,account])
+    return account
+  }
+  async function inspect(account:string,slug='fixture-course',node='fixture-node') {
+    return (await admin.query('select academy.inspect_attempt_reauthentication($1,$2,$3,$4) as result',[attemptId,account,slug,node])).rows[0].result
+  }
+  it('reads exact active ownership without changing expiry, parameters or consumption',async()=>{
+    const account=await fixture()
+    const before=(await admin.query('select * from academy.attempt where attempt_id=$1',[attemptId])).rows[0]
+    expect(await inspect(account)).toBe('active')
+    expect((await admin.query('select * from academy.attempt where attempt_id=$1',[attemptId])).rows[0]).toEqual(before)
+  })
+  it('does not leak availability to another account, course, node or progress epoch',async()=>{
+    const account=await fixture(), other=await activate('attempt-recovery-other','attempt-other@example.test')
+    expect(await inspect(other)).toBe('invalid');expect(await inspect(account,'wrong-course')).toBe('invalid');expect(await inspect(account,'fixture-course','wrong-node')).toBe('invalid')
+    await admin.query("insert into academy.course_progress_epoch(user_id,course_slug,epoch) values($1,'fixture-course',1)",[account])
+    expect(await inspect(account)).toBe('invalid')
+  })
+  it('reconciles completed and in-flight work without extending a sixty minute attempt',async()=>{
+    const account=await fixture()
+    await admin.query("update academy.attempt set claim_token='11111111-1111-4111-8111-111111111111',consumed_at=clock_timestamp() where attempt_id=$1",[attemptId])
+    expect(await inspect(account)).toBe('pending')
+    await admin.query("update academy.attempt set consumed_at=clock_timestamp()-interval '31 seconds' where attempt_id=$1",[attemptId])
+    expect(await inspect(account)).toBe('active')
+    await admin.query("update academy.attempt set expires_at=clock_timestamp()-interval '1 second' where attempt_id=$1",[attemptId])
+    expect(await inspect(account)).toBe('invalid')
+    await admin.query("update academy.attempt set outcome='{}'::jsonb where attempt_id=$1",[attemptId])
+    expect(await inspect(account)).toBe('completed')
   })
 })

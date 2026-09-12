@@ -47,6 +47,7 @@ export async function authClient() {
 }
 
 export interface SessionUser {
+  authentication?: IdentitySessionAssurance
   account: AcademyUser
   /** อีเมลที่ issuer ยืนยัน — ใช้แสดงผล ไม่ใช่ตัวตน */
   email: string
@@ -58,13 +59,16 @@ export async function resolveIdentitySessionUser({
   sessionId,
   sessionStore,
   resolveAccount = findActiveUser,
+  recordActivity = true,
 }: {
   sessionId: string
-  sessionStore: Pick<IdentityDurableSessionPort, 'get'>
+  sessionStore: Pick<IdentityDurableSessionPort, 'get' | 'peek'>
+  recordActivity?: boolean
   resolveAccount?: IdentityAccountResolver
 }): Promise<SessionUser | null> {
   try {
-    const claims = await sessionStore.get(sessionId)
+    if (!recordActivity && typeof sessionStore.peek !== 'function') return null
+    const claims = recordActivity ? await sessionStore.get(sessionId) : await sessionStore.peek!(sessionId)
     if (!claims) return null
     const account = await resolveAccount({
       issuer: claims.issuer,
@@ -72,7 +76,7 @@ export async function resolveIdentitySessionUser({
       email: claims.verifiedEmail,
     })
     if (!account) return null
-    return { account, email: account.email }
+    return { account, email: account.email, authentication: snapshotIdentitySessionAssurance(claims.authentication) ?? { method: 'legacy_unknown' } }
   } catch {
     return null
   }
@@ -88,13 +92,13 @@ export async function resolveIdentitySessionUser({
  * ออกใบรับรอง (และในอนาคตคือ certification) ใบรับรองที่ออกให้อีเมลที่ไม่เคยยืนยัน
  * คือใบที่อ้างถึงคนที่เราไม่รู้ว่ามีตัวตนจริงไหม
  */
-export async function currentUser(): Promise<SessionUser | null> {
+export async function currentUser({ recordActivity = true }: { recordActivity?: boolean } = {}): Promise<SessionUser | null> {
   const requestHeaders = await headers()
   const sessionId = parseAcademySessionCookie(requestHeaders.get('cookie'))
   if (sessionId) {
     const sessionStore = createAcademyIdentityProductionSessionStore()
     if (!sessionStore) return null
-    return resolveIdentitySessionUser({ sessionId, sessionStore })
+    return resolveIdentitySessionUser({ sessionId, sessionStore, recordActivity })
   }
 
   // Direct GoTrue sessions are retained only for the explicit local fixture.
@@ -114,10 +118,11 @@ export async function currentUser(): Promise<SessionUser | null> {
     email,
   })
   if (!account) return null
-  return { account, email: account.email }
+  return { account, email: account.email, authentication: { method: 'legacy_unknown' } }
 }
 
 export async function signOut(): Promise<void> {
   const supabase = await authClient()
   await supabase.auth.signOut()
 }
+import { type IdentitySessionAssurance, snapshotIdentitySessionAssurance } from '@/lib/identity/authentication-assurance'

@@ -1,76 +1,262 @@
-// อ่าน request body แบบมีเพดาน — **หยุดอ่านทันทีที่เกิน** ไม่ใช่อ่านจบแล้วค่อยบ่น
-//
-// ทำไมไม่ใช้ `request.text()` / `request.arrayBuffer()` แล้วค่อยวัด: สองตัวนั้น
-// buffer ทั้ง body จน EOF ก่อนคืนค่า แปลว่าเราจ่ายค่า memory ไปครบแล้วก่อนจะได้
-// ปฏิเสธ · ผู้ใช้ที่ล็อกอินส่ง chunked body ขนาดมหาศาลได้ และบน Cloudflare Workers
-// การ buffer payload ใหญ่ชน memory limit ได้จริง (RIL cross-model รอบ 3 ชี้)
-//
-// และต้องวัดเป็น **byte** ไม่ใช่ `String.length` — String.length นับ UTF-16 code unit
-// ซึ่งอักษรไทยหนึ่งตัว = 1 หน่วยแต่กิน 3 byte จริง (RIL รอบ 2 พิสูจน์ว่าทะลุได้)
-
 export type BoundedBody = { ok: true; text: string } | { ok: false; reason: 'too-large' }
 
 export type BoundedJson =
   | { ok: true; value: unknown }
   | { ok: false; reason: 'too-large' | 'invalid-json' | 'read-error' }
 
-export async function readBoundedBody(request: Request, maxBytes: number): Promise<BoundedBody> {
-  const body = request.body
-
-  // ปฏิเสธเร็วจาก Content-Length ถ้าประกาศมาเกิน — แต่ **ห้ามเชื่อเป็น guard เดียว**
-  // เพราะ header ปลอมได้และ chunked body ไม่มี header นี้
-  //
-  // ⚠️ ต้อง cancel body ด้วย ไม่ใช่ return เฉยๆ — ไม่งั้นฝั่งที่ส่งยังถูกปล่อยให้
-  // ส่งต่อและ underlying source ไม่เคยรู้ว่าเราเลิกสนใจแล้ว
-  const declared = Number(request.headers.get('content-length'))
-  if (Number.isFinite(declared) && declared > maxBytes) {
-    await body?.cancel().catch(() => {})
-    return { ok: false, reason: 'too-large' }
-  }
-
-  if (!body) return { ok: true, text: '' }
-
-  const reader = body.getReader()
-  const chunks: Uint8Array[] = []
-  let total = 0
-
-  try {
-    while (true) {
-      const { done, value } = await reader.read()
-      if (done) break
-      if (!value) continue
-      total += value.byteLength
-      if (total > maxBytes) {
-        // ตัดสายทันที — ไม่อ่านส่วนที่เหลือและทิ้งสิ่งที่อ่านมาแล้ว
-        await reader.cancel().catch(() => {})
-        return { ok: false, reason: 'too-large' }
-      }
-      chunks.push(value)
-    }
-  } finally {
-    // `cancel()` ไม่ปล่อย lock ให้เองตาม spec ของ Streams — ถ้าไม่ปล่อย
-    // `request.body.locked` จะค้างเป็น true ตลอดอายุของ request
-    try {
-      reader.releaseLock()
-    } catch {
-      // มี read ค้างอยู่ในบางเส้นทาง — ปล่อยผ่าน สิ่งที่ต้องการคือไม่ถือ lock ไว้เฉยๆ
-    }
-  }
-
-  const merged = new Uint8Array(total)
-  let offset = 0
-  for (const chunk of chunks) {
-    merged.set(chunk, offset)
-    offset += chunk.byteLength
-  }
-  return { ok: true, text: new TextDecoder().decode(merged) }
+export interface BoundedBodyOptions {
+  timeoutMs?: number
 }
 
-/** อ่านและ parse JSON โดยไม่เปิดทางให้ request.json() buffer payload แบบไร้เพดาน */
-export async function readBoundedJson(request: Request, maxBytes: number): Promise<BoundedJson> {
+interface BoundedBodyPlan {
+  maxBytes: number
+  timeoutMs: number
+}
+
+type BodyDeadline = {
+  at: number
+  expiration: Promise<never>
+  cleanup(): void
+}
+
+const DEFAULT_BODY_TIMEOUT_MS = 5_000
+const MAX_BODY_BYTES = 1024 * 1024
+const MAX_BODY_READS = 4_096
+
+function validBytes(value: number): boolean {
+  return Number.isSafeInteger(value) && value > 0 && value <= MAX_BODY_BYTES
+}
+
+function invalidBounds(): RangeError {
+  return new RangeError('Invalid bounded body bounds')
+}
+
+function timeoutError(): DOMException {
+  return new DOMException('Request body deadline exceeded', 'TimeoutError')
+}
+
+function planBoundedBody(
+  maxBytes: number,
+  options: BoundedBodyOptions = {},
+): BoundedBodyPlan {
+  if (!validBytes(maxBytes)) throw invalidBounds()
+  const requestedTimeoutMs = options.timeoutMs ?? DEFAULT_BODY_TIMEOUT_MS
+  if (typeof requestedTimeoutMs !== 'number'
+    || !Number.isSafeInteger(requestedTimeoutMs)
+    || requestedTimeoutMs <= 0
+    || requestedTimeoutMs > DEFAULT_BODY_TIMEOUT_MS) {
+    throw invalidBounds()
+  }
+  return {
+    maxBytes,
+    timeoutMs: requestedTimeoutMs,
+  }
+}
+
+function createBodyDeadline(
+  signal: AbortSignal,
+  timeoutMs: number,
+): BodyDeadline {
+  let rejectExpiration: (reason?: unknown) => void = () => undefined
+  let closed = false
+  const expiration = new Promise<never>((_resolve, reject) => {
+    rejectExpiration = reject
+  })
+  void expiration.catch(() => undefined)
+
+  const timeout = setTimeout(() => {
+    if (closed) return
+    closed = true
+    signal.removeEventListener('abort', onAbort)
+    rejectExpiration(timeoutError())
+  }, timeoutMs)
+
+  function onAbort() {
+    if (closed) return
+    closed = true
+    if (timeout !== undefined) clearTimeout(timeout)
+    signal.removeEventListener('abort', onAbort)
+    rejectExpiration(signal.reason)
+  }
+
+  if (signal.aborted) {
+    onAbort()
+  } else {
+    signal.addEventListener('abort', onAbort, { once: true })
+  }
+
+  return {
+    at: Date.now() + timeoutMs,
+    expiration,
+    cleanup() {
+      settle()
+    },
+  }
+
+  function settle() {
+    if (closed) return
+    closed = true
+    clearTimeout(timeout)
+    signal.removeEventListener('abort', onAbort)
+  }
+}
+
+async function cancelBody(
+  body: ReadableStream<Uint8Array>,
+  deadline: BodyDeadline,
+  reason: unknown,
+): Promise<boolean> {
+  let cancellation: Promise<void>
+  try {
+    cancellation = body.cancel(reason)
+    void cancellation.catch(() => undefined)
+  } catch {
+    return false
+  }
+  return await raceCancellation(cancellation, deadline)
+}
+
+async function cancelReader(
+  reader: ReadableStreamDefaultReader<Uint8Array>,
+  deadline: BodyDeadline,
+  reason: unknown,
+): Promise<boolean> {
+  let cancellation: Promise<void>
+  try {
+    cancellation = reader.cancel(reason)
+    void cancellation.catch(() => undefined)
+  } catch {
+    return false
+  }
+  return await raceCancellation(cancellation, deadline)
+}
+
+async function raceCancellation(
+  cancellation: Promise<void>,
+  deadline: BodyDeadline,
+): Promise<boolean> {
+  const remainingMs = deadline.at - Date.now()
+  if (remainingMs <= 0) return false
+  let cancellationTimeout: ReturnType<typeof setTimeout> | undefined
+  const wall = new Promise<never>((_resolve, reject) => {
+    cancellationTimeout = setTimeout(
+      () => reject(timeoutError()),
+      remainingMs,
+    )
+  })
+  void wall.catch(() => undefined)
+  try {
+    await Promise.race([cancellation.catch(() => undefined), wall])
+    return Date.now() < deadline.at
+  } catch {
+    return false
+  } finally {
+    if (cancellationTimeout !== undefined) clearTimeout(cancellationTimeout)
+  }
+}
+
+export async function readBoundedBody(
+  request: Request,
+  maxBytes: number,
+  options: BoundedBodyOptions = {},
+): Promise<BoundedBody> {
+  const plan = planBoundedBody(maxBytes, options)
+  const body = request.body
+  const deadline = createBodyDeadline(request.signal, plan.timeoutMs)
+
+  try {
+    if (request.signal.aborted) {
+      if (body) await cancelBody(body, deadline, request.signal.reason)
+      throw request.signal.reason
+    }
+
+    const declared = Number(request.headers.get('content-length'))
+    if (body && Number.isFinite(declared) && declared > plan.maxBytes) {
+      await cancelBody(
+        body,
+        deadline,
+        new RangeError('Request body exceeded the byte bound'),
+      )
+      return { ok: false, reason: 'too-large' }
+    }
+
+    if (!body) return { ok: true, text: '' }
+
+    let bytes: Uint8Array
+    try {
+      bytes = new Uint8Array(plan.maxBytes + 1)
+    } catch {
+      throw invalidBounds()
+    }
+
+    const reader = body.getReader()
+    let total = 0
+    let reads = 0
+
+    try {
+      while (true) {
+        if (reads >= MAX_BODY_READS) {
+          await cancelReader(
+            reader,
+            deadline,
+            new RangeError('Request body was too fragmented'),
+          )
+          throw new RangeError('Request body was too fragmented')
+        }
+        reads += 1
+
+        let read: ReadableStreamReadResult<Uint8Array>
+        try {
+          read = await Promise.race([reader.read(), deadline.expiration])
+        } catch (error) {
+          await cancelReader(reader, deadline, error)
+          throw error
+        }
+
+        const { done, value } = read
+        if (done) break
+        if (!value?.byteLength) {
+          await cancelReader(
+            reader,
+            deadline,
+            new RangeError('Request body made no progress'),
+          )
+          throw new RangeError('Request body made no progress')
+        }
+        if (value.byteLength > bytes.byteLength - total
+          || total + value.byteLength > plan.maxBytes) {
+          await cancelReader(
+            reader,
+            deadline,
+            new RangeError('Request body exceeded the byte bound'),
+          )
+          return { ok: false, reason: 'too-large' }
+        }
+        bytes.set(value, total)
+        total += value.byteLength
+      }
+    } finally {
+      try {
+        reader.releaseLock()
+      } catch {
+        // Cancellation was already bounded; a hostile stream may retain its read request.
+      }
+    }
+
+    return { ok: true, text: new TextDecoder().decode(bytes.subarray(0, total)) }
+  } finally {
+    deadline.cleanup()
+  }
+}
+
+export async function readBoundedJson(
+  request: Request,
+  maxBytes: number,
+  options: BoundedBodyOptions = {},
+): Promise<BoundedJson> {
   let body: BoundedBody
   try {
-    body = await readBoundedBody(request, maxBytes)
+    body = await readBoundedBody(request, maxBytes, options)
   } catch {
     return { ok: false, reason: 'read-error' }
   }

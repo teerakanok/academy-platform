@@ -6,7 +6,6 @@ import { AccessRequiredView } from '@/components/course/AccessRequiredView'
 describe('AccessRequiredView', () => {
   it('renders an honest Thai recovery path without falling back to English', () => {
     const page = renderToStaticMarkup(createElement(AccessRequiredView, {
-      courseTitle: 'พื้นฐานระบบปฏิบัติการและ Linux',
       locale: 'th',
       reason: 'not-enrolled',
       slug: 'basic-os-linux',
@@ -22,7 +21,6 @@ describe('AccessRequiredView', () => {
 
   it('keeps a locked learner on the same localized course roadmap', () => {
     const page = renderToStaticMarkup(createElement(AccessRequiredView, {
-      courseTitle: 'Basic OS & Linux',
       locale: 'en',
       reason: 'locked',
       slug: 'basic-os-linux',

@@ -105,9 +105,9 @@ async function fetchDeletionCount(
     })
     if (controller.signal.aborted) throw new Error('request timed out')
     return { response, value: parsed.ok ? parsed.value : null }
-  } catch (error) {
+  } catch {
     if (controller.signal.aborted) throw new Error('request timed out')
-    throw error
+    throw new Error('request failed')
   } finally {
     clearTimeout(timeout)
   }
@@ -134,6 +134,7 @@ export async function runPurgeJob(
     try {
       const result = await fetchDeletionCount(fetcher, new URL(`/rpc/${job.rpc}`, base), {
         method: 'POST',
+        redirect: 'error',
         headers: {
           authorization: `Bearer ${token}`,
           'content-type': 'application/json',

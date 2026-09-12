@@ -14,7 +14,7 @@ describe('Cloudflare Worker runtime budget', () => {
       logs: {
         enabled: true,
         head_sampling_rate: 0.1,
-        invocation_logs: true,
+        invocation_logs: false,
       },
       traces: { enabled: false },
     })

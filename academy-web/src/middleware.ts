@@ -27,6 +27,7 @@ const PUBLIC_EXACT = new Set([
   '/unsubscribe',
   '/sign-in',
   '/sign-in/sent',
+  '/api/security/csp-report',
   '/robots.txt',
   '/sitemap.xml',
   '/favicon.ico',
@@ -84,11 +85,14 @@ function continueWithContentSecurityPolicy(request: NextRequest): NextResponse {
   )
 
   const response = NextResponse.next({ request: { headers: requestHeaders } })
-  response.headers.set('Content-Security-Policy', academyContentSecurityPolicy([
-    "'self'",
-    `'nonce-${nonce}'`,
-    "'strict-dynamic'",
-  ]))
+  if (process.env.NODE_ENV !== 'development') {
+    response.headers.set('Content-Security-Policy', academyContentSecurityPolicy([
+      "'self'",
+      `'nonce-${nonce}'`,
+      "'strict-dynamic'",
+    ], nonce))
+  }
+  response.headers.set('Cross-Origin-Opener-Policy', 'same-origin')
   return response
 }
 

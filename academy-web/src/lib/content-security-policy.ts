@@ -1,3 +1,5 @@
+import { ACADEMY_SSO_ORIGIN } from './auth/sso-signout-policy'
+
 function localAccountCenterFormActionOrigin(): string | null {
   if (
     process.env.NODE_ENV === 'production'
@@ -18,20 +20,28 @@ function localAccountCenterFormActionOrigin(): string | null {
   }
 }
 
-export function academyContentSecurityPolicy(scriptSources: string[]): string {
+export function academyContentSecurityPolicy(
+  scriptSources: string[],
+  styleNonce?: string,
+): string {
+  if (styleNonce && !/^[A-Za-z0-9+/_-]{1,128}={0,2}$/u.test(styleNonce)) {
+    throw new Error('Invalid CSP style nonce')
+  }
   const localAccountCenterOrigin = localAccountCenterFormActionOrigin()
   return [
     "default-src 'self'",
-    "base-uri 'self'",
+    "base-uri 'none'",
+    "report-uri /api/security/csp-report",
     `form-action 'self'${localAccountCenterOrigin ? ` ${localAccountCenterOrigin}` : ''}`,
     "frame-ancestors 'none'",
     "object-src 'none'",
     `script-src ${scriptSources.join(' ')}`,
-    "style-src 'self' 'unsafe-inline'",
+    `style-src 'self'${styleNonce ? ` 'nonce-${styleNonce}'` : ''}`,
+    "style-src-attr 'unsafe-inline'",
     "img-src 'self' data: blob:",
     "font-src 'self' data:",
     "media-src 'self' blob:",
-    "connect-src 'self'",
+    `connect-src 'self' ${ACADEMY_SSO_ORIGIN}`,
     "worker-src 'self' blob:",
     "frame-src 'none'",
     "manifest-src 'self'",

@@ -14,6 +14,7 @@
     "test": "vitest run",
     "test:unit": "vitest run --project unit",
     "test:integration": "vitest run --project integration",
+    "test:boundary": "ACADEMY_REQUIRE_BOUNDARY_TESTS=1 vitest run --project integration tests/integration/academy-runtime-api.test.ts tests/integration/academy-retention-api.test.ts",
     "test:e2e": "playwright test",
     "test:e2e:fast": "playwright test --grep-invert @full-acceptance",
     "test:e2e:public": "playwright test --config=playwright.public.config.ts",
@@ -27,14 +28,14 @@
     "cache:sync": "node scripts/sync-open-next-cache.mjs",
     "asset-guard": "node scripts/check-open-next-assets.mjs",
     "build:cf": "bash scripts/build-cloudflare.sh",
-    "deploy:cf": "npm run build:cf && wrangler deploy --autoconfig=false --keep-vars",
+    "deploy:cf": "npm run test:boundary && npm audit --omit=dev && npm run build:cf && wrangler deploy --autoconfig=false --keep-vars",
     "test:workerd-signer": "node scripts/workerd-signer-check.mjs"
   },
   "dependencies": {
     "@cyberskills/tokens": "file:packages/tokens",
     "@supabase/ssr": "^0.12.4",
     "@supabase/supabase-js": "^2.111.0",
-    "next": "^15.5.22",
+    "next": "15.5.24",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "server-only": "^0.0.1",
@@ -52,18 +53,20 @@
     "@types/react-dom": "^18.3.7",
     "autoprefixer": "^10.5.4",
     "eslint": "^9.39.5",
-    "eslint-config-next": "^15.5.22",
+    "eslint-config-next": "15.5.24",
     "pg": "^8.22.0",
     "postcss": "^8.5.25",
     "supabase": "^2.111.0",
     "tailwindcss": "^3.4.19",
     "typescript": "^5.9.3",
-    "vitest": "^3.2.7",
+    "vitest": "4.1.11",
     "wrangler": "^4.120.0"
   },
   "overrides": {
+    "js-yaml": "4.3.2",
     "nanoid": "3.3.18",
     "postcss": "$postcss",
-    "sharp": "0.35.2"
+    "qs": "6.16.0",
+    "sharp": "0.35.4"
   }
 }

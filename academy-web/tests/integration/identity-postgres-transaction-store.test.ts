@@ -77,6 +77,8 @@ function fixture(): { browserBinding: string; input: PendingIdentityTransactionI
 function verifiedResult(input: PendingIdentityTransactionInput) {
   const suffix = input.state.slice(0, 16).toLowerCase()
   return {
+    version: 2 as const,
+    authentication: { method: 'webauthn_uv' as const, auth_time: Math.floor(Date.now() / 1_000) },
     issuer: input.client.expectedIssuer,
     subject: `principal-${input.state}`,
     verifiedEmail: `learner+${suffix}@example.com`,

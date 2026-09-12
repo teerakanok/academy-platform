@@ -3,11 +3,11 @@ import {
   readStrictJsonResponse,
 } from '@/lib/http/strict-json-response'
 import { isAcademyInternalReturnPath } from '@/lib/auth/internal-return-path'
+import { ACADEMY_SSO_SIGNOUT_URL } from './sso-signout-policy'
 
 const MAX_ACCOUNT_RESPONSE_BYTES = 4 * 1024
 const MAX_ACCOUNT_EMAIL_LENGTH = 254
 const MAX_AUTH_ERROR_LENGTH = 512
-const MAX_SSO_SIGNOUT_URL_LENGTH = 256
 
 export type AccountResponse =
   | { signedIn: false }
@@ -78,13 +78,9 @@ function boundedError(value: unknown): value is string {
     && value.length <= MAX_AUTH_ERROR_LENGTH
 }
 
-/** URL นี้มาจาก server ของเราเอง (route อ่านจาก consumer-registry) ไม่ใช่ input
- *  จากภายนอก — bound ไว้เพื่อกัน response ปลอมยัด URL ยาว ๆ เข้า client state.
- *  null = มีค่ามาแต่ไม่ผ่าน bound (ผู้เรียกเช็ค key set ก่อนเรียกแล้ว) */
+/** Credentialed browser requests use only the exact approved endpoint. */
 function boundedSsoSignoutUrl(value: unknown): string | null {
-  if (typeof value !== 'string') return null
-  if (value.length > MAX_SSO_SIGNOUT_URL_LENGTH || !value.startsWith('https://')) return null
-  return value
+  return value === ACADEMY_SSO_SIGNOUT_URL ? value : null
 }
 
 export function projectSignOutResponse(value: unknown): SignOutResponse | null {
@@ -160,10 +156,12 @@ async function readAuthActionResponse<T>(
   response: Response,
   project: (value: unknown) => T | null,
   expectedSuccess: (value: T) => boolean,
+  signal?: AbortSignal,
 ): Promise<T | null> {
   const parsed = await readStrictJsonResponse(response, {
     maxBytes: MAX_ACCOUNT_RESPONSE_BYTES,
     maxDepth: 2,
+    signal,
   })
   if (!parsed.ok) return null
   const projected = project(parsed.value)
@@ -171,12 +169,12 @@ async function readAuthActionResponse<T>(
   return projected
 }
 
-export async function readSignOutResponse(response: Response): Promise<SignOutResponse | null> {
+export async function readSignOutResponse(response: Response, signal?: AbortSignal): Promise<SignOutResponse | null> {
   if (!response.ok) {
     cancelResponseBody(response)
     return null
   }
-  return readAuthActionResponse(response, projectSignOutResponseWithSso, () => true)
+  return readAuthActionResponse(response, projectSignOutResponseWithSso, () => true, signal)
 }
 
 export async function readOtpResponse(response: Response): Promise<OtpResponse | null> {

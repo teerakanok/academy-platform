@@ -1,6 +1,7 @@
 import type { IdentityCodeExchangeRequest as IdentityCodeExchangeRequestContract } from './adapter'
 
 const REQUEST_KEYS = [
+  'resultVersion',
   'clientId',
   'clientAssertion',
   'redirectUri',
@@ -38,6 +39,7 @@ export function projectIdentityCodeExchangeRequest(
     if (typeof snapshot.clientId !== 'string'
       || snapshot.clientId.length < 1
       || snapshot.clientId.length > 80
+      || snapshot.resultVersion !== 2
       || typeof snapshot.clientAssertion !== 'string'
       || snapshot.clientAssertion.length < 32
       || snapshot.clientAssertion.length > 4096
@@ -54,6 +56,7 @@ export function projectIdentityCodeExchangeRequest(
     return {
       clientId: snapshot.clientId,
       clientAssertion: snapshot.clientAssertion,
+      resultVersion: 2,
       redirectUri: snapshot.redirectUri,
       code: snapshot.code,
       codeVerifier: snapshot.codeVerifier,

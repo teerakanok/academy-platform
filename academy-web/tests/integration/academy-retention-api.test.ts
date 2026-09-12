@@ -17,6 +17,9 @@ function isSafeLocalTestTarget(raw: string | undefined): boolean {
 }
 
 const hasDedicatedApi = Boolean(signingSecret && testDatabaseId && destructiveTestOptIn && isSafeLocalTestTarget(apiUrl))
+if (process.env.ACADEMY_REQUIRE_BOUNDARY_TESTS === '1' && !hasDedicatedApi) {
+  throw new Error('Required boundary gate needs a configured disposable local retention API, database identity and explicit fixture opt-in; refusing skipped verification')
+}
 
 function tokenFor(role: string): string {
   if (!signingSecret) throw new Error('retention API test configuration is missing')

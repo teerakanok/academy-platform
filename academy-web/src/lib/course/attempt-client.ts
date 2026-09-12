@@ -4,7 +4,7 @@ import { SIMULATION_SURFACE_INPUT_FIELDS } from '@/lib/simulation/types'
 
 export type AttemptClientResult =
   | { status: 'ready'; id: string; questions: AttemptQuestion[]; simulations: AttemptSimulation[] }
-  | { status: 'failed'; reason: 'quota' | 'access-lost' | 'error'; retryAfterSeconds?: number }
+  | { status: 'failed'; reason: 'quota' | 'signed-out' | 'access-lost' | 'error'; retryAfterSeconds?: number }
 
 const MAX_RESPONSE_BYTES = 256 * 1024
 const MAX_JSON_DEPTH = 16
@@ -220,7 +220,7 @@ export async function requestLessonAttempt(slug: string, nodeId: string): Promis
       body: JSON.stringify({ slug, nodeId }),
     })
     if (response.status === 401 || response.status === 403) {
-      return { status: 'failed', reason: 'access-lost' }
+      return { status: 'failed', reason: response.status === 401 ? 'signed-out' : 'access-lost' }
     }
     if (response.status === 429) {
       const parsed = await readStrictJsonResponse(response, {

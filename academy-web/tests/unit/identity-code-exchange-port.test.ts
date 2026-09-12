@@ -40,6 +40,7 @@ const REGISTRATION = {
   redirectUris: [CLIENT.redirectUri],
 } as const satisfies LocalIdentityAuthorizationRegistration
 const REQUEST = {
+    resultVersion: 2 as const,
   clientId: CLIENT.clientId,
   clientAssertion: ASSERTION,
   redirectUri: CLIENT.redirectUri,
@@ -47,6 +48,8 @@ const REQUEST = {
   codeVerifier: 'v'.repeat(48),
 }
 const RESULT = {
+    version: 2 as const,
+    authentication: { method: 'webauthn_uv' as const, auth_time: Math.floor(Date.now() / 1_000) },
   issuer: CLIENT.expectedIssuer,
   subject: 'learner-1',
   verifiedEmail: 'learner@example.test',

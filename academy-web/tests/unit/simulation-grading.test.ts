@@ -100,8 +100,8 @@ describe('meets — เคสที่ต้องผ่านก็ต้อง
 describe('gradingFingerprint — ต้องผูกกับกติกาจริง', () => {
   const base = challenge([{ id: 'r1', label: 'l', field: 'f', operator: 'equals', value: 'x' }])
 
-  it('กติกาเดิม → ค่าเดิมเสมอ (deterministic)', () => {
-    expect(gradingFingerprint(base)).toBe(gradingFingerprint(structuredClone(base)))
+  it('กติกาเดิม → ค่าเดิมเสมอ (deterministic)', async () => {
+    expect(await gradingFingerprint(base)).toBe(await gradingFingerprint(structuredClone(base)))
   })
 
   it.each([
@@ -113,23 +113,23 @@ describe('gradingFingerprint — ต้องผูกกับกติกา�
       requirements: [...base.requirements, { id: 'r2', label: 'l', field: 'h', operator: 'isTrue' as const }],
     }],
     ['surface เปลี่ยน', { ...base, surface: 'other-surface' as SimulationChallenge['surface'] }],
-  ])('%s → ลายนิ้วมือต้องเปลี่ยน', (_label, changed) => {
+  ])('%s → ลายนิ้วมือต้องเปลี่ยน', async (_label, changed) => {
     // ⚠️ ถ้าฟังก์ชันนี้คืนค่าคงที่ เทสที่ตรวจแค่รูปแบบ (`/^sim-[0-9a-f]{8}$/`) จะเขียว
     // ทั้งที่หลักฐานอ้างเวอร์ชันที่ไม่มีความหมาย — RIL รอบ 2 ชี้ช่องนี้
-    expect(gradingFingerprint(changed as SimulationChallenge)).not.toBe(gradingFingerprint(base))
+    expect(await gradingFingerprint(changed as SimulationChallenge)).not.toBe(await gradingFingerprint(base))
   })
 
-  it('ลำดับของ requirements ไม่ทำให้ค่าต่าง (เรียงก่อนคำนวณ)', () => {
+  it('ลำดับของ requirements ไม่ทำให้ค่าต่าง (เรียงก่อนคำนวณ)', async () => {
     const two = challenge([
       { id: 'a', label: 'l', field: 'f', operator: 'isTrue' },
       { id: 'b', label: 'l', field: 'g', operator: 'isFalse' },
     ])
     const reordered = { ...two, requirements: [...two.requirements].reverse() }
-    expect(gradingFingerprint(reordered)).toBe(gradingFingerprint(two))
+    expect(await gradingFingerprint(reordered)).toBe(await gradingFingerprint(two))
   })
 
-  it('label เปลี่ยนไม่ทำให้ค่าต่าง — label คือคำอธิบาย ไม่ใช่กติกา', () => {
+  it('label เปลี่ยนไม่ทำให้ค่าต่าง — label คือคำอธิบาย ไม่ใช่กติกา', async () => {
     const relabeled = { ...base, requirements: [{ ...base.requirements[0], label: 'เขียนใหม่' }] }
-    expect(gradingFingerprint(relabeled)).toBe(gradingFingerprint(base))
+    expect(await gradingFingerprint(relabeled)).toBe(await gradingFingerprint(base))
   })
 })

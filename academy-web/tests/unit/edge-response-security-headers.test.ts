@@ -6,16 +6,18 @@ import { servePrivateMedia } from '@/lib/media/worker-delivery'
 const EXPECTED_HEADERS = {
   'Content-Security-Policy': [
     "default-src 'self'",
-    "base-uri 'self'",
+    "base-uri 'none'",
+    'report-uri /api/security/csp-report',
     "form-action 'self'",
     "frame-ancestors 'none'",
     "object-src 'none'",
     "script-src 'self'",
-    "style-src 'self' 'unsafe-inline'",
+    "style-src 'self'",
+    "style-src-attr 'none'",
     "img-src 'self' data: blob:",
     "font-src 'self' data:",
     "media-src 'self' blob:",
-    "connect-src 'self'",
+    "connect-src 'self' https://accounts.cyberskills.co.th",
     "worker-src 'self' blob:",
     "frame-src 'none'",
     "manifest-src 'self'",
@@ -42,8 +44,12 @@ describe('Worker-generated response security headers', () => {
     const [legacy, unconfigured] = await Promise.all([
       servePrivateMedia(new Request('https://academy.test/media/lesson-demo.mp4'), {
         MEDIA_SIGNING_SECRET: 'unused-secret',
-      }),
-      servePrivateMedia(new Request('https://academy.test/course-media/formats-handout'), {}),
+      }, async () => new Response(null, { status: 204, headers: { 'cache-control': 'no-store' } })),
+      servePrivateMedia(
+        new Request('https://academy.test/course-media/formats-handout'),
+        {},
+        async () => new Response(null, { status: 204, headers: { 'cache-control': 'no-store' } }),
+      ),
     ])
 
     expect(legacy?.status).toBe(404)
@@ -63,7 +69,8 @@ describe('Worker CSP fallback', () => {
     const pagePolicy = [
       "default-src 'self'",
       "script-src 'self' 'nonce-<nonce>' 'strict-dynamic'",
-      "style-src 'self' 'unsafe-inline'",
+      `style-src 'self' 'nonce-${nonce}'`,
+      "style-src-attr 'unsafe-inline'",
     ].join('; ').replace('<nonce>', nonce)
     const response = withEdgeSecurityHeaders(new Response('<html></html>', {
       headers: {
@@ -73,7 +80,24 @@ describe('Worker CSP fallback', () => {
       },
     }))
 
-    expect(response.headers.get('content-security-policy')).toBe(pagePolicy)
+    expect(response.headers.get('content-security-policy')).toBe([
+      "default-src 'self'",
+      "base-uri 'none'",
+      'report-uri /api/security/csp-report',
+      "form-action 'self'",
+      "frame-ancestors 'none'",
+      "object-src 'none'",
+      `script-src 'self' 'nonce-${nonce}' 'strict-dynamic'`,
+      `style-src 'self' 'nonce-${nonce}'`,
+      "style-src-attr 'unsafe-inline'",
+      "img-src 'self' data: blob:",
+      "font-src 'self' data:",
+      "media-src 'self' blob:",
+      "connect-src 'self' https://accounts.cyberskills.co.th",
+      "worker-src 'self' blob:",
+      "frame-src 'none'",
+      "manifest-src 'self'",
+    ].join('; '))
     expect(response.headers.get('cache-control')).toBe('private, no-store')
   })
 })

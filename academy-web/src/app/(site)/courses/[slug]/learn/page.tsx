@@ -30,6 +30,7 @@ export default async function LearnerCoursePage({
   const access = await authorizeCourseResource(user.account.id, slug)
   if (!access.allowed) {
     if (access.reason === 'unavailable') throw new Error('Academy access store unavailable')
+    if (access.reason === 'retired') notFound()
     const denied = new URLSearchParams({ course: slug })
     if (locale) denied.set('lang', locale)
     redirect(`/access-required?${denied.toString()}`)

@@ -74,8 +74,10 @@ export function WaitlistForm({ consentSummary }: { consentSummary: string }) {
         data-testid="waitlist-success"
         className="rounded-xl border border-cs-accent-border bg-cs-accent-dim px-5 py-4 text-cs-text"
       >
-        <p className="font-semibold">You are on the list.</p>
-        <p className="text-sm text-cs-body mt-1">We will email you when the next course opens.</p>
+        <p className="font-semibold">Request received.</p>
+        <p className="text-sm text-cs-body mt-1">
+          Your request is pending. It does not subscribe you to marketing email.
+        </p>
       </div>
     )
   }
@@ -129,7 +131,7 @@ export function WaitlistForm({ consentSummary }: { consentSummary: string }) {
           disabled={status === 'submitting'}
           className="rounded-xl bg-cs-accent-fill px-6 py-3 font-semibold text-cs-on-accent transition-opacity hover:opacity-90 disabled:opacity-50"
         >
-          {status === 'submitting' ? 'Saving…' : 'Notify me'}
+          {status === 'submitting' ? 'Submitting…' : 'Request a place'}
         </button>
       </div>
 

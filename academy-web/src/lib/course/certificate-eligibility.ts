@@ -7,6 +7,7 @@ import { loadProgress } from '@/lib/course/progress-db'
 import { courseRecordSummary, type CourseRecordSummary } from '@/lib/course/roadmap'
 import { isProofBearing } from '@/lib/course/assessment-policy'
 import { safeErrorMessage } from '@/lib/safe-log'
+import { certificateAssessmentReady } from './certificate-assessment-readiness'
 
 /**
  * Evidence-based certificate eligibility (W4 of the approved claim).
@@ -29,6 +30,9 @@ export async function certificateEligibility(
   try {
     const structure = getCourseStructure(courseSlug)
     if (!structure) return { unavailable: true, reason: 'course-not-found' }
+    if (!certificateAssessmentReady(structure)) {
+      return { unavailable: true, reason: 'assessment-not-ready' }
+    }
     const record = await loadProgress(userId, courseSlug)
     const summary = courseRecordSummary(structure, toLearnerState(record))
     const courseVersion = structure.version

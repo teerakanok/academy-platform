@@ -168,13 +168,14 @@ describe('ด่านที่ผูกกับ attempt — หน้า lesso
       expect(item.kind === 'mcq' ? item.prompt : undefined).toBeUndefined()
       expect(item.id).toBeTruthy()
     }
-    const serialized = JSON.stringify(pub)
-    for (const item of withCheckpoint.lesson.checkpoint) {
-      if ('kind' in item && item.kind === 'simulation') continue
-      for (const text of Object.values(item.choices)) {
-        expect(serialized, `ข้อความตัวเลือกของ ${item.id} ยังติดมากับหน้า`).not.toContain(text)
-      }
-    }
+    // Teaching prose can legitimately contain the same text as an answer choice.
+    // The security boundary is the assessment projection, not removing knowledge
+    // from the lesson. Exact keys also catch newly added grading metadata.
+    expect(pub.checkpoint).toEqual(withCheckpoint.lesson.checkpoint.map((item) => ({
+      kind: 'kind' in item && item.kind === 'simulation' ? 'simulation' : 'mcq',
+      id: item.id,
+    })))
+    expect(pub.blocks).toEqual(toPublicLesson(withCheckpoint.lesson).blocks)
   })
 
   it('ค่าเริ่มต้น (บทสอนทั่วไป) ยังส่งโจทย์มาเหมือนเดิม', () => {

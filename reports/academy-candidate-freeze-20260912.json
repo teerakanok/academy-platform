@@ -1,0 +1,1063 @@
+{
+  "schema": "academy-candidate-freeze/20260912-v2",
+  "purpose": "Freeze of the current dirty candidate state for independent review of the applied maintenance-admission change and the security-recovery candidate. Not a deployment approval; deployment remains controller-owned.",
+  "frozenAt": "2026-09-12T15:47:19+07:00",
+  "candidate": {
+    "worktree": "/Users/teerakanok/Dev/continuations/academy-security-recovery-20260912-523a1d40",
+    "branch": "codex/academy-security-recovery-523a1d40",
+    "head": "bf74fbffd565694510815593f74f7a4b1a1e4b67",
+    "baselineNote": "HEAD equals the recovery baseline; ALL changes are uncommitted dirty state (127 modified + 46 untracked git entries; 178 files after expanding untracked directories). Nothing was committed, pushed, or deployed by this lane.",
+    "node": "v24.18.0"
+  },
+  "authority": {
+    "record": "reports/security/identity-recovery-523a1d40/current-owner-authority-20260912.json (director repo)",
+    "admission": "proposal implementation/testing approved and applied",
+    "deployment": "deploy-when-complete-and-ready authority exists but deployment is controller-owned; this freeze does not deploy"
+  },
+  "freshCombinedAcceptance": {
+    "rawLog": "artifacts/academy-fresh-combined-acceptance-20260912.log",
+    "runWindow": "2026-09-12 15:40-15:47 +07:00",
+    "results": {
+      "fullUnit": {
+        "command": "npm run test:unit",
+        "testFiles": "174 passed (174)",
+        "tests": "3277 passed | 2 skipped (3279)",
+        "failed": 0,
+        "note": "prior stale static assertion (static-asset-boundary.test.ts run_worker_first) is corrected in this state; rerun confirms green"
+      },
+      "lintAndTypecheck": {
+        "command": "npm run lint",
+        "eslint": "0 errors, 22 warnings (all pre-existing)",
+        "tsc": "tsconfig.json + tsconfig.worker.json + ops/academy-retention-worker/tsconfig.json all pass",
+        "exitCode": 0
+      },
+      "productionOpenNextBuild": {
+        "command": "npm run build:cf",
+        "result": "PASS end-to-end",
+        "gates": "verify:workerd -> opennextjs-cloudflare build -> cache:sync (39 prerender assets) -> asset-guard (no mp4/vtt/pdf/zip in assets) -> check-final-worker-startup on real workerd",
+        "finalWorkerStartup": "PASS final OpenNext Worker initialized on real workerd; raw-host/static gate HTTP 404; maintenance rejects before bindings; open assets preserve cache; scheduled recovery remains reachable; outbound requests blocked; bundle 16017.6 KiB",
+        "exitCode": 0
+      },
+      "realWorkerd": {
+        "command": "npm run verify:workerd",
+        "result": "14/14 PASS",
+        "exitCode": 0
+      },
+      "isolatedPostgresLifecycleAssurance": {
+        "command": "node scripts/test-identity-lifecycle-page-store-postgres.mjs",
+        "tests": "59 passed (59) across identity-lifecycle-enforcement (31) + identity-lifecycle-page-store (28)",
+        "cleanupVerified": true,
+        "exitCode": 0
+      },
+      "isolatedPostgresPendingWaitlist": {
+        "command": "node scripts/test-pending-waitlist-postgres.mjs",
+        "result": "5/5 behavior+privilege groups passed; all 43 migrations + privileged SQL applied",
+        "cleanupVerified": true,
+        "exitCode": 0
+      },
+      "isolatedPostgresF01CrossProduct": {
+        "command": "node <director-P>/academy-recovery-f01-postgres.mjs",
+        "tests": "1 passed (1)",
+        "scope": "Identity durable-outbox fixtures -> real publisher HTTP/signing -> Academy assertion/verification/leased projection/runtime session denial; tamper/replay/wrong-audience fail closed",
+        "limitation": "direct-seeded outbox fixtures; NOT administrative-action-to-enforcement E2E and NOT production evidence",
+        "cleanupVerified": true,
+        "exitCode": 0
+      },
+      "focusedAdmissionUnit": {
+        "command": "vitest run --project unit tests/unit/edge-admission.test.ts",
+        "tests": "16 passed (16)",
+        "exitCode": 0
+      }
+    },
+    "containerHygiene": "No owned containers remain; 14 pre-existing foreign containers (supabase_*_academy-web, crux-*) untouched. Owned container names were harness-enforced patterns (academy-identity-lifecycle-*, academy-pending-waitlist-*, f01 harness label com.cyberskills.test) with verified self-cleanup rather than the aclang- prefix; no preexisting container was affected.",
+    "overall": "ALL GREEN on the frozen dirty state; no fixture or source change was needed during this rerun."
+  },
+  "admissionBehaviorEvidence": {
+    "modeSafety": "src/lib/edge-admission.ts: only exact 'open' admits; absent/malformed/maintenance/throwing-binding reads -> 503 no-store retry-after 60 with CSP base-uri 'none'. Unit: edge-admission.test.ts 16/16. Real workerd: modes ['maintenance','','OPEN','invalid'] x methods [GET,HEAD,POST] x paths ['/', '/_next/static/fixture.js', '/media/fixture', '/api/progress'] all 503 no-store retry-after 60 while an env Proxy throws on ANY other binding access (admission rejects before bindings).",
+    "workerFirstRoutingAndRawHost": "wrangler.jsonc assets.run_worker_first=true (all routes worker-first, no SPA fallback); worker.ts order: isServedHost -> admissionResponse -> rate limit -> media -> OpenNext. Real workerd: raw host -> 404 no-store; raw-host static path with admission open -> 404 (asset cannot bypass host gate); canonical-host static asset -> 200 immutable cache preserved, exactly one ASSETS read. scripts/admission-release-policy.mjs rejects any release config without explicit mode or with non-true run_worker_first / SPA fallback; check-final-worker-startup.mjs asserts it on every build.",
+    "maintenanceResponse": "503 text/plain, cache-control no-store, retry-after 60, edge security headers applied (verified in unit and real workerd runs above).",
+    "scheduledUnaffected": "worker.ts scheduled() calls runAcademyIdentityLifecyclePull without admissionResponse; real workerd test invokes scheduled with a Proxy that THROWS if ACADEMY_ADMISSION_MODE is read and asserts the lifecycle handler executed (scheduledReads > 0).",
+    "invocationCostAvailability": "Config-level facts only: run_worker_first=true means every request including static assets invokes the Worker (Workers invocation count now includes asset traffic); limits.cpu_ms=500 bounds per-invocation CPU; observability logs head_sampling_rate=0.1 with invocation_logs=false bounds log cost. No measured invocation-cost or live availability data exists; deployed vars/routing read-back against assertAdmissionReleasePolicy remains required and is not proven by this build."
+  },
+  "reviewNotes": [
+    "docs/security/maintenance-admission.md paragraphs 1 and 3 still describe the PRE-admission-change state (worker entry does not call the helper; only /media/* worker-first; wrangler.jsonc lacks ACADEMY_ADMISSION_MODE). That contradicts the applied change in this frozen state (worker.ts calls admissionResponse; wrangler.jsonc has ACADEMY_ADMISSION_MODE=open and run_worker_first=true). The doc was NOT edited after acceptance to keep the freeze byte-identical to the tested state; the reviewer must treat those two paragraphs as stale and a follow-up doc correction is required.",
+    "Guard-preservation: no weakening of the authorization fence or Access JWT defense-in-depth check occurred in this rerun; the previously rejected automatic-review actions (removing the Access JWT check; persisting admission without worker-first routing) remain not applied.",
+    "Remaining acceptance-open items and production gaps are enumerated in reports/academy-lane-report-20260912.md; a green source build is not production readiness."
+  ],
+  "changedFiles": [
+    {
+      "status": "M",
+      "path": "academy-web/SBOM.md",
+      "sha256": "95d261504ec2c7841f4da9fced0af828526b5d2f7fc24a31b71cb50197563465"
+    },
+    {
+      "status": "M",
+      "path": "academy-web/docs/identity-lifecycle-runtime.md",
+      "sha256": "30520f382a7b5147aeee4477c1218233440704104baec24c46480b66db997300"
+    },
+    {
+      "status": "M",
+      "path": "academy-web/docs/privacy/data-processing-register.md",
+      "sha256": "b8d6ccd6d7ea01faee5d11ba4317a1003572539bfe5f807e90953d0eb9aaffc2"
+    },
+    {
+      "status": "M",
+      "path": "academy-web/docs/privacy/request-runbook.md",
+      "sha256": "de071725d732e8c1bccbd035540bf3dfc1fc2a44f6154c127f266984b4c96407"
+    },
+    {
+      "status": "M",
+      "path": "academy-web/eslint.config.mjs",
+      "sha256": "932a766ea820b578875a85f71940e1b14697131fd832edb8c9d64315b34f96cd"
+    },
+    {
+      "status": "M",
+      "path": "academy-web/next.config.ts",
+      "sha256": "2711ca1053494dc1a774ff24537ed9ded41a3d2ebcc2bca0728d510b35ffc7a7"
+    },
+    {
+      "status": "M",
+      "path": "academy-web/ops/academy-retention-worker/retention.ts",
+      "sha256": "15d1a804f1f81219279eac4f7b8543cda168fe9ae67e3f3eb17511e5e178657b"
+    },
+    {
+      "status": "M",
+      "path": "academy-web/package-lock.json",
+      "sha256": "17aaa6d0ad875ad24a1364504419a5b2830560c8abde7cd9f39e4fa9dfad4253"
+    },
+    {
+      "status": "M",
+      "path": "academy-web/package.json",
+      "sha256": "7bcc2151b29a839d0c8a4606760f3068c73e771f8a94bf9156c0d51aa487d4aa"
+    },
+    {
+      "status": "M",
+      "path": "academy-web/scripts/check-final-worker-startup.mjs",
+      "sha256": "1a2a9c1e2e513baff037e6a491b42452b587fa124c3262684ad5242a209db8aa"
+    },
+    {
+      "status": "M",
+      "path": "academy-web/scripts/test-identity-lifecycle-page-store-postgres.mjs",
+      "sha256": "f975f1bce7c12e27f00b409d0feba4cf02185f2bfdc13165ef5e79e80ac42494"
+    },
+    {
+      "status": "M",
+      "path": "academy-web/scripts/test-identity-lifecycle-page-store-postgres.test.mjs",
+      "sha256": "1eaa2dc7f49aa01e6fe9af78a1ba0efbe15b6f2a5226d97ee2675c3567db45aa"
+    },
+    {
+      "status": "M",
+      "path": "academy-web/src/app/(localized)/courses/[slug]/[locale]/page.tsx",
+      "sha256": "89fb76a6890be1367556568a4ac917346f56ec3d89df903fe6b467f3dc8259ce"
+    },
+    {
+      "status": "M",
+      "path": "academy-web/src/app/(site)/access-required/page.tsx",
+      "sha256": "8ab1a46d6c0d71a437768e1da6e23b61d33e4df4adec005662984814dc3a9072"
+    },
+    {
+      "status": "M",
+      "path": "academy-web/src/app/(site)/api/admin/courses/[slug]/route.ts",
+      "sha256": "918035a1c877836e9a65c6375e36ff495dce8d8b8129f055d07f8964ae374b06"
+    },
+    {
+      "status": "M",
+      "path": "academy-web/src/app/(site)/api/auth/sign-out/route.ts",
+      "sha256": "1c00089f52af0c63b60915342f403bff71abe9ae6f0eb0a85b2ad3a00a3c9297"
+    },
+    {
+      "status": "M",
+      "path": "academy-web/src/app/(site)/api/courses/[slug]/certificate/pdf/route.ts",
+      "sha256": "98f5ed6eb4178ec379be20462ec2976a3c0b63fed22ca65cb136d1b1187604b3"
+    },
+    {
+      "status": "M",
+      "path": "academy-web/src/app/(site)/api/courses/[slug]/certificate/route.ts",
+      "sha256": "c002d54a23a37a699d0ee206ee254662e69dd81a7d4e7b63611f954bbd572ade"
+    },
+    {
+      "status": "M",
+      "path": "academy-web/src/app/(site)/api/leads/route.ts",
+      "sha256": "c4fca747fb05fea14c2b54721e371fcd793ffa4223331ccf47be5b9819ab5349"
+    },
+    {
+      "status": "M",
+      "path": "academy-web/src/app/(site)/api/progress/route.ts",
+      "sha256": "16b6101b6ddd8652db478a03f1d4510a4781bd721fce60c2f008033f5ac29bf3"
+    },
+    {
+      "status": "M",
+      "path": "academy-web/src/app/(site)/course-media/[assetId]/route.ts",
+      "sha256": "f3291ec2f57b475c037697ab4a7073c7ed0967e0e512b4a473d0d369dff43e06"
+    },
+    {
+      "status": "M",
+      "path": "academy-web/src/app/(site)/courses/[slug]/learn/page.tsx",
+      "sha256": "097d8e891bfed2b770b398c3e3a8b4b072829d02733583651ff9edc84c51ebed"
+    },
+    {
+      "status": "M",
+      "path": "academy-web/src/app/(site)/courses/[slug]/lessons/[nodeId]/page.tsx",
+      "sha256": "7befde1d2f0df50d679fcc5ab7f5d211311c860d359faf35a22b9438e166ef48"
+    },
+    {
+      "status": "M",
+      "path": "academy-web/src/app/(site)/courses/[slug]/page.tsx",
+      "sha256": "766dd41633a45948e73e60c77573619fa485605e5d665a810c0e66ad77f13f02"
+    },
+    {
+      "status": "M",
+      "path": "academy-web/src/app/(site)/courses/[slug]/share/[locale]/route.tsx",
+      "sha256": "6f6ca0d32d2e9622b538a87d56172d4e338c1ef7e2a96ca608f235e28e20af5d"
+    },
+    {
+      "status": "M",
+      "path": "academy-web/src/app/(site)/courses/page.tsx",
+      "sha256": "946511b4e99a14842c05751402fe27000901a025a05b25920c263b816a30ac86"
+    },
+    {
+      "status": "M",
+      "path": "academy-web/src/app/(site)/page.tsx",
+      "sha256": "6fec98d367b5128360dad9a9267e8b3687d9b9f3dabc798b027a4604c6a49083"
+    },
+    {
+      "status": "M",
+      "path": "academy-web/src/app/(site)/sign-in/page.tsx",
+      "sha256": "ba06c93bc6f888cf5fcc4ead95dba46dae29ed18fa0d173d86ff864447d4d3a3"
+    },
+    {
+      "status": "M",
+      "path": "academy-web/src/app/courses/[slug]/opengraph-image.tsx",
+      "sha256": "ecf8ecbc78a457d810b800136ed2797493dc65743098cedf6f9b6eb51bcbc804"
+    },
+    {
+      "status": "M",
+      "path": "academy-web/src/app/sitemap.ts",
+      "sha256": "09d0e1cd561f7b90473d0eebafb2d5d2a82f2e816341b6d542ab6947a6783967"
+    },
+    {
+      "status": "M",
+      "path": "academy-web/src/components/AppShell.tsx",
+      "sha256": "8342c0f95f0fc5458fb873a4283cb5fb320006849c19f88c8d3da9cd5d4468b5"
+    },
+    {
+      "status": "M",
+      "path": "academy-web/src/components/WaitlistForm.tsx",
+      "sha256": "65381b5065c27b79d7fda2af4cfa9054e5b0a80f9ec50d0811c243995504fec4"
+    },
+    {
+      "status": "M",
+      "path": "academy-web/src/components/auth/AccountMenu.tsx",
+      "sha256": "a9d7c6cd2912b44fbe58861156a636caef8a3b6787e8e2ac5c45e2a406f8d105"
+    },
+    {
+      "status": "M",
+      "path": "academy-web/src/components/course/AccessRequiredView.tsx",
+      "sha256": "040e6534d7a7ad18b22757e70249109bbea3856e8bf71eededaed385a068a2f7"
+    },
+    {
+      "status": "M",
+      "path": "academy-web/src/components/course/CheckpointQuiz.tsx",
+      "sha256": "ae52cda86f19d8c8b7499e62d047407969af6e0e8b23d4733c02ec22296a1e18"
+    },
+    {
+      "status": "M",
+      "path": "academy-web/src/components/course/InteractiveVideo.tsx",
+      "sha256": "002dec3228d206cc32d17f61f0ddcb449de6e4507491d5e369e2859991dbe00d"
+    },
+    {
+      "status": "M",
+      "path": "academy-web/src/components/course/LessonView.tsx",
+      "sha256": "3300b919dc2a6e5648b31bb4acb959d35b04bba1d20c4b3ddea02072944b1359"
+    },
+    {
+      "status": "M",
+      "path": "academy-web/src/lib/account/course-access.ts",
+      "sha256": "c1ede6f7d2fcb38b925caf040487c4976275b950afa57fe6e3ef81b46070f635"
+    },
+    {
+      "status": "M",
+      "path": "academy-web/src/lib/auth/account-response-client.ts",
+      "sha256": "f315c9451d79981e9b5f0a2331e4d34ebdeed42b25de2e3c3facf5983e7b48fd"
+    },
+    {
+      "status": "M",
+      "path": "academy-web/src/lib/auth/session.ts",
+      "sha256": "db8c76040177eca069152638e1002a1b7779647596eba59e1ee4fcdcf46a5756"
+    },
+    {
+      "status": "M",
+      "path": "academy-web/src/lib/authenticated-mutation-quota.ts",
+      "sha256": "a909e47decf9f51fcb058b60cc7044c7ee9e5922684f6444874d4193daf1dc34"
+    },
+    {
+      "status": "M",
+      "path": "academy-web/src/lib/content-security-policy.ts",
+      "sha256": "3c42e8f29fd73ec9b67d4f4a83208b569c60f513064e6af3c9b0257ab9a76ae0"
+    },
+    {
+      "status": "M",
+      "path": "academy-web/src/lib/content/course-loader.ts",
+      "sha256": "24fe62631a5b08f42404f03515b955323af6e2bf9af4941685b9eb2839ba55e4"
+    },
+    {
+      "status": "M",
+      "path": "academy-web/src/lib/content/legacy-public-course-route.ts",
+      "sha256": "231ba619d110a13c1f4603580406f73cce4d0fd701c9c8cb4f83878c438616af"
+    },
+    {
+      "status": "M",
+      "path": "academy-web/src/lib/course/attempt-client.ts",
+      "sha256": "f46c9a81f8cd7726b0f7403ecd0ed5d8516931424f9731e9d73da2c584a4fa85"
+    },
+    {
+      "status": "M",
+      "path": "academy-web/src/lib/course/certificate-eligibility.ts",
+      "sha256": "42969e2cf3a7ad53ab0061b0d42ab6394bbbcb5fdc44d069ff94fa77a937e358"
+    },
+    {
+      "status": "M",
+      "path": "academy-web/src/lib/course/checkpoint-draft.ts",
+      "sha256": "8f1e2376495c2a470702a5795e5d0c482549c8d3cebd6e3fe320e841aee117f9"
+    },
+    {
+      "status": "M",
+      "path": "academy-web/src/lib/course/progress-client.ts",
+      "sha256": "36a655d9b8980c0afa5ba650ac69eaa67cfc1d49cd638c13ce6277b2198138c9"
+    },
+    {
+      "status": "M",
+      "path": "academy-web/src/lib/course/progress.ts",
+      "sha256": "f66ecbedee2b9cc1d458867936524d735e68b65a52a804f75e65ae5bb6f8f28b"
+    },
+    {
+      "status": "M",
+      "path": "academy-web/src/lib/course/settings.ts",
+      "sha256": "cc9e009099667cedb4c1c6406dda18dd42b9e88776c55c31a9735b78cee16d9b"
+    },
+    {
+      "status": "M",
+      "path": "academy-web/src/lib/course/visibility.ts",
+      "sha256": "fa0db81cf9450a02e8de35c34e73c3dd318ce3d0b201cb6c3e8bb9d773b5e000"
+    },
+    {
+      "status": "M",
+      "path": "academy-web/src/lib/edge-rate-limit-policy.ts",
+      "sha256": "bc6aec7a68ea1e973b2f49051caef1d4982925aead47b1b122795855972ce4ae"
+    },
+    {
+      "status": "M",
+      "path": "academy-web/src/lib/edge-security-headers.ts",
+      "sha256": "67f80338507a5f8083195e446bc4c63b8954327989ea01e6841ec894bcbabefa"
+    },
+    {
+      "status": "M",
+      "path": "academy-web/src/lib/http/bounded-body.ts",
+      "sha256": "4bd76260e05b52b4cd24213e6fc665ca0f2d2cd04851365606e69200d1aab5b0"
+    },
+    {
+      "status": "M",
+      "path": "academy-web/src/lib/i18n/privacy.ts",
+      "sha256": "7e6fee4e0a08d798fa3e241c467a38ff51e375a012634169cc985ad1670cabca"
+    },
+    {
+      "status": "M",
+      "path": "academy-web/src/lib/identity/adapter.ts",
+      "sha256": "536b0f68f43a02e59baaaffbe06154391f5437c3a3e5ea353c322d5ebbdcfad9"
+    },
+    {
+      "status": "M",
+      "path": "academy-web/src/lib/identity/code-exchange-request.ts",
+      "sha256": "304b38bfb92ff05952785c687d40a189f3fa93462685b3a8a0b478d130059697"
+    },
+    {
+      "status": "M",
+      "path": "academy-web/src/lib/identity/code-exchange-result-envelope.ts",
+      "sha256": "a66928ed545364c92e11a9e498f9d39d5b55de7ac5a81cbe65a40715319c6a9f"
+    },
+    {
+      "status": "M",
+      "path": "academy-web/src/lib/identity/code-exchange-result.ts",
+      "sha256": "fec103c67042d5194bc45497c0e0768569826f67a513f8140e1f9475cebb15c7"
+    },
+    {
+      "status": "M",
+      "path": "academy-web/src/lib/identity/fake-adapter.ts",
+      "sha256": "3292b4db8e750935430ae705b07277a6cce3ed0bc261eeb77147f4567e7c2221"
+    },
+    {
+      "status": "M",
+      "path": "academy-web/src/lib/identity/lifecycle-page-store.ts",
+      "sha256": "a4af65d497dbee152b9beb68533ae65300f9203f85d29bcf99137fdf306e9162"
+    },
+    {
+      "status": "M",
+      "path": "academy-web/src/lib/identity/local-runtime.ts",
+      "sha256": "9fd6013443106324b1c9776bf43a6b1c71c91a348b8cec1d35c8f0c57602641d"
+    },
+    {
+      "status": "M",
+      "path": "academy-web/src/lib/identity/postgres-session-store.ts",
+      "sha256": "f57ae80908107c8c24f1f42d5da3b7d82c747dea87b3f11f71402bea846378a3"
+    },
+    {
+      "status": "M",
+      "path": "academy-web/src/lib/identity/postgres-transaction-store.ts",
+      "sha256": "572cdfb4bd9b0c99ce35be348228d7e030fcd0e133b73a001f2d7824c2dfee8b"
+    },
+    {
+      "status": "M",
+      "path": "academy-web/src/lib/identity/production-runtime.ts",
+      "sha256": "c9988ec3b2027e70ed8f1cf3e10cb58b2fcbec27f452c8089e8182c7f413bdab"
+    },
+    {
+      "status": "M",
+      "path": "academy-web/src/lib/identity/runtime-browser-flow.ts",
+      "sha256": "c0ff5670d2b8cde9c72fbeeeda1abf9d82e7233a4d26876be6d98c2b24343f10"
+    },
+    {
+      "status": "M",
+      "path": "academy-web/src/lib/identity/runtime-completion.ts",
+      "sha256": "3b5593e5ff49d007035d96c032473cbc795390fe1ec9a34558c6691bc1bdeca6"
+    },
+    {
+      "status": "M",
+      "path": "academy-web/src/lib/identity/session-store.ts",
+      "sha256": "13a62fe77db55f7b676625d1d1018cfd87327819f9ce740ad3f1508fbd8e5352"
+    },
+    {
+      "status": "M",
+      "path": "academy-web/src/lib/identity/transaction.ts",
+      "sha256": "d0bc5c155bd14443a68ffc15c2e003ac2f82ab2170e31280879c1c37c30f6dfd"
+    },
+    {
+      "status": "M",
+      "path": "academy-web/src/lib/media/resolve.ts",
+      "sha256": "cb93e40bb2468d9dd8393275baeddb69712d6d4ae29bf56f843ad2fa468ed8aa"
+    },
+    {
+      "status": "M",
+      "path": "academy-web/src/lib/media/worker-delivery.ts",
+      "sha256": "1629230001e881e4a2240e37161ff2e08ee5af1fb49e05b80dfd92a64809b997"
+    },
+    {
+      "status": "M",
+      "path": "academy-web/src/lib/player/progress.ts",
+      "sha256": "cc99958490619800f328b579651432aceddcf92dddf13b97e0afd4f48c70519f"
+    },
+    {
+      "status": "M",
+      "path": "academy-web/src/lib/safe-log.ts",
+      "sha256": "3108e8dfc14cb6314ad422059019bc573e414c7e75f3fc241cecf3c9760c0b38"
+    },
+    {
+      "status": "M",
+      "path": "academy-web/src/lib/simulation/types.ts",
+      "sha256": "a9d74870a2955b7c48382b209bb3e723d59e7fafff46c8c2370dab0067c4b393"
+    },
+    {
+      "status": "M",
+      "path": "academy-web/src/middleware.ts",
+      "sha256": "3144dfdac6e5b2100c1f48bb0950f0524565008718202e2fed0b1831a1035801"
+    },
+    {
+      "status": "M",
+      "path": "academy-web/tests/integration/academy-retention-api.test.ts",
+      "sha256": "ac7fde43b6ae905cb926154b74a79d40e049c61548ffee6e9f78363d5da4d8c0"
+    },
+    {
+      "status": "M",
+      "path": "academy-web/tests/integration/academy-runtime-api.test.ts",
+      "sha256": "8d7bf469af14d2c2b8b9e92189e0ac9b3528cd7e1a31ccce055fca5f2af47da5"
+    },
+    {
+      "status": "M",
+      "path": "academy-web/tests/integration/identity-boundary.test.ts",
+      "sha256": "eb7624952d18e6940f360d50feb4cd28ab0fca02a27875573c2b99bcb94fd301"
+    },
+    {
+      "status": "M",
+      "path": "academy-web/tests/integration/identity-lifecycle-enforcement.test.ts",
+      "sha256": "e4346ba558ca3c5ba4081b8eb77d0e563b0c5a285934d363f2a2271d71548e75"
+    },
+    {
+      "status": "M",
+      "path": "academy-web/tests/integration/identity-lifecycle-page-store.test.ts",
+      "sha256": "86c8a074e5b107a89620a8a64923e9a5b706e7b7193958109a67203466639bb1"
+    },
+    {
+      "status": "M",
+      "path": "academy-web/tests/integration/identity-postgres-transaction-store.test.ts",
+      "sha256": "c479f1e5a0228171f908ca87c87549abe68a1f627cac93b94c09c309af44e8e0"
+    },
+    {
+      "status": "M",
+      "path": "academy-web/tests/unit/access-required-view.test.ts",
+      "sha256": "33b3959d804061b2ce83c62e89b0054759d876728345bf7724421f68de548adb"
+    },
+    {
+      "status": "M",
+      "path": "academy-web/tests/unit/account-active-user-activation.test.ts",
+      "sha256": "9b7217ad00c2a10c4605ad4968ca7cca61b4c788024de289610502c5af17c24e"
+    },
+    {
+      "status": "M",
+      "path": "academy-web/tests/unit/attempt-client.test.ts",
+      "sha256": "e985020d04c18d8c7209c248b46631768990e990ebfe247d8df510a0711f882a"
+    },
+    {
+      "status": "M",
+      "path": "academy-web/tests/unit/bounded-body.test.ts",
+      "sha256": "2b0bc2dd13eb4b36898a1ee6f8978e9285c914ad7c6aefb834f87e2792a59cd8"
+    },
+    {
+      "status": "M",
+      "path": "academy-web/tests/unit/course-access.test.ts",
+      "sha256": "d6f075ba0ce07de28dee1fa62186100878757162abaa30c771d931cb71f56012"
+    },
+    {
+      "status": "M",
+      "path": "academy-web/tests/unit/current-user-identity-session.test.ts",
+      "sha256": "aa5eccebf2be33379d78721441d16f81b238063a37f3cb2db5a44b67f2790911"
+    },
+    {
+      "status": "M",
+      "path": "academy-web/tests/unit/edge-response-security-headers.test.ts",
+      "sha256": "a7b1a2102e89a42ab044d79629d405cdcd32911c32632f49a9bea032343cc86b"
+    },
+    {
+      "status": "M",
+      "path": "academy-web/tests/unit/identity-client-assertion-conformance.test.ts",
+      "sha256": "0f8e4aa4dce632f7f2f7f63b18f2c2c648584078a5c1249702965b8fbca7c069"
+    },
+    {
+      "status": "M",
+      "path": "academy-web/tests/unit/identity-client-assertion-registration-rehearsal.test.ts",
+      "sha256": "ef304dbd076088f99f381dbedf5f3f0619c65292a4d85d62486140f7ea7a8757"
+    },
+    {
+      "status": "M",
+      "path": "academy-web/tests/unit/identity-client-assertion-secret-diagnostic.test.ts",
+      "sha256": "a774ab25971da825f40908d35866e62032cad94e6a0d9e846bc88e793daf40c0"
+    },
+    {
+      "status": "M",
+      "path": "academy-web/tests/unit/identity-code-exchange-adapter.test.ts",
+      "sha256": "8849e534828798189b6ff534d85b1685f13be79f390ea25d801a7be943720f40"
+    },
+    {
+      "status": "M",
+      "path": "academy-web/tests/unit/identity-code-exchange-json-operation.test.ts",
+      "sha256": "30c3f2d51534889eea166cbb15c87f1a08d9ea1c1e85f1d87da43b891657c033"
+    },
+    {
+      "status": "M",
+      "path": "academy-web/tests/unit/identity-code-exchange-port.test.ts",
+      "sha256": "c44e92e42b473d7fe5f8f4e152e7de973d28be3292590e2e67eb4c917b16bfe3"
+    },
+    {
+      "status": "M",
+      "path": "academy-web/tests/unit/identity-code-exchange-response-transport.test.ts",
+      "sha256": "cdcee11e7efc9b8ff7668f74b1467233a8e097f53034115dfbcc3e2ae25d9392"
+    },
+    {
+      "status": "M",
+      "path": "academy-web/tests/unit/identity-code-exchange-result-envelope.test.ts",
+      "sha256": "7b9ef5a93cd865e79e9732ed83aa6171886be27e1cb69acd95f46e001082a75b"
+    },
+    {
+      "status": "M",
+      "path": "academy-web/tests/unit/identity-code-exchange-result-verifier-port.test.ts",
+      "sha256": "1539fa2def369cfca4a0517dcf80331222314901568d136a093ed683146faa24"
+    },
+    {
+      "status": "M",
+      "path": "academy-web/tests/unit/identity-code-exchange-result.test.ts",
+      "sha256": "9698fa181d468e825df45f94c1bb2b6b267c125cb7847056567d6a19020f66f6"
+    },
+    {
+      "status": "M",
+      "path": "academy-web/tests/unit/identity-code-exchange-transport.test.ts",
+      "sha256": "7a256107e0b6fccc873fd2c13565b73ad5b42e037ce785fad3e32b580d5ebf74"
+    },
+    {
+      "status": "M",
+      "path": "academy-web/tests/unit/identity-lifecycle-page-store.test.ts",
+      "sha256": "57231a7722d439767bed8182a245d2f8400a9f97f80b15c5645a73b98ac628d0"
+    },
+    {
+      "status": "M",
+      "path": "academy-web/tests/unit/identity-local-browser-flow.test.ts",
+      "sha256": "775f5430a83ff524176ac4b67efa2e08887b91584a3664a05f3394a80cac8353"
+    },
+    {
+      "status": "M",
+      "path": "academy-web/tests/unit/identity-local-signed-result.test.ts",
+      "sha256": "4e9702c9422839f205f94b9aab0bad493e0ef2bd178e251105f93a2db025d531"
+    },
+    {
+      "status": "M",
+      "path": "academy-web/tests/unit/identity-postgres-session-store.test.ts",
+      "sha256": "1e122a463a8e816ac8812f033e5bd1234f1856e58e21fd5258aabd28b4cbe36d"
+    },
+    {
+      "status": "M",
+      "path": "academy-web/tests/unit/identity-postgres-transaction-store.test.ts",
+      "sha256": "4a66a5020155bc11325b3db35ce6b8fc4e4a2b679da14a94664ea743287e78dc"
+    },
+    {
+      "status": "M",
+      "path": "academy-web/tests/unit/identity-production-runtime-routes.test.ts",
+      "sha256": "a3aef83ab3c19c262f503dd111c3aca6c1e95f5aa729446136365a854977f145"
+    },
+    {
+      "status": "M",
+      "path": "academy-web/tests/unit/identity-runtime-browser-flow.test.ts",
+      "sha256": "5beb042733cf38f97c8ffa88b918041f78f9a215d364274cf23155f6b6d896d2"
+    },
+    {
+      "status": "M",
+      "path": "academy-web/tests/unit/identity-runtime-completion.test.ts",
+      "sha256": "07f49a9671f21a3130076b3ef3f84ba2afb2db898d4ef8625cb7060ad1412152"
+    },
+    {
+      "status": "M",
+      "path": "academy-web/tests/unit/identity-session-store.test.ts",
+      "sha256": "99b7e57ca76e661d55860194582e3aed900195f0e6a2f59a088666879af46650"
+    },
+    {
+      "status": "M",
+      "path": "academy-web/tests/unit/identity-transaction.test.ts",
+      "sha256": "8efe1531084edf713a75faf7ec7cd141abf02920ca41efec02a68eef716f4b23"
+    },
+    {
+      "status": "M",
+      "path": "academy-web/tests/unit/media-delivery.test.ts",
+      "sha256": "f1605fe57dc81d3a579273bd0f69d254ab857c80b15806e6b78fb6c90e586be1"
+    },
+    {
+      "status": "M",
+      "path": "academy-web/tests/unit/media-resolve.test.ts",
+      "sha256": "c1a7106898c86982e669a73e4d0b4db9541c3af1889a84c87922dfd89150ad24"
+    },
+    {
+      "status": "M",
+      "path": "academy-web/tests/unit/public-course-route.test.ts",
+      "sha256": "bca63ba6d8d3973132ce956abd691132f203b34e635bec293dc516d7d96c7ccf"
+    },
+    {
+      "status": "M",
+      "path": "academy-web/tests/unit/public-course-share-route.test.ts",
+      "sha256": "7640eda244d44002d06aa2f633f0d64c7e1ae1f99c3833d3d82eb343586a6e16"
+    },
+    {
+      "status": "M",
+      "path": "academy-web/tests/unit/public-lesson.test.ts",
+      "sha256": "3a7dd587918f72fcbf048922ea513130541b8d446ebc607bffe3b088262078db"
+    },
+    {
+      "status": "M",
+      "path": "academy-web/tests/unit/retention-scheduler.test.ts",
+      "sha256": "0bf68afa3584a4bd5766078eefb7424984a90295a7cae00f3d86a5391359fc86"
+    },
+    {
+      "status": "M",
+      "path": "academy-web/tests/unit/safe-log.test.ts",
+      "sha256": "8c834d188f75ff8deccc54697b16c7049e42745a8da0369fe1d43eb5744d4feb"
+    },
+    {
+      "status": "M",
+      "path": "academy-web/tests/unit/security-headers.test.ts",
+      "sha256": "670e7d5e20fb88d066cf79f2d1d2d3e86ee23a03f3c86d75407341789adfdd74"
+    },
+    {
+      "status": "M",
+      "path": "academy-web/tests/unit/security-wiring.test.ts",
+      "sha256": "361467a0201cf6e4eecd1291e3acfc509a1ed93e68d29e865026d7e39cf9b4b6"
+    },
+    {
+      "status": "M",
+      "path": "academy-web/tests/unit/sign-out-route.test.ts",
+      "sha256": "b50f4b0c0fcb54ba11b6ea4f504e99d35097cece8ebafa6eb9ec13854ba5ff2c"
+    },
+    {
+      "status": "M",
+      "path": "academy-web/tests/unit/simulation-grading.test.ts",
+      "sha256": "7f626c17b6ab56c981cc2c2b4662d05211f3b2a19a6b4fa518e0ffa2d1bea07c"
+    },
+    {
+      "status": "M",
+      "path": "academy-web/tests/unit/static-asset-boundary.test.ts",
+      "sha256": "7feb3246c4f4834ed7770d084a1a8006c20d09539a8c714b718a0438a28001d7"
+    },
+    {
+      "status": "M",
+      "path": "academy-web/tests/unit/worker-runtime-budget.test.ts",
+      "sha256": "2ddbe189a348ecb3e63f1e75553f8288b519b55cbac7aea443726b03b56f3138"
+    },
+    {
+      "status": "M",
+      "path": "academy-web/tests/workerd/signer-worker.ts",
+      "sha256": "5dc05bce6e18ead4f73308c1d12e2cf3020688cab367fd1b88ba8950d6bc9149"
+    },
+    {
+      "status": "M",
+      "path": "academy-web/vitest.config.ts",
+      "sha256": "2e1799901251a936ab3289d8366a9adbed1a8688b98bec680ab9446aae57b3ad"
+    },
+    {
+      "status": "M",
+      "path": "academy-web/worker.ts",
+      "sha256": "8a7513acbace57a8d6ef3af40cb1d2e0b4565fdfd0f19289d9334bfcdf888aaf"
+    },
+    {
+      "status": "M",
+      "path": "academy-web/wrangler.jsonc",
+      "sha256": "c7155fc6a45a298033762c815d0decfd72dff4c38be95d266aaf3bc9e2916510"
+    },
+    {
+      "status": "M",
+      "path": "docs/maintenance/academy-operations-runbook.md",
+      "sha256": "00a479d4e09d7155f9b0716299bcee1f7456716b8d0e57d803230f0708ada5b6"
+    },
+    {
+      "status": "??",
+      "path": "academy-web/docs/privacy/browser-learner-state.md",
+      "sha256": "c1a3fff3a424e1e67e0b28188c98c02214f1de2d33ee0b2d772ba81f208dbd68"
+    },
+    {
+      "status": "??",
+      "path": "academy-web/docs/privacy/data-access-and-erasure.md",
+      "sha256": "f4adcac76ac1d65e7fed8f38c72b9e7a0f2fbcf2a74b1a0093f0f4d08d4c71fb"
+    },
+    {
+      "status": "??",
+      "path": "academy-web/docs/security-events.md",
+      "sha256": "bfe0453602f1456614280734206c08f8b12bd8055a05cc43c741aa1bf6958d77"
+    },
+    {
+      "status": "??",
+      "path": "academy-web/docs/security/csp-reporting.md",
+      "sha256": "4b627b9a48631e99dee9eceae16d1e4f1a8c288abdb44c9cdc586d66df08cc13"
+    },
+    {
+      "status": "??",
+      "path": "academy-web/docs/security/maintenance-admission.md",
+      "sha256": "bc1bb99ea589ec38ace95963a44d2b1bd4fbff5be176e43ae51c4412ba3571e3"
+    },
+    {
+      "status": "??",
+      "path": "academy-web/docs/security/session-timeout-ux-analysis.md",
+      "sha256": "4b6b8ca229fb6a5862e30809c98644c1f379159d065932ef840d6d2a82d5aaa5"
+    },
+    {
+      "status": "??",
+      "path": "academy-web/reports/security/npm-audit-all-20260912.json",
+      "sha256": "8c5cc5bf5e854de645bbfc7816cbb5c318a206e4e06cfe0f2069aeb7c684fb5d"
+    },
+    {
+      "status": "??",
+      "path": "academy-web/reports/security/npm-audit-all-fixed-20260912.json",
+      "sha256": "116ec7a3f7670d30df23a38b8ef843ae8391ccf9d77ee48df434812c6788e239"
+    },
+    {
+      "status": "??",
+      "path": "academy-web/reports/security/npm-audit-production-20260912.json",
+      "sha256": "116ec7a3f7670d30df23a38b8ef843ae8391ccf9d77ee48df434812c6788e239"
+    },
+    {
+      "status": "??",
+      "path": "academy-web/scripts/admission-release-policy.mjs",
+      "sha256": "bc54508995721cf9f3579b44c02578b0d2fd6bc43c2de346c6235b5b16340b63"
+    },
+    {
+      "status": "??",
+      "path": "academy-web/scripts/test-pending-waitlist-postgres.mjs",
+      "sha256": "f63a4f5d612a84fb113385881f3c2e90e1c2d4fb46686eae22ec29ce8ba1a589"
+    },
+    {
+      "status": "??",
+      "path": "academy-web/src/app/(site)/api/attempts/reauthenticate/route.ts",
+      "sha256": "35a23c9c036f2d25af6b9133d3ca36314f8e6fc48d7b6a120d2e87659be204b8"
+    },
+    {
+      "status": "??",
+      "path": "academy-web/src/app/(site)/api/auth/activity/route.ts",
+      "sha256": "e8de371c0e13fe3bcba85343044577ede4de3a0ef7c99bb25b52a0f1e27182dc"
+    },
+    {
+      "status": "??",
+      "path": "academy-web/src/app/(site)/api/security/csp-report/route.ts",
+      "sha256": "90126194d4060ce23658f862a367666fb3e794973f8289c8f737a383c70f465a"
+    },
+    {
+      "status": "??",
+      "path": "academy-web/src/components/privacy/LocalLearnerStateSync.tsx",
+      "sha256": "c01523d4ee54e8af7470dd6251cdfc624a4a1a10e42f2ee619374bbbe7ebd84b"
+    },
+    {
+      "status": "??",
+      "path": "academy-web/src/lib/auth/foreground-video-activity.ts",
+      "sha256": "9264d8b2ea30c557ac6c677fee2ba800c1b4ff5188e39391b5628e4282ab4023"
+    },
+    {
+      "status": "??",
+      "path": "academy-web/src/lib/auth/session-recovery-client.ts",
+      "sha256": "3d2e8b09ad0ef5b6c575272048294a13d459f16e88b90aa476ee39d8c21b5212"
+    },
+    {
+      "status": "??",
+      "path": "academy-web/src/lib/auth/sign-out-client.ts",
+      "sha256": "9cf8aa460d6fd64b09848467077716ea2c0170f67718880a2e686f83ac9df15e"
+    },
+    {
+      "status": "??",
+      "path": "academy-web/src/lib/auth/sso-signout-policy.ts",
+      "sha256": "98a2999320a8218fff9ce37758755e380be3d91ba188033cd7a5fe825de59979"
+    },
+    {
+      "status": "??",
+      "path": "academy-web/src/lib/course/certificate-assessment-readiness.ts",
+      "sha256": "adee0c1b2e8237959e3612e3868c86c8f76c3fd62c82ae41611802524998e196"
+    },
+    {
+      "status": "??",
+      "path": "academy-web/src/lib/edge-admission.ts",
+      "sha256": "d616232169a537d1fc02a9baca95517848f4bc462900c9ce28ef412437781d65"
+    },
+    {
+      "status": "??",
+      "path": "academy-web/src/lib/identity/authentication-assurance.ts",
+      "sha256": "c4a8d2c6a62592a24b132aaf591ef7d01a143f841e1ac337e984e3840505c213"
+    },
+    {
+      "status": "??",
+      "path": "academy-web/src/lib/identity/lifecycle-first-login.ts",
+      "sha256": "c40ee07dd31f5541b889ad2e6ab277b60b02351918ea6a00d2a5bd5bef31b807"
+    },
+    {
+      "status": "??",
+      "path": "academy-web/src/lib/media/authorization-probe.ts",
+      "sha256": "17bd47307e19a27bf62ecd47e33f3ec976d71f66afde849f9af77199d8de0e9a"
+    },
+    {
+      "status": "??",
+      "path": "academy-web/src/lib/media/open-next-authorizer.ts",
+      "sha256": "c012268a8d0bde2abd619c17dae8ce6e265317fb0ee04017aca199ebdfd85aa4"
+    },
+    {
+      "status": "??",
+      "path": "academy-web/src/lib/privacy/local-learner-state.ts",
+      "sha256": "a01c9e8c35b266cacbf3f6b9447375a29eb77da007441b049b558db1ee5d44a1"
+    },
+    {
+      "status": "??",
+      "path": "academy-web/src/lib/security/csp-report-parser.ts",
+      "sha256": "cdc06108c243bedae8694e332fa4dc8757d1103cbf7c35e928adca7b1fb446f1"
+    },
+    {
+      "status": "??",
+      "path": "academy-web/src/lib/security/security-events.ts",
+      "sha256": "ee0198ee29bb9eeb994c2075e3cd17238673ff05ab894a4e06ed3e2bafa2ffb3"
+    },
+    {
+      "status": "??",
+      "path": "academy-web/supabase/migrations/0040_pending_waitlist_requests.sql",
+      "sha256": "7282c57d98a2a4c33e587ad08858969067f83e21a48bc43eaf862623955c0f1e"
+    },
+    {
+      "status": "??",
+      "path": "academy-web/supabase/migrations/0041_identity_lifecycle_first_login_guards.sql",
+      "sha256": "a55aa19b61f543acd63c4549f46bc5a780459404e351b07efba173633efae548"
+    },
+    {
+      "status": "??",
+      "path": "academy-web/supabase/migrations/0043_identity_assurance_and_session_policy.sql",
+      "sha256": "82332e028759b075ba7931a4eea342b7098ff33b32ad732ed069bce6353a8a7d"
+    },
+    {
+      "status": "??",
+      "path": "academy-web/supabase/migrations/0044_attempt_reauthentication_read.sql",
+      "sha256": "f5cda62ae2bb94334fe00e460636cbc8dfc3d2f81d9aa35ac8a8d22cd683ed49"
+    },
+    {
+      "status": "??",
+      "path": "academy-web/supabase/rollbacks/0040_pending_waitlist_requests.rollback.sql",
+      "sha256": "27b61c7bfc32e3aa8ac1b8ad3d9075a92e7f6243d8e08ec33f93e2d9067e4b67"
+    },
+    {
+      "status": "??",
+      "path": "academy-web/tests/fixtures/identity-assurance-v2-public-vectors.json",
+      "sha256": "b34171155e667a1ca0971042a1bbed5083fc653b2f6d1e7c19155ab6706fc53f"
+    },
+    {
+      "status": "??",
+      "path": "academy-web/tests/unit/admin-course-publication.test.ts",
+      "sha256": "8527fee25501a5dadd08d6de9c1a5f7ab950c577d20d45aa0220dbe14fa122c1"
+    },
+    {
+      "status": "??",
+      "path": "academy-web/tests/unit/certificate-assessment-readiness.test.ts",
+      "sha256": "be0a02620ba3a2902d2aa69a8e7457f50839f978601df956d08f5f449261377b"
+    },
+    {
+      "status": "??",
+      "path": "academy-web/tests/unit/client-privacy.test.ts",
+      "sha256": "d9d6cb6917f0f5d0da6a59d23107ecb4be4d88fd285d46382603986c8a6fee2e"
+    },
+    {
+      "status": "??",
+      "path": "academy-web/tests/unit/costly-resource-quota.test.ts",
+      "sha256": "7c8c466b3707118a5d6269679041addd70587f6708c55ffc6687f33ccacb88e3"
+    },
+    {
+      "status": "??",
+      "path": "academy-web/tests/unit/course-availability-security.test.ts",
+      "sha256": "44c52f90c42c73cc2179bf7844e92d597870d924157a5c60d5bafbf123ed4111"
+    },
+    {
+      "status": "??",
+      "path": "academy-web/tests/unit/csp-reporting.test.ts",
+      "sha256": "e40986a432404afaa9b711dfb9aaf8545664755234260477eaab0f31777c151c"
+    },
+    {
+      "status": "??",
+      "path": "academy-web/tests/unit/edge-admission.test.ts",
+      "sha256": "7d8e8958474f816d94598c28708c84841487fd2c6eafb3bda5643037da05181e"
+    },
+    {
+      "status": "??",
+      "path": "academy-web/tests/unit/foreground-video-activity.test.ts",
+      "sha256": "efccb11e436fa5aca5fefe79341c9fc84252881619bed4521e13b290f89f50a9"
+    },
+    {
+      "status": "??",
+      "path": "academy-web/tests/unit/identity-assurance-v2.test.ts",
+      "sha256": "23bd56a8f9cb643b5385780df33081425066d282befc7d1b55f4672f62513aae"
+    },
+    {
+      "status": "??",
+      "path": "academy-web/tests/unit/media-revalidation.test.ts",
+      "sha256": "40ee4226b69813e667f703f7023a9e072ed21ba6ffd1fba1b83f66d438d497d9"
+    },
+    {
+      "status": "??",
+      "path": "academy-web/tests/unit/pending-consent.test.ts",
+      "sha256": "f4e0ea2e7c26978ab155ffa38da160e44f9607dd992aa96b55bc3d6d757ad5e2"
+    },
+    {
+      "status": "??",
+      "path": "academy-web/tests/unit/security-events.test.ts",
+      "sha256": "2c0473ffc6517fb73d20fd2ce3f15e788969050ca03b6a3cfd987ba5ffcf95a9"
+    },
+    {
+      "status": "??",
+      "path": "academy-web/tests/unit/session-activity-route.test.ts",
+      "sha256": "4ad80dfd71a412aa9b2bf2623c82c0aa1955d8061d80cf95d5940d8664834ec2"
+    },
+    {
+      "status": "??",
+      "path": "academy-web/tests/unit/session-recovery-client.test.ts",
+      "sha256": "5745e64b799228a13a803d49a59d408f269c873100e7dc80db785f8e566aebe7"
+    },
+    {
+      "status": "??",
+      "path": "academy-web/tests/unit/sign-out-client.test.ts",
+      "sha256": "24d6fe052a398cf6d10c9e3f7af8660bb6c4d65f9aa398ca6f6f41c842ea8323"
+    },
+    {
+      "status": "??",
+      "path": "docs/identity-browser-signout-contract.md",
+      "sha256": "66cb74cb025adf43921c12aae806380e3adc2e048e05dd775cdb728cc4e4efb7"
+    },
+    {
+      "status": "??",
+      "path": "reports/security/2026-09-11-owasp-top10-source-assessment.md",
+      "sha256": "723816769e85cb36b7dc2762f608d6da2a09fed98a63eecae0bc419f46f9cea6"
+    }
+  ],
+  "changedFilesCount": 178,
+  "manifestScope": "Every git-modified file plus every file inside untracked directories (node_modules/.next/.open-next/.DS_Store excluded). SHA256 computed on the frozen bytes at 2026-09-12T15:47+07:00.",
+  "refrozenAt": "2026-09-12T16:13:47+07:00",
+  "refreezeNote": "v2 refreeze after follow-up lane (independent review verdict PASS_WITH_NOTES). Same 178-file set as v1; only the 3 files below changed bytes. Nothing committed, pushed, or deployed.",
+  "followUp": {
+    "review": "/Users/teerakanok/Dev/cyberskills-director/reports/security/identity-recovery-523a1d40/academy-independent-review-20260912.md",
+    "verdict": "PASS_WITH_NOTES",
+    "ranAt": "2026-09-12T16:13:47+07:00",
+    "deltaVsV1": {
+      "filesChanged": [
+        {
+          "path": "academy-web/tests/unit/identity-client-assertion-secret-diagnostic.test.ts",
+          "sha256V1": "428e15201bbf508b6b4c26321dc5d18074a517cdd69bde9a42598f97008ed219",
+          "sha256V2": "a774ab25971da825f40908d35866e62032cad94e6a0d9e846bc88e793daf40c0",
+          "change": "F3: restored the deleted rejection case request({headers: {\"cf-access-jwt-assertion\": \"\"}}) in the admission test loop (byte-identical to baseline bf74fbf); no other line touched."
+        },
+        {
+          "path": "academy-web/docs/security/maintenance-admission.md",
+          "sha256V1": "64ae7156df1ab944191b9b0d3f90e30f421fa323496a0925272d97fb32cee5bf",
+          "sha256V2": "bc1bb99ea589ec38ace95963a44d2b1bd4fbff5be176e43ae51c4412ba3571e3",
+          "change": "F5: rewrote paragraphs 1 and 3 to the applied state (worker.ts calls admissionResponse; exact-match open; fail-closed 503 no-store retry-after 60; wrangler.jsonc run_worker_first true + ACADEMY_ADMISSION_MODE declared; scheduled handler never reads the mode; deployed vars/routing read-back still owed). Paragraphs 2 and 4-6 untouched."
+        },
+        {
+          "path": "academy-web/src/lib/identity/lifecycle-first-login.ts",
+          "sha256V1": "0dad95923ec617b490fb6391ef477a35e7eb505fa9c1c586618606f18f230262",
+          "sha256V2": "c40ee07dd31f5541b889ad2e6ab277b60b02351918ea6a00d2a5bd5bef31b807",
+          "change": "F4: added a header doc-comment labeling the module as scaffolding awaiting rollout wiring (wiring is a product rollout decision tied to lifecycle enablement authority); code otherwise untouched and still has no importer."
+        }
+      ],
+      "newFiles": [],
+      "deletedFiles": []
+    },
+    "findings": {
+      "F3": {
+        "severity": "LOW",
+        "disposition": "closed",
+        "action": "restored the empty cf-access-jwt-assertion denial case into the existing rejection loop",
+        "verification": "npx vitest run tests/unit/identity-client-assertion-secret-diagnostic.test.ts -> Test Files 1 passed (1); Tests 13 passed (13); Type Errors no errors"
+      },
+      "F5": {
+        "severity": "MEDIUM (doc-only)",
+        "disposition": "closed",
+        "action": "rewrote paragraphs 1 and 3 of docs/security/maintenance-admission.md to match frozen behavior",
+        "verification": "npm run lint (covers docs via unchanged tsc chain; doc is markdown) -> 22 problems (0 errors, 22 warnings), exit 0"
+      },
+      "F4": {
+        "severity": "INFO",
+        "disposition": "closed (label-only; intentionally NOT wired)",
+        "action": "header comment labels the module scaffolding awaiting rollout wiring; wiring into the login flow remains a product rollout decision tied to lifecycle enablement authority",
+        "verification": "npm run lint -> 0 errors, 22 warnings (all pre-existing), exit 0 (tsc app/worker/retention configs pass)"
+      },
+      "F2": {
+        "severity": "LOW",
+        "disposition": "deferred (adjudicated structural)",
+        "reason": "Browser HTML inline style= enumeration: 10 occurrences / 3 client components / 5 distinct patterns. RoadmapGraph.tsx (7 occurrences) positions each roadmap node with data-driven left/top + per-node animationDelay (N unbounded per authored course) in a use-client component where a nonce cannot be minted; migrating requires restructuring to server-computed layout + per-node rules or abandoning the HTML-node-over-SVG design. Removing the directive now would silently collapse node positioning on the learn page. Static leftovers (RadarChart fontSize/fontWeight, HEX_CLIP shapes, CourseDashboard progress width) are migratable but a partial migration cannot remove the directive, so it delivers no security delta while touching review-passed code. Kept style-src-attr unsafe-inline as adjudicated follow-up per reviewer disposition; script-src stays nonce + strict-dynamic.",
+        "evidence": {
+          "browserHtml": [
+            "src/components/course/RoadmapGraph.tsx:87 maxWidth/height from layoutRoadmap()",
+            "src/components/course/RoadmapGraph.tsx:133,205 clipPath hexagon (static values, conditional class possible)",
+            "src/components/course/RoadmapGraph.tsx:159 per-node left%/top from data-driven layout",
+            "src/components/course/RoadmapGraph.tsx:166,176 per-node animationDelay rank*60ms",
+            "src/components/course/CourseDashboard.tsx:96,111 progress fill width finishedPercent%",
+            "src/components/course/RadarChart.tsx:130 static fontSize 11 / fontWeight 600"
+          ],
+          "notBrowserHtml": [
+            "src/lib/course-share-image.tsx (10 occurrences) renders only via satori ImageResponse (opengraph-image.tsx + share/[locale]/route.tsx) -> served as image bytes, CSP style-src-attr not applicable"
+          ],
+          "notCspGoverned": [
+            "src/components/course/blocks/LabBlock.tsx:67-70 and ImageBlock.tsx:22-25 set document.body.style.overflow via CSSOM property assignment (not blocked by style-src-attr)"
+          ]
+        }
+      }
+    },
+    "verificationRuns": [
+      {
+        "command": "npx vitest run tests/unit/identity-client-assertion-secret-diagnostic.test.ts",
+        "result": "Test Files 1 passed (1) | Tests 13 passed (13) | Type Errors no errors | exit 0"
+      },
+      {
+        "command": "npm run lint",
+        "result": "ESLint 22 problems (0 errors, 22 warnings) + tsc app/worker/retention-worker configs pass | exit 0"
+      }
+    ]
+  }
+}

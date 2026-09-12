@@ -499,6 +499,73 @@ describe('Academy Identity lifecycle page-store boundary', () => {
     await expect(store.read()).rejects.toThrow(/snapshot response/)
   })
 
+  it('durably fences a disabled projection when its leased page commit fails', async () => {
+    const rpc = vi.fn(async (functionName: string) => functionName === 'fence_identity_lifecycle_page_failure'
+      ? { data: null, error: null }
+      : { data: null, error: { message: 'commit failed' } })
+    const commit = buildIdentityLifecyclePageCommit(readySnapshot(), {
+      nextCursor: '2',
+      configRevision: 1,
+      events: [event('learner-a', 'disabled', 2)],
+    }, 1)
+
+    await expect(new AcademyIdentityLifecyclePageStore({ rpc }).commitPageUnderLease(commit, {
+      claimToken: '00000000-0000-4000-8000-000000000001',
+      claimedBy: 'worker-a',
+    })).rejects.toThrow(/^Identity lifecycle page commit under lease failed$/)
+
+    expect(rpc).toHaveBeenCalledTimes(2)
+    expect(rpc).toHaveBeenNthCalledWith(2, 'fence_identity_lifecycle_page_failure', {
+      p_projections: [{
+        current: {
+          issuer: ISSUER,
+          subjectKey: fixtureSubjectKey('learner-a'),
+          state: 'disabled',
+          revision: 2,
+        },
+        health: { status: 'ready' },
+        highestKnownRevision: 2,
+      }],
+    })
+  })
+
+  it('does not create a failure fence for an active-only commit', async () => {
+    const rpc = vi.fn(async () => ({ data: null, error: { message: 'commit failed' } }))
+    const commit = buildIdentityLifecyclePageCommit(null, {
+      nextCursor: '1',
+      configRevision: 1,
+      events: [event('learner-a', 'active', 1)],
+    }, 1)
+
+    await expect(new AcademyIdentityLifecyclePageStore({ rpc }).commitPageUnderLease(commit, {
+      claimToken: '00000000-0000-4000-8000-000000000001',
+      claimedBy: 'worker-a',
+    })).rejects.toThrow(/^Identity lifecycle page commit under lease failed$/)
+    expect(rpc).toHaveBeenCalledTimes(1)
+  })
+
+  it.each(['returned', 'thrown'])('fails closed with a sanitized error when the failure fence is %s', async (failureMode) => {
+    const rpc = vi.fn(async (functionName: string) => {
+      if (functionName !== 'fence_identity_lifecycle_page_failure') {
+        return { data: null, error: { message: 'commit failed' } }
+      }
+      if (failureMode === 'thrown') {
+        throw new Error('DATABASE_URL=must-not-leak')
+      }
+      return { data: null, error: { message: 'DATABASE_URL=must-not-leak' } }
+    })
+    const commit = buildIdentityLifecyclePageCommit(readySnapshot(), {
+      nextCursor: '2',
+      configRevision: 1,
+      events: [event('learner-a', 'deleted', 2)],
+    }, 1)
+
+    await expect(new AcademyIdentityLifecyclePageStore({ rpc }).commitPageUnderLease(commit, {
+      claimToken: '00000000-0000-4000-8000-000000000001',
+      claimedBy: 'worker-a',
+    })).rejects.toThrow(/^Identity lifecycle page failure could not be fenced$/)
+  })
+
   it('fails closed on malformed RPC data or an RPC error', async () => {
     const malformed = new AcademyIdentityLifecyclePageStore({
       rpc: async () => ({ data: { ...readySnapshot(), extra: true }, error: null }),

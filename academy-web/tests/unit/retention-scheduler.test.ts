@@ -56,6 +56,7 @@ describe('Academy retention scheduler', () => {
     const [url, init] = fetcher.mock.calls[0] as [URL, RequestInit]
     expect(url.pathname).toBe('/rpc/run_retention_attempts')
     expect(init.body).toBe('{}')
+    expect(init.redirect).toBe('error')
     expect(init.headers).toMatchObject({ 'content-type': 'application/json' })
   })
 
@@ -64,6 +65,17 @@ describe('Academy retention scheduler', () => {
     await expect(runPurgeJob(env, entitlementHistory, { fetcher })).resolves.toEqual({ rounds: 2, deleted: 1 })
     const [url] = fetcher.mock.calls[0] as [URL, RequestInit]
     expect(url.pathname).toBe('/rpc/run_retention_course_entitlement_history')
+  })
+
+  it('does not expose a failed transport URL or credential through scheduler logs', async () => {
+    const sentinel = 'fixture-sensitive-url-and-credential'
+    const log = vi.fn()
+    const warn = vi.fn()
+    const fetcher = vi.fn().mockRejectedValue(new Error(sentinel))
+    await expect(runRetention(env, { fetcher, logger: { log, warn } }, [attempts]))
+      .rejects.toThrow('request failed')
+    expect(JSON.stringify([...log.mock.calls, ...warn.mock.calls])).not.toContain(sentinel)
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining('request failed'))
   })
 
   it('fails on a timeout or non-integer API result', async () => {

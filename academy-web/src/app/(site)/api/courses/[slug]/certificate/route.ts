@@ -53,12 +53,19 @@ export async function GET(
   const { slug } = await params
   const structure = getCourseStructure(slug)
   if (!structure) return NextResponse.json({ ok: false, error: 'ไม่พบคอร์สนี้' }, { status: 404, headers: NO_STORE })
+  const access = await authorizeCourseResource(user.account.id, slug)
+  if (!access.allowed) {
+    return NextResponse.json(
+      { ok: false, error: access.reason === 'unavailable' ? 'ตรวจสิทธิ์ไม่สำเร็จ' : 'ไม่มีสิทธิ์เข้าถึงคอร์สนี้' },
+      { status: deniedAccessStatus(access), headers: NO_STORE },
+    )
+  }
   try {
     const issued = await loadIssued(user.account.id, slug)
     if (issued) return NextResponse.json({ ok: true, issued }, { headers: NO_STORE })
     const eligibility = await certificateEligibility(user.account.id, slug)
     if ('unavailable' in eligibility) {
-      return NextResponse.json({ ok: false, error: 'ตรวจเงื่อนไขไม่สำเร็จ' }, { status: 503, headers: NO_STORE })
+      return NextResponse.json({ ok: false, error: eligibility.reason === 'assessment-not-ready' ? 'คอร์สนี้ยังไม่เปิดออกใบรับรอง' : 'ตรวจเงื่อนไขไม่สำเร็จ' }, { status: 503, headers: NO_STORE })
     }
     return NextResponse.json({
       ok: true,
@@ -116,7 +123,7 @@ export async function POST(
     }
     const eligibility = await certificateEligibility(user.account.id, slug)
     if ('unavailable' in eligibility) {
-      return NextResponse.json({ ok: false, error: 'ตรวจเงื่อนไขไม่สำเร็จ' }, { status: 503 })
+      return NextResponse.json({ ok: false, error: eligibility.reason === 'assessment-not-ready' ? 'คอร์สนี้ยังไม่เปิดออกใบรับรอง' : 'ตรวจเงื่อนไขไม่สำเร็จ' }, { status: 503, headers: NO_STORE })
     }
     if (!eligibility.eligible) {
       return NextResponse.json({ ok: false, error: 'ยังทำคอร์สไม่ครบเงื่อนไข' }, { status: 409 })

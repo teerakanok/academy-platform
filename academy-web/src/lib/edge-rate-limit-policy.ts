@@ -14,6 +14,15 @@ export type EdgeRateLimitOperation =
   | 'identity-start-get'
   | 'identity-start-post'
   | 'identity-callback-get'
+  | 'csp-report'
+  | 'learner-attempt'
+  | 'session-activity'
+  | 'attempt-reauthentication'
+  | 'certificate-status'
+  | 'certificate-issue'
+  | 'certificate-pdf'
+  | 'certificate-verify'
+  | 'private-media'
 
 export interface EdgeRateLimitRule {
   operation: EdgeRateLimitOperation
@@ -79,7 +88,38 @@ const rules = new Map([
     limit: LIMIT,
     windowMs: WINDOW_MS,
   }],
+  ['POST:/api/security/csp-report', {
+    operation: 'csp-report' as const,
+    globalLimit: 300,
+    limit: 20,
+    windowMs: WINDOW_MS,
+  }],
 ])
+
+// Global and actor counters deliberately aggregate across course/asset IDs: a
+// caller cannot obtain another budget by iterating the content registry.
+function costlyResourceRule(method: string, path: string): EdgeRateLimitRule | null {
+  let operation: EdgeRateLimitOperation
+  let limit: number
+  let globalLimit: number
+  if (method === 'POST' && path === '/api/auth/activity') {
+    operation = 'session-activity'; limit = 1200; globalLimit = 1200
+  } else if (method === 'POST' && path === '/api/attempts/reauthenticate') {
+    operation = 'attempt-reauthentication'; limit = 120; globalLimit = 1200
+  } else if (method === 'POST' && path === '/api/attempts') {
+    operation = 'learner-attempt'; limit = 60; globalLimit = 1200
+  } else if (method === 'GET' && path === '/api/certificate/verify') {
+    operation = 'certificate-verify'; limit = 30; globalLimit = 600
+  } else if (/^\/api\/courses\/[^/]+\/certificate$/.test(path) && (method === 'GET' || method === 'POST')) {
+    operation = method === 'GET' ? 'certificate-status' : 'certificate-issue'
+    limit = method === 'GET' ? 60 : 10; globalLimit = method === 'GET' ? 1200 : 300
+  } else if (method === 'GET' && /^\/api\/courses\/[^/]+\/certificate\/pdf$/.test(path)) {
+    operation = 'certificate-pdf'; limit = 20; globalLimit = 600
+  } else if ((method === 'GET' || method === 'HEAD') && path.startsWith('/course-media/')) {
+    operation = 'private-media'; limit = 300; globalLimit = 6000
+  } else return null
+  return { operation, limit, globalLimit, windowMs: WINDOW_MS }
+}
 
 export type EdgeRateLimitAdmission =
   | { kind: 'public' }
@@ -104,6 +144,7 @@ function canonicalAdmission(request: Request): EdgeRateLimitAdmission {
 
   const canonicalPath = canonicalTrailingSlash(pathname)
   const rule = rules.get(`${request.method}:${canonicalPath}`)
+    ?? costlyResourceRule(request.method, canonicalPath)
   if (rule) return { kind: 'protected', rule }
 
   if (pathname.includes('%')) {
@@ -121,6 +162,7 @@ function canonicalAdmission(request: Request): EdgeRateLimitAdmission {
       || /[\u0000-\u001f\u007f]/.test(decodedPath)
       || decodedSegments.some((segment) => segment === '.' || segment === '..')
       || rules.has(`${request.method}:${canonicalDecodedPath}`)
+      || costlyResourceRule(request.method, canonicalDecodedPath) !== null
     ) return { kind: 'invalid' }
   }
 

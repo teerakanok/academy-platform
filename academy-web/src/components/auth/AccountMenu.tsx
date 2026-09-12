@@ -4,8 +4,8 @@ import { useEffect, useState } from 'react'
 import { useUi } from '@/components/i18n/LocaleProvider'
 import {
   readAccountResponse,
-  readSignOutResponse,
 } from '@/lib/auth/account-response-client'
+import { signOutCurrentBrowser } from '@/lib/auth/sign-out-client'
 
 // สถานะบัญชีบน header — ดึงหลัง hydrate เพื่อให้หน้าร้านยังเป็น static ได้
 //
@@ -72,28 +72,7 @@ export function AccountMenu() {
           setSigningOut(true)
           setSignOutError(false)
           try {
-            const response = await fetch('/api/auth/sign-out', { method: 'POST' })
-            const result = await readSignOutResponse(response)
-            if (!result) throw new Error('sign-out failed')
-            // จบ SSO กลางก่อน reload (F-1): Identity session cookie อยู่ที่ browser
-            // บน origin ของ accounts.* เท่านั้น ฝั่ง server ของเราถือค่ามันไม่ได้ —
-            // ต้องเป็น browser ที่เรียกเอง same-site จึง attach ได้ no-cors +
-            // keepalive ให้คำขอรอดการนำทางที่ตามมาทันที ถ้า Identity ไม่ตอบ
-            // ก็แค่เท่ากับ behavior เดิม (SSO ยังอยู่) ไม่ทำ sign-out ฝั่งเราพัง
-            if (result.ssoSignoutUrl) {
-              try {
-                void fetch(result.ssoSignoutUrl, {
-                  method: 'POST',
-                  credentials: 'include',
-                  mode: 'no-cors',
-                  keepalive: true,
-                })
-              } catch {
-                // best-effort — SSO ที่ยังอยู่ถูกจำกัดอายุโดย TTL ของมันเอง
-              }
-            }
-            // reload เต็ม — หน้าที่ render ไว้ยังคิดว่าล็อกอินอยู่
-            window.location.assign(result.revocation === 'not-confirmed' ? '/sign-in?notice=local-only' : '/')
+            window.location.assign(await signOutCurrentBrowser())
           } catch {
             setSignOutError(true)
             setSigningOut(false)

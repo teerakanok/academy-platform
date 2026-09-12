@@ -28,7 +28,7 @@ const JTIS = [
   '34a49b39-2030-44bb-8bd5-fbd40928cc0a',
 ] as const
 const SIBLING_IDENTITY_CONTROL = join(__dirname, '../../../../identity-control')
-const CANONICAL_IDENTITY_CONTROL = '/private/tmp/identity-security-correction-cde63a58'
+const CANONICAL_IDENTITY_CONTROL = '/Users/teerakanok/Dev/continuations/identity-security-recovery-20260912-523a1d40'
 
 afterEach(() => {
   vi.unstubAllGlobals()

@@ -136,6 +136,25 @@ export function inspectPinnedPostgresImage(invoke) {
   return { imageId, repoDigest: IMAGE_REPO_DIGEST, architecture }
 }
 
+export function probeFinalPostgresServer(invoke, containerName, environment) {
+  const probe = invoke([
+    'exec', containerName, 'pg_isready', '--host', '127.0.0.1',
+    '--username', USERNAME, '--dbname', DATABASE,
+  ], { env: environment })
+  if (probe.status !== 0 || probe.error) return false
+
+  const roundtrip = invoke([
+    'exec', containerName, 'psql', '--host', '127.0.0.1',
+    '--username', USERNAME, '--dbname', DATABASE,
+    '--tuples-only', '--no-align', '--command',
+    'select current_database(), current_user',
+  ], { env: environment })
+  return roundtrip.status === 0
+    && !roundtrip.error
+    && String(roundtrip.stderr ?? '').trim() === ''
+    && String(roundtrip.stdout ?? '').trim() === `${DATABASE}|${USERNAME}`
+}
+
 export function buildOwnedPostgresRunArguments({ containerName, ownerNonce, port }) {
   if (typeof containerName !== 'string'
     || !/^academy-identity-lifecycle-[1-9][0-9]{0,9}-[0-9a-f]{8}$/.test(containerName)
@@ -467,21 +486,20 @@ async function main() {
     }
     if (port === null) throw new Error('Could not allocate an owned loopback test port in 61000-61999')
 
+    // The official image's temporary bootstrap server is Unix-socket only.
+    // An exact TCP SQL round trip therefore proves the final server is accepting
+    // the same database/user the integration process will use.
+    const databaseEnvironment = {
+      POSTGRES_DB: DATABASE,
+      POSTGRES_USER: USERNAME,
+      POSTGRES_PASSWORD: password,
+    }
     let ready = false
-    for (let attempt = 0; attempt < 60 && !ready; attempt += 1) {
-      const probe = invoke([
-        'exec', containerName, 'pg_isready', '--username', USERNAME, '--dbname', DATABASE,
-      ], {
-        env: {
-          POSTGRES_DB: DATABASE,
-          POSTGRES_USER: USERNAME,
-          POSTGRES_PASSWORD: password,
-        },
-      })
-      ready = probe.status === 0 && !probe.error
+    for (let attempt = 0; attempt < 120 && !ready; attempt += 1) {
+      ready = probeFinalPostgresServer(invoke, containerName, databaseEnvironment)
       if (!ready) await new Promise((resolveDelay) => setTimeout(resolveDelay, 250))
     }
-    if (!ready) throw new Error('Owned disposable PostgreSQL did not become ready')
+    if (!ready) throw new Error('Owned disposable PostgreSQL final TCP server did not become ready')
 
     const databaseUrl = `postgresql://${USERNAME}:${encodeURIComponent(password)}@127.0.0.1:${port}/${DATABASE}`
     const evidence = captureOwnedDisposableEvidence(invoke, {

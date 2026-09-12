@@ -12,7 +12,7 @@ export default async function LegacyCoursePage({
   searchParams: Promise<LegacyCourseSearchParams>
 }) {
   const { slug } = await params
-  const target = legacyCourseRedirectPath({ slug, searchParams: await searchParams })
+  const target = await legacyCourseRedirectPath({ slug, searchParams: await searchParams })
   if (!target) notFound()
   permanentRedirect(target)
 }

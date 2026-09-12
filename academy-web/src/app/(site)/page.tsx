@@ -1,13 +1,15 @@
 import Link from 'next/link'
 import { WaitlistForm } from '@/components/WaitlistForm'
-import { getAllPublicCourses } from '@/lib/content/course-source'
 import { CourseCover } from '@/components/course/CourseCover'
 import { consentText, CURRENT_CONSENT_VERSION } from '@/lib/consent'
+import { getVisiblePublicCourses } from '@/lib/course/visibility'
+
+export const dynamic = 'force-dynamic'
 
 // Landing — Academy ยืนได้ด้วยตัวเอง คนมาถึงหน้านี้โดยไม่เคยรู้จัก CYBERSKILLS ก็ได้
 // งานของหน้านี้จึงไม่ใช่การขอ email ก่อน แต่คือให้เขาตัดสินใจได้จากข้อมูลคอร์สจริง
-export default function HomePage() {
-  const courses = getAllPublicCourses()
+export default async function HomePage() {
+  const courses = await getVisiblePublicCourses()
   const consentLabel = consentText(CURRENT_CONSENT_VERSION).trim()
 
   return (

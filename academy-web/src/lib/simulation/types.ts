@@ -183,7 +183,7 @@ function meets(state: SimulationState, req: SimulationRequirement): boolean {
  * ค่านี้คำนวณจาก surface + requirements โดยตรง จึงเปลี่ยนเองอัตโนมัติเมื่อกติกา
  * เปลี่ยน ไม่ต้องพึ่งว่ามีใครจำได้ว่าต้อง bump เลขเวอร์ชัน
  */
-export function gradingFingerprint(challenge: SimulationChallenge): string {
+export async function gradingFingerprint(challenge: SimulationChallenge): Promise<string> {
   const canonical = JSON.stringify({
     surface: challenge.surface,
     requiredFields: {
@@ -192,15 +192,10 @@ export function gradingFingerprint(challenge: SimulationChallenge): string {
     },
     requirements: challenge.requirements
       .map((r) => ({ id: r.id, field: r.field, operator: r.operator, value: r.value ?? null }))
-      .sort((a, b) => a.id.localeCompare(b.id)),
+      .sort((a, b) => a.id < b.id ? -1 : a.id > b.id ? 1 : 0),
   })
-  // FNV-1a — สั้น อ่านออก และไม่ต้องพึ่ง crypto (ฟังก์ชันนี้ต้องรันได้ทั้งสองฝั่ง)
-  let hash = 0x811c9dc5
-  for (let i = 0; i < canonical.length; i++) {
-    hash ^= canonical.charCodeAt(i)
-    hash = Math.imul(hash, 0x01000193) >>> 0
-  }
-  return `sim-${hash.toString(16).padStart(8, '0')}`
+  const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(canonical))
+  return `sim-sha256-${Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, '0')).join('')}`
 }
 
 export function gradeSimulation(

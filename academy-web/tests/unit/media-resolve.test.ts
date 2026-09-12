@@ -2,8 +2,9 @@ import { describe, expect, it } from 'vitest'
 import type { CourseNode } from '@/lib/content/course-types'
 import type { PublicLesson } from '@/lib/content/public-lesson'
 import { resolveAuthorizedLessonMedia } from '@/lib/media/resolve'
-import { readdirSync, statSync } from 'node:fs'
+import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'
+import { loadCourseStructure } from '@/lib/content/course-loader'
 
 function lesson(nodeId: string, href = '/media/sample-handout.pdf'): PublicLesson {
   return {
@@ -29,6 +30,19 @@ function node(id: string, src?: string): CourseNode {
 }
 
 describe('authorized lesson media resolver', () => {
+  it.each(['https://unapproved.example/video.mp4', '//unapproved.example/video.mp4', 'data:video/mp4;base64,AAAA', '/media/unregistered.mp3'])
+    ('rejects unregistered video tracks at authoring and delivery boundaries: %s', async (reference) => {
+      const file = 'content/courses/basic-os-linux/course.json'
+      const structure = JSON.parse(readFileSync(file, 'utf8'))
+      const videoNode = structure.nodes.find((entry: CourseNode) => entry.video)
+      videoNode.video.src = reference
+      expect(() => loadCourseStructure(file, structure)).toThrow(/private media registry/)
+      await expect(resolveAuthorizedLessonMedia(node('os-what-it-does', reference),
+        lesson('os-what-it-does', '/media/sample-diagram.svg'), {
+          courseSlug: 'basic-os-linux', nodeId: 'os-what-it-does',
+        })).rejects.toThrow(/not registered/)
+    })
+
   it('keeps private media extensions out of public ASSETS', () => {
     const root = join(process.cwd(), 'public')
     const files: string[] = []

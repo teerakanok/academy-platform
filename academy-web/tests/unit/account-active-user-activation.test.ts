@@ -113,6 +113,7 @@ describe('active Academy account activation resolution', () => {
         createdAt: '2026-01-01T00:00:00.000Z',
       },
       email: claims.email,
+      authentication: { method: 'legacy_unknown' },
     })
     expect(sessionStore.get).toHaveBeenCalledWith(sessionId)
     expect(database.academyDb).toHaveBeenCalledTimes(1)

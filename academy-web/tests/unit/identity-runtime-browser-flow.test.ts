@@ -392,6 +392,8 @@ function createFixture(overrides: {
           expectedServiceId: CLIENT.serviceId,
         })
         return {
+    version: 2 as const,
+    authentication: { method: 'webauthn_uv' as const, auth_time: Math.floor(Date.now() / 1_000) },
           issuer: CLIENT.expectedIssuer,
           subject: 'founder-subject',
           verifiedEmail: 'Founder@cyberskills.co.th',

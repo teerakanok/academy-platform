@@ -1,6 +1,8 @@
 'use client'
 
 import Link from 'next/link'
+import { inspectAttemptRecovery } from '@/lib/auth/session-recovery-client'
+import { browserCheckpointDraftStore, clearCheckpointDraft } from '@/lib/course/checkpoint-draft'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import type { CourseNode, CourseStructure, Locale } from '@/lib/content/course-types'
@@ -172,6 +174,9 @@ export function LessonView({
     })
   }
 
+  const [recovering, setRecovering] = useState(false)
+  const [recoveryMessage, setRecoveryMessage] = useState('')
+  const [recoveryInvalid, setRecoveryInvalid] = useState(false)
   const [syncError, setSyncError] = useState<ProgressSyncFailure | null>(null)
   const [accessIssue, setAccessIssue] = useState<'signed-out' | 'access-lost' | 'unavailable' | null>(null)
 
@@ -195,7 +200,7 @@ export function LessonView({
       void pushProgress({ action: 'open', slug: structure.slug, nodeId: node.id }).then(({ failure }) => {
         if (!alive || !failure) return
         setSyncError(failure)
-        if (failure.accessLost) setAccessIssue('access-lost')
+        if (failure.accessLost) setAccessIssue(failure.signedOut ? 'signed-out' : 'access-lost')
       })
     })
     return () => {
@@ -328,7 +333,52 @@ export function LessonView({
     router.push(target ? lessonPath(target.id) : coursePath)
   }
 
-  const accessLost = accessIssue ?? (attempt.status === 'failed' && attempt.reason === 'access-lost' ? 'access-lost' : null)
+  function discardRetainedAttemptDraft() {
+    const store = browserCheckpointDraftStore()
+    if (store && attempt.status === 'ready') clearCheckpointDraft(store, {
+      courseSlug: structure.slug, nodeId: node.id, attemptId: attempt.id,
+    })
+  }
+
+  async function retryAfterSignIn() {
+    if (recovering) return
+    setRecovering(true)
+    try {
+      if (attempt.status !== 'ready') {
+        setRecoveryInvalid(true)
+        setRecoveryMessage('There is no verified attempt to restore. Reopen this lesson to continue with your saved learning record.')
+        return
+      }
+      const status = await inspectAttemptRecovery(structure.slug, node.id, attempt.id)
+      if (status === 'invalid') {
+        discardRetainedAttemptDraft()
+        setRecoveryInvalid(true)
+        setRecoveryMessage('This attempt is no longer available to this account. Its unsent draft has been cleared. Reopen the lesson to start a new task.')
+        return
+      }
+      if (status !== 'active' && status !== 'completed') {
+        setRecoveryMessage(status === 'pending' ? 'A previous submission is still being checked. Wait briefly, then check again.'
+          : status === 'signed-out' ? 'Sign in in the new tab first, then return here and check again.'
+          : 'We could not verify this attempt. Your draft remains hidden in this tab; try again.')
+        return
+      }
+      // Reconcile server-recorded work before exposing any retained answers.
+      const fresh = await fetchProgress(structure.slug)
+      if (!fresh.ok) { setRecoveryMessage('We could not read your saved work. Keep this tab open and try again.'); return }
+      setRecord(fresh.record)
+      if (status === 'completed' || fresh.record.completed.includes(node.id) || fresh.record.testedOut.includes(node.id)) {
+        discardRetainedAttemptDraft()
+        setRecoveryInvalid(true)
+        setRecoveryMessage('The server already recorded this attempt. Reopen the lesson to view the saved result; the old draft will not be resubmitted.')
+        return
+      }
+      setSyncError(null)
+      setAccessIssue(null)
+      setRecoveryMessage('')
+    } finally { setRecovering(false) }
+  }
+
+  const accessLost = accessIssue ?? (attempt.status === 'failed' && (attempt.reason === 'access-lost' || attempt.reason === 'signed-out') ? attempt.reason : null)
   if (accessLost) {
     return (
       <article className="space-y-6" data-testid="lesson-access-lost">
@@ -343,17 +393,24 @@ export function LessonView({
           </h1>
           <p className="mt-3 text-sm leading-relaxed text-cs-body">
             {accessLost === 'signed-out'
-              ? 'Your session ended before this work could be saved. Sign in again to continue.'
+              ? 'Your session ended after 30 minutes without activity or the 12-hour session limit. Any unsent attempt draft is hidden in this tab. Keep this tab open while you sign in again.'
               : accessLost === 'access-lost'
                 ? 'This lesson is no longer available to this account. Work that the server did not confirm has not been marked complete.'
                 : 'Your learning record is unchanged. Return to My learning and try again.'}
           </p>
-          <Link
-            href={accessLost === 'signed-out' ? `/sign-in?next=${encodeURIComponent(lessonPath(node.id))}` : '/dashboard'}
-            className="mt-5 inline-block rounded-control bg-cs-accent-fill px-5 py-3 text-sm font-semibold text-cs-on-accent"
-          >
-            {accessLost === 'signed-out' ? 'Sign in again' : 'Return to My learning'}
-          </Link>
+          {accessLost === 'signed-out' ? <>
+            <a href={`/sign-in?next=${encodeURIComponent('/dashboard')}`} target="_blank" rel="noopener noreferrer"
+              className="mt-5 inline-block rounded-control bg-cs-accent-fill px-5 py-3 text-sm font-semibold text-cs-on-accent">
+              Sign in in a new tab
+            </a>
+            {!recoveryInvalid && <button type="button" onClick={() => void retryAfterSignIn()} disabled={recovering}
+              className="ml-3 rounded-control border border-cs-border px-5 py-3 text-sm" data-testid="lesson-reauthenticate-retry">
+              {recovering ? 'Checking saved work…' : 'I signed in — check this attempt'}
+            </button>}
+            {recoveryMessage && <p role="status" className="mt-3 text-sm">{recoveryMessage}</p>}
+            {recoveryInvalid && <a href={lessonPath(node.id)} className="mt-3 inline-block underline">Reopen lesson</a>}
+          </> : <Link href="/dashboard" className="mt-5 inline-block rounded-control bg-cs-accent-fill px-5 py-3 text-sm font-semibold text-cs-on-accent">Return to My learning</Link>}
+
         </section>
       </article>
     )
@@ -559,6 +616,7 @@ export function LessonView({
 
       {mode === 'learn' && node.video && lesson.videoCueQuestions && lesson.videoCueQuestions.length > 0 && (
         <InteractiveVideo
+          onSessionEnded={() => setAccessIssue('signed-out')}
           video={node.video}
           questions={lesson.videoCueQuestions}
           answeredCueIds={Object.keys(record.videoCueResults[node.id] ?? {})}

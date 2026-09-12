@@ -15,7 +15,7 @@ const COPY = {
     body: {
       inactive: 'Your CYBERSKILLS account is signed in, but Academy enrollment has not been activated. No learning record has been changed.',
       locked: 'Continue from the course roadmap first. Your learning record and completed work are unchanged.',
-      'not-enrolled': (title: string) => `${title} is not included in your current enrollment. Your existing learning record is unchanged.`,
+      'not-enrolled': 'This course is not included in your current enrollment. Your existing learning record is unchanged.',
     },
     roadmap: 'Return to the course roadmap',
     dashboard: 'Return to My learning',
@@ -31,7 +31,7 @@ const COPY = {
     body: {
       inactive: 'บัญชี CYBERSKILLS ของคุณเข้าสู่ระบบแล้ว แต่ยังไม่ได้เปิดสิทธิ์ Academy เราไม่ได้เปลี่ยนแปลงประวัติการเรียนของคุณ',
       locked: 'กลับไปเรียนตามลำดับในแผนการเรียนก่อน ประวัติการเรียนและบทที่ทำเสร็จแล้วยังคงเดิม',
-      'not-enrolled': (title: string) => `${title} ยังไม่อยู่ในสิทธิ์การเรียนปัจจุบัน ประวัติการเรียนเดิมของคุณยังคงเดิม`,
+      'not-enrolled': 'คอร์สนี้ยังไม่อยู่ในสิทธิ์การเรียนปัจจุบัน ประวัติการเรียนเดิมของคุณยังคงเดิม',
     },
     roadmap: 'กลับไปที่แผนการเรียน',
     dashboard: 'กลับไปที่คอร์สของฉัน',
@@ -40,12 +40,10 @@ const COPY = {
 } as const
 
 export function AccessRequiredView({
-  courseTitle,
   locale,
   reason,
   slug,
 }: {
-  courseTitle: string
   locale: Locale
   reason: AccessReason
   slug: string
@@ -64,7 +62,7 @@ export function AccessRequiredView({
         {copy.heading[reason]}
       </h1>
       <p className="mt-4 max-w-xl leading-relaxed text-cs-body">
-        {typeof body === 'function' ? body(courseTitle) : body}
+        {body}
       </p>
       <div className="mt-8 flex flex-wrap gap-3">
         <Link

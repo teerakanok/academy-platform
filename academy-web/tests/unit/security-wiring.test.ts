@@ -140,7 +140,7 @@ describe('security boundary wiring', () => {
     expect(delivery).not.toContain('location: `/api/media/open?token=')
     expect(route).toContain('httpOnly: true')
     expect(route).toContain("sameSite: 'lax'")
-    expect(route).toContain('path: mediaDeliveryPath(asset.id)')
+    expect(route).toContain('path: mediaDeliveryPath(current.asset.id)')
     expect(route).toContain('authorizeCourseResource')
     expect(existsSync(join(ROOT, 'src/app/api/media/open/route.ts'))).toBe(false)
   })

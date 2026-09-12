@@ -21,9 +21,9 @@ export const metadata = privatePage('Sign in')
 export default async function SignInPage({
   searchParams,
 }: {
-  searchParams: Promise<{ next?: string; notice?: string }>
+  searchParams: Promise<{ next?: string; notice?: string; reason?: string }>
 }) {
-  const { next, notice } = await searchParams
+  const { next, notice, reason } = await searchParams
   const target = safeNextPath(next)
   const requestHeaders = await headers()
   const requestHost = requestHeaders.get('host') ?? ''
@@ -33,9 +33,23 @@ export default async function SignInPage({
 
   return (
     <div className="mx-auto max-w-lg px-6 py-16">
+      {reason === 'reauthentication-required' && (
+        <p role="alert" className="mb-6 border-l-2 border-cs-amber py-2 pl-4 text-sm text-cs-body">
+          Your sign-in verification expired. Please sign in again to continue.
+        </p>
+      )}
       {notice === 'local-only' && (
         <p role="status" className="mb-6 border-l-2 border-cs-amber py-2 pl-4 text-sm text-cs-body">
-          Signed out of this browser. Refresh-token revocation could not be confirmed; sessions already open on other devices were not changed.
+          Signed out of this browser. Academy session revocation could not be confirmed; sessions already open on other devices were not changed.
+        </p>
+      )}
+      {(notice === 'sso-unconfirmed' || notice === 'sign-out-unconfirmed') && (
+        <p role="alert" className="mb-6 border-l-2 border-cs-amber py-2 pl-4 text-sm text-cs-body">
+          {notice === 'sso-unconfirmed'
+            ? 'Signed out of Academy in this browser. CYBERSKILLS single sign-on could not be confirmed as ended.'
+            : 'Academy cookies were cleared, but Academy session revocation and ending CYBERSKILLS single sign-on could not be confirmed.'}
+          {' '}Before leaving a shared device, open your CYBERSKILLS account and sign out there. Sessions already open in other products or devices were not changed.
+          {' '}<a href="https://accounts.cyberskills.co.th" className="underline underline-offset-4">Open CYBERSKILLS account</a>
         </p>
       )}
       {notice === 'identity-unavailable' && (

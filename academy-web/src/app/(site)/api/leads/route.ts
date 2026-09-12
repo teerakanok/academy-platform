@@ -11,7 +11,7 @@ export const runtime = 'nodejs'
 
 const MAX_BODY_BYTES = 10_000
 
-// consent ต้องเป็น true จาก checkbox ที่ user ติ๊กเอง (ไม่ pre-tick — ดู WaitlistForm);
+// checkbox คือคำขอ pending เท่านั้น — DOI ยังอยู่นอก slice นี้
 // consent_text_version ผูกฝั่ง server กับไฟล์ versioned เสมอ ไม่รับจาก client
 const leadSchema = z.object({
   email: z.string().trim().toLowerCase().pipe(z.email()).pipe(z.string().max(320)),
@@ -65,10 +65,10 @@ export async function POST(request: NextRequest) {
     )
   }
 
-  const { error } = await db.rpc('record_lead_consent', {
+  const { error } = await db.rpc('record_pending_waitlist_request', {
     p_email: email,
-    p_consent_at: new Date().toISOString(),
-    p_consent_text_version: CURRENT_CONSENT_VERSION,
+    p_requested_at: new Date().toISOString(),
+    p_requested_consent_text_version: CURRENT_CONSENT_VERSION,
     p_utm_source: utmSource ?? null,
     p_utm_medium: utmMedium ?? null,
     p_utm_campaign: utmCampaign ?? null,

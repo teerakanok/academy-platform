@@ -1,6 +1,7 @@
 import { SIMULATION_SURFACE_INPUT_FIELDS, type SimulationState, type SimulationSurface } from '@/lib/simulation/types'
 
 const PREFIX = 'academy.checkpoint-draft:v1'
+const browserDraftMemory = new Map<string, string>()
 
 export interface CheckpointDraftStore {
   getItem(key: string): string | null
@@ -8,13 +9,36 @@ export interface CheckpointDraftStore {
   removeItem(key: string): void
 }
 
-/** Browser storage is optional; privacy policy and sandboxing may deny even reading it. */
+function removeLegacyPersistentDrafts(): void {
+  if (typeof window === 'undefined') return
+
+  let keys: string[]
+  try {
+    keys = Object.keys(window.localStorage)
+  } catch {
+    return
+  }
+  for (const key of keys) {
+    if (key !== PREFIX && !key.startsWith(`${PREFIX}:`)) continue
+    try {
+      window.localStorage.removeItem(key)
+    } catch {
+      // Cleanup is best-effort; a denied storage operation must not break learning.
+    }
+  }
+}
+
+/**
+ * Unsubmitted checkpoint work is browser-memory only. It survives React rerenders,
+ * but intentionally disappears on reload or in a new tab; submitted progress is server-side.
+ */
 export function browserCheckpointDraftStore(): CheckpointDraftStore | null {
   if (typeof window === 'undefined') return null
-  try {
-    return window.localStorage
-  } catch {
-    return null
+  removeLegacyPersistentDrafts()
+  return {
+    getItem: (key) => browserDraftMemory.get(key) ?? null,
+    setItem: (key, value) => void browserDraftMemory.set(key, value),
+    removeItem: (key) => void browserDraftMemory.delete(key),
   }
 }
 
@@ -151,4 +175,12 @@ export function clearCheckpointDraft(store: CheckpointDraftStore, scope: Checkpo
   } catch {
     // Storage denial must not prevent the learner from continuing.
   }
+}
+
+export function clearBrowserCheckpointDraftMemory(): void {
+  browserDraftMemory.clear()
+}
+
+export function clearLegacyCheckpointDrafts(): void {
+  removeLegacyPersistentDrafts()
 }

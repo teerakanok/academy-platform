@@ -35,6 +35,7 @@ describe('local durable identity session store', () => {
 
       expect(restarted.get(created.id)).toEqual({
         ...claims,
+        authentication: { method: 'legacy_unknown' },
         createdAt: 1_000,
         expiresAt: 61_000,
       })

@@ -3,6 +3,7 @@ import { Fraunces, Inter, JetBrains_Mono } from 'next/font/google'
 import { LocaleProvider } from '@/components/i18n/LocaleProvider'
 import { ThemeBootstrapScript } from '@/components/ThemeBootstrapScript'
 import { SiteChrome } from '@/components/i18n/SiteChrome'
+import { LocalLearnerStateSync } from '@/components/privacy/LocalLearnerStateSync'
 import { internalSurfacesEnabled } from '@/lib/internal-surface'
 import type { UiLocale } from '@/lib/i18n/ui'
 
@@ -49,6 +50,7 @@ export function AcademyShell({
         <ThemeBootstrapScript />
       </head>
       <body className="min-h-screen flex flex-col">
+        <LocalLearnerStateSync />
         <LocaleProvider initialLocale={locale} fixedLocale={fixedLocale}>
           <SiteChrome showInternalSurfaces={internalSurfacesEnabled()}>{children}</SiteChrome>
         </LocaleProvider>

@@ -172,6 +172,15 @@ const handler = {
         admitted += 1
       }
       if (admitted !== 10) throw new Error(`admitted ${admitted}/10 before 429`)
+      for (let attempt = 0; attempt < 21; attempt += 1) {
+        const decision = await enforceEdgeRateLimit(new Request(`${origin}/api/courses/course-${attempt}/certificate/pdf`, {
+          headers: { 'cf-connecting-ip': '198.51.100.10' },
+        }), environment)
+        if (attempt < 20 && decision instanceof Response) throw new Error('certificate budget denied too early')
+        if (attempt === 20 && (!(decision instanceof Response) || decision.status !== 429)) {
+          throw new Error('cross-course certificate PDF budget bypassed')
+        }
+      }
       return 'real DO admitted 10, returned 429, rejected ambiguity, and signed valid markers'
     })
 
@@ -338,7 +347,7 @@ const handler = {
       const nowSeconds = Math.floor(now.getTime() / 1_000)
       const encode = (value: unknown) => btoa(String.fromCharCode(...new TextEncoder().encode(JSON.stringify(value))))
         .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')
-      const header = encode({ alg: 'ES256', kid: 'identity-result-prod-2026-08', typ: 'identity-code-exchange-result+jwt' })
+      const header = encode({ alg: 'ES256', kid: 'identity-result-prod-2026-08', typ: 'identity-code-exchange-result-v2+jwt' })
       const nonceValue = 'n'.repeat(43)
       const claims = encode({
         aud: 'https://academy.cyberskills.co.th',
@@ -347,6 +356,8 @@ const handler = {
         iat: nowSeconds,
         iss: 'https://accounts.cyberskills.co.th/v1/code/results',
         result: {
+    version: 2 as const,
+    authentication: { method: 'webauthn_uv' as const, auth_time: Math.floor(Date.now() / 1_000) },
           activation: { revision: 1, status: 'active' },
           audience: 'https://academy.cyberskills.co.th',
           issuer: 'https://supabase.cyberskills.co.th/auth/v1',
@@ -396,6 +407,12 @@ const handler = {
           sessionIdDigest,
         }, secret)
         let bucketCalls = 0
+        let authorizationCalls = 0
+        const authorizedMedia = async () => {
+          authorizationCalls += 1
+          return new Response(null, { status: 204, headers: { 'cache-control': 'no-store' } })
+        }
+        const revokedMedia = async () => new Response(null, { status: 403 })
         const mediaEnv = {
           MEDIA_SIGNING_SECRET: secret,
           COURSE_MEDIA: {
@@ -405,11 +422,22 @@ const handler = {
             },
           },
         }
+        const deniedAfterRevocation = await servePrivateMedia(
+          new Request('https://academy.cyberskills.co.th/course-media/os-video-en', {
+            headers: { cookie: `${MEDIA_DELIVERY_COOKIE}=${token}; __Host-academy_session=${sessionId}` },
+          }),
+          mediaEnv,
+          revokedMedia,
+        )
+        if (deniedAfterRevocation?.status !== 403 || bucketCalls !== 0) {
+          throw new Error('revoked authorization was not refused before R2')
+        }
         const deniedWithoutSession = await servePrivateMedia(
           new Request('https://academy.cyberskills.co.th/course-media/os-video-en', {
             headers: { cookie: `${MEDIA_DELIVERY_COOKIE}=${token}` },
           }),
           mediaEnv,
+          authorizedMedia,
         )
         if (deniedWithoutSession !== null || bucketCalls !== 0) {
           throw new Error('grant alone was not refused before R2')
@@ -419,6 +447,7 @@ const handler = {
             headers: { cookie: `${MEDIA_DELIVERY_COOKIE}=${token}; __Host-academy_session=${'X'.repeat(43)}` },
           }),
           mediaEnv,
+          authorizedMedia,
         )
         if (deniedWrongSession !== null || bucketCalls !== 0) {
           throw new Error('wrong session was not refused before R2')
@@ -428,6 +457,7 @@ const handler = {
             headers: { cookie: `${MEDIA_DELIVERY_COOKIE}=${token}; __Host-academy_session=${sessionId}` },
           }),
           mediaEnv,
+          authorizedMedia,
         )
         if (!full || full.status !== 200) throw new Error(`full GET status ${full?.status}`)
         const fullBytes = new Uint8Array(await full.arrayBuffer())
@@ -437,6 +467,7 @@ const handler = {
             headers: { cookie: `${MEDIA_DELIVERY_COOKIE}=${token}; __Host-academy_session=${sessionId}`, range: 'bytes=100-199' },
           }),
           mediaEnv,
+          authorizedMedia,
         )
         if (!ranged || ranged.status !== 206) throw new Error(`range GET status ${ranged?.status}`)
         const contentRange = ranged.headers.get('content-range')
@@ -450,6 +481,7 @@ const handler = {
             headers: { cookie: `${MEDIA_DELIVERY_COOKIE}=${token}; __Host-academy_session=${sessionId}` },
           }),
           mediaEnv,
+          authorizedMedia,
         )
         if (head?.status !== 200) throw new Error(`HEAD status ${head?.status}`)
         const denied = await servePrivateMedia(
@@ -457,9 +489,11 @@ const handler = {
             headers: { cookie: `${MEDIA_DELIVERY_COOKIE}=${token}x; __Host-academy_session=${sessionId}` },
           }),
           mediaEnv,
+          authorizedMedia,
         )
         if (denied !== null) throw new Error('tampered grant was not refused')
-        return 'R2 get with Headers range, session-bound 200/206/HEAD, grant-alone and wrong-session refused before R2'
+        if (authorizationCalls !== 3) throw new Error(`authorization calls ${authorizationCalls}`)
+        return 'R2 get with Headers range, session-bound 200/206/HEAD, revalidated authorization, and pre-R2 denials'
       } finally {
         await bucket.delete(key)
       }

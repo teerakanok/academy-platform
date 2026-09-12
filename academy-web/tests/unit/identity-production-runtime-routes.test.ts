@@ -36,6 +36,7 @@ let createResult: { status: 'created'; expiresAt: string } | { status: 'capacity
 const RATE_LIMIT_SECRET = 'identity-route-test-secret-32-bytes'
 
 beforeEach(async () => {
+  database.academyDb.mockClear()
   const keyPair = await crypto.subtle.generateKey({ name: 'ECDSA', namedCurve: 'P-256' }, true, ['sign', 'verify'])
   const privateJwk = await crypto.subtle.exportKey('jwk', keyPair.privateKey)
   const canonicalPrivateJwk = JSON.stringify({
@@ -113,6 +114,36 @@ afterEach(() => {
 })
 
 describe('production Identity routes use the real registry composition', () => {
+  it('never logs unverified result fields or a transport error name', async () => {
+    const sentinel = 'fixture-sensitive-unverified-field'
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    const encode = (value: unknown) => Buffer.from(JSON.stringify(value)).toString('base64url')
+    const signedResult = `${encode({ alg: sentinel, typ: sentinel, kid: sentinel })}.${encode({
+      [sentinel]: sentinel, result: { activation: { status: sentinel } },
+    })}.${'A'.repeat(86)}`
+    for (const failure of ['result', 'transport']) {
+      vi.stubGlobal('fetch', failure === 'result'
+        ? vi.fn(async () => new Response(JSON.stringify({ signedResult }), {
+          headers: { 'content-type': 'application/json', 'cache-control': 'no-store' },
+        }))
+        : vi.fn(async () => { const error = new Error(sentinel); error.name = sentinel; throw error }))
+      const started = await startRoute(await marked(new Request(`${'https://academy.cyberskills.co.th'}/api/auth/identity/start`, {
+        method: 'POST', headers: {
+          origin: 'https://academy.cyberskills.co.th', host: 'academy.cyberskills.co.th',
+          'content-type': 'application/x-www-form-urlencoded',
+        }, body: new URLSearchParams({ next: '/dashboard' }),
+      })))
+      const state = new URL(started.headers.get('location')!).searchParams.get('state')
+      const callback = await callbackRoute(await marked(new Request(
+        `https://academy.cyberskills.co.th/auth/callback?code=${'c'.repeat(24)}&state=${state}`,
+        { headers: { cookie: started.headers.getSetCookie()[0]!.split(';', 1)[0]! } },
+      )))
+      expect(new URL(callback.headers.get('location')!).searchParams.get('notice')).toBe('identity-unavailable')
+    }
+    expect(warn).toHaveBeenCalledWith('[identity-result-verification] rejected')
+    expect(JSON.stringify(warn.mock.calls)).not.toContain(sentinel)
+  })
+
   it('starts through the registry and routes a callback into the same server-only composition', async () => {
     const started = await startRoute(await marked(new Request('https://academy.cyberskills.co.th/api/auth/identity/start', {
       method: 'POST',

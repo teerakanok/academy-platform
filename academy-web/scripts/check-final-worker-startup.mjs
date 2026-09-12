@@ -5,10 +5,13 @@ import { spawnSync } from 'node:child_process'
 import path from 'node:path'
 import process from 'node:process'
 import { fileURLToPath } from 'node:url'
+import { unstable_readConfig } from 'wrangler'
+import { assertAdmissionReleasePolicy } from './admission-release-policy.mjs'
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const artifactPath = path.join(root, '.open-next/worker.js')
 const entryPath = path.join(root, 'worker.ts')
+assertAdmissionReleasePolicy(unstable_readConfig({ config: path.join(root, 'wrangler.jsonc') }))
 
 if (!existsSync(entryPath) || !existsSync(artifactPath)) {
   console.error('FAIL final OpenNext artifact is missing; run the OpenNext build first')
@@ -81,6 +84,45 @@ export default {
     if (response.status !== 404 || response.headers.get('cache-control') !== 'no-store') {
       throw new Error('raw-host gate returned ' + response.status)
     }
+
+    for (const mode of ['maintenance', '', 'OPEN', 'invalid']) {
+      for (const method of ['GET', 'HEAD', 'POST']) {
+        for (const pathname of ['/', '/_next/static/fixture.js', '/media/fixture', '/api/progress']) {
+          const env = new Proxy({ ACADEMY_ADMISSION_MODE: mode }, {
+            get(target, key) {
+              if (key === 'ACADEMY_SERVED_HOSTS') return undefined
+              if (key === 'ACADEMY_ADMISSION_MODE') return target.ACADEMY_ADMISSION_MODE
+              throw new Error('maintenance touched dependency ' + String(key))
+            },
+          })
+          const closed = await worker.fetch(new Request('https://academy.cyberskills.co.th' + pathname, { method }), env, {})
+          if (closed.status !== 503 || closed.headers.get('cache-control') !== 'no-store' || closed.headers.get('retry-after') !== '60') {
+            throw new Error('maintenance gate did not close ' + method + ' ' + pathname)
+          }
+        }
+      }
+    }
+    for (const method of ['GET', 'HEAD']) {
+      const rejected = await worker.fetch(new Request('https://raw-host.example/_next/static/fixture.js', { method }), { ACADEMY_ADMISSION_MODE: 'open' }, {})
+      if (rejected.status !== 404) throw new Error('raw-host static path bypass')
+      let assetReads = 0
+      const staticResponse = await worker.fetch(new Request('https://academy.cyberskills.co.th/_next/static/fixture.js', { method }), {
+        ACADEMY_ADMISSION_MODE: 'open',
+        ASSETS: { async fetch() { assetReads++; return new Response(method === 'HEAD' ? null : 'public fixture', { headers: { 'cache-control': 'public, max-age=31536000, immutable' } }) } },
+      }, { waitUntil() {}, passThroughOnException() {} })
+      if (staticResponse.status !== 200 || assetReads !== 1 || staticResponse.headers.get('cache-control') !== 'public, max-age=31536000, immutable') {
+        throw new Error('open static asset delivery/cache changed')
+      }
+    }
+    let scheduledReads = 0
+    await worker.scheduled({}, new Proxy({ IDENTITY_LIFECYCLE_ENABLED: 'false' }, {
+      get(target, key) {
+        if (key === 'ACADEMY_ADMISSION_MODE') throw new Error('maintenance gated scheduled recovery')
+        if (key === 'IDENTITY_LIFECYCLE_ENABLED') scheduledReads++
+        return target[key]
+      },
+    }))
+    if (scheduledReads === 0) throw new Error('scheduled lifecycle handler did not execute')
   },
 }
 `
@@ -125,4 +167,4 @@ if (runtime.status !== 0) {
   process.exit(1)
 }
 
-console.log(`PASS final OpenNext Worker initialized on real workerd; raw-host gate HTTP 404; outbound requests blocked; bundle ${(bundle.length / 1024).toFixed(1)} KiB`)
+console.log(`PASS final OpenNext Worker initialized on real workerd; raw-host/static gate HTTP 404; maintenance rejects before bindings; open assets preserve cache; scheduled recovery remains reachable; outbound requests blocked; bundle ${(bundle.length / 1024).toFixed(1)} KiB`)

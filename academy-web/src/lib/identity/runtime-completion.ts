@@ -1,3 +1,4 @@
+import { snapshotIdentityAuthentication, isAcceptableIdentityAuthenticationReceipt, AcademyIdentityReauthenticationRequired } from './authentication-assurance'
 import type {
   ExchangeResult,
   IdentityClientAssertionProvider,
@@ -58,6 +59,7 @@ const SESSION_CLAIMS_KEYS = [
   'activation',
   'createdAt',
   'expiresAt',
+  'authentication',
 ] as const
 const OPAQUE_SESSION_ID = /^[A-Za-z0-9_-]{32,160}$/
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/
@@ -239,6 +241,7 @@ export function createAcademyIdentityRuntimeCompletion(optionsValue: unknown): {
             activeClaim = Object.freeze({ ...activeClaim, exchangeResult: completed.exchange })
           }
 
+          assertFreshCompletion(completed.exchange)
           stage = 'profile_activation'
           const activationInput: IdentityProfileActivationInput = {
             issuer: completed.exchange.issuer,
@@ -253,11 +256,13 @@ export function createAcademyIdentityRuntimeCompletion(optionsValue: unknown): {
             await commit(activationInput),
             activationInput,
           )
+          assertFreshCompletion(completed.exchange)
           stage = 'session_creation'
           const sessionInput: IdentitySessionClaims = {
             issuer: activationCommit.issuer,
             subject: activationCommit.subject,
             verifiedEmail: activationCommit.verifiedEmail,
+            authentication: completed.exchange.authentication,
             activation: {
               status: activationCommit.activation.status,
               revision: activationCommit.activation.revision,
@@ -274,6 +279,7 @@ export function createAcademyIdentityRuntimeCompletion(optionsValue: unknown): {
             sessionId,
             returnPath: completed.returnPath,
           })
+          assertFreshCompletion(completed.exchange)
           await finalize(activeClaim, receipt)
           finalized = true
 
@@ -286,8 +292,10 @@ export function createAcademyIdentityRuntimeCompletion(optionsValue: unknown): {
             } catch {
               // The bounded database lease still permits recovery after expiry.
             }
+            if (error instanceof AcademyIdentityReauthenticationRequired) throw error
             throw new AcademyIdentityRuntimeCompletionFailure(true)
           }
+          if (error instanceof AcademyIdentityReauthenticationRequired) throw error
           throw new AcademyIdentityRuntimeCompletionFailure(
             claimAttempted && (
               !(error instanceof IdentityTransactionError)
@@ -374,9 +382,11 @@ function snapshotCheckpointExchangeResult(
 ): ExchangeResult {
   const candidate = snapshotExactDataRecord(
     value,
-    ['activation', 'audience', 'issuer', 'nonce', 'serviceId', 'subject', 'verifiedEmail'] as const,
+    ['activation', 'audience', 'issuer', 'nonce', 'serviceId', 'subject', 'verifiedEmail', 'version', 'authentication'] as const,
   )
   const activation = snapshotExactDataRecord(candidate.activation, ACTIVATION_KEYS)
+  const authentication = snapshotIdentityAuthentication(candidate.authentication)
+  if (candidate.version !== 2 || !authentication) throw new Error(FAILURE_MESSAGE)
   if (typeof candidate.issuer !== 'string' || candidate.issuer.length < 1
     || typeof candidate.subject !== 'string' || candidate.subject.length < 1
     || candidate.subject.length > 512 || candidate.subject.includes('\0')
@@ -401,6 +411,8 @@ function snapshotCheckpointExchangeResult(
     issuer: candidate.issuer,
     subject: candidate.subject,
     verifiedEmail,
+    version: 2,
+    authentication,
     audience: candidate.audience,
     serviceId: candidate.serviceId,
     nonce: candidate.nonce,
@@ -480,6 +492,7 @@ function snapshotSessionReceipt(
     || claims.issuer !== expected.issuer
     || claims.subject !== expected.subject
     || claims.verifiedEmail !== expected.verifiedEmail
+    || !sameAuthentication(claims.authentication, expected.authentication)
     || activation.status !== expected.activation.status
     || activation.revision !== expected.activation.revision
     || typeof claims.createdAt !== 'number'
@@ -525,4 +538,17 @@ function snapshotExactDataRecord<const Keys extends readonly string[]>(
     snapshot[key as Keys[number]] = descriptor.value
   }
   return snapshot
+}
+
+export { AcademyIdentityReauthenticationRequired } from './authentication-assurance'
+
+function assertFreshCompletion(result: ExchangeResult): void {
+  if (!isAcceptableIdentityAuthenticationReceipt(result.authentication, Math.floor(Date.now() / 1_000))) {
+    throw new AcademyIdentityReauthenticationRequired()
+  }
+}
+function sameAuthentication(actual: unknown, expected: unknown): boolean {
+  const left = snapshotIdentityAuthentication(actual)
+  const right = snapshotIdentityAuthentication(expected)
+  return !!left && !!right && left.auth_time === right.auth_time
 }

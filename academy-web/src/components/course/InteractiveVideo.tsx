@@ -1,5 +1,6 @@
 'use client'
 
+import { attachForegroundVideoActivity } from '@/lib/auth/foreground-video-activity'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type { LessonVideo, Locale } from '@/lib/content/course-types'
 import type { PublicVideoCueQuestion } from '@/lib/content/public-lesson'
@@ -26,8 +27,10 @@ export function InteractiveVideo({
   questions,
   answeredCueIds,
   onCueAnswered,
+  onSessionEnded,
 }: {
   video: LessonVideo
+  onSessionEnded?: () => void
   questions: PublicVideoCueQuestion[]
   answeredCueIds: string[]
   /** ส่งคำตอบให้เซิร์ฟเวอร์ตรวจ — คำถามกลางวิดีโอไม่มีเฉลยอยู่ฝั่งนี้แล้ว (W0-1) */
@@ -64,6 +67,13 @@ export function InteractiveVideo({
     ? `${activeAudio.src}${mediaRetry === null ? '' : `${activeAudio.src.includes('?') ? '&' : '?'}retry=${mediaRetry}`}`
     : undefined
   const captions = video.captions ?? []
+
+  const sessionEndedRef = useRef(onSessionEnded)
+  sessionEndedRef.current = onSessionEnded
+  useEffect(() => {
+    const element = videoRef.current
+    return element ? attachForegroundVideoActivity(element, () => sessionEndedRef.current?.()) : undefined
+  }, [audioLocale, mediaRetry])
 
   const cues = [...video.cues].sort((a, b) => a.atSeconds - b.atSeconds)
   const questionByCue = new Map(questions.map((q) => [q.cueId, q]))

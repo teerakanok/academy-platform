@@ -450,7 +450,7 @@ export async function POST(request: Request) {
         passed: verdict.passed,
         requirements: verdict.results.map((r) => ({ id: r.id, met: r.met })),
         // ลายนิ้วมือของกติกาจริง ไม่ใช่เวอร์ชันคอร์ส — ดูเหตุผลใน gradingFingerprint
-        challengeVersion: gradingFingerprint(sim.challenge),
+        challengeVersion: await gradingFingerprint(sim.challenge),
         at: new Date().toISOString(),
       }
     }

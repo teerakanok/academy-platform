@@ -5,6 +5,11 @@ const compat = new FlatCompat({ baseDirectory: import.meta.dirname })
 const eslintConfig = [
   ...compat.extends('next/core-web-vitals', 'next/typescript'),
   {
+    files: ['scripts/academy-bound-worker-executor.cjs'],
+    // This isolated Node launcher deliberately uses CommonJS before loading its worker.
+    rules: { '@typescript-eslint/no-require-imports': 'off' },
+  },
+  {
     ignores: [
       '.next/**',
       'out/**',

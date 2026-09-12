@@ -258,18 +258,26 @@ describe('Academy Identity lifecycle atomic PostgreSQL page store', () => {
     const objects = await admin.query(`select table_name from information_schema.tables
       where table_schema = 'academy' and table_name like 'identity_lifecycle_%'
       order by table_name`)
-    expect(objects.rows).toEqual([
+    const coreObjects = objects.rows.filter(({ table_name }) => table_name !== 'identity_lifecycle_authorization_fences')
+    expect(coreObjects).toEqual([
       { table_name: 'identity_lifecycle_consumer_checkpoint' },
       { table_name: 'identity_lifecycle_projection' },
       { table_name: 'identity_lifecycle_pull_leases' },
     ])
+    expect(objects.rows.every(({ table_name }) => [
+      'identity_lifecycle_authorization_fences',
+      'identity_lifecycle_consumer_checkpoint',
+      'identity_lifecycle_projection',
+      'identity_lifecycle_pull_leases',
+    ].includes(table_name))).toBe(true)
     const foreignKeys = await admin.query(`select count(*)::int as count
       from pg_constraint c join pg_namespace n on n.oid = c.connamespace
       where n.nspname = 'academy' and c.contype = 'f'
         and c.conrelid in (
-          'academy.identity_lifecycle_consumer_checkpoint'::regclass,
-          'academy.identity_lifecycle_projection'::regclass,
-          'academy.identity_lifecycle_pull_leases'::regclass
+          to_regclass('academy.identity_lifecycle_authorization_fences'),
+          to_regclass('academy.identity_lifecycle_consumer_checkpoint'),
+          to_regclass('academy.identity_lifecycle_projection'),
+          to_regclass('academy.identity_lifecycle_pull_leases')
         )`)
     expect(foreignKeys.rows[0]?.count).toBe(0)
 

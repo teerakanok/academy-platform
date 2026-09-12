@@ -1,3 +1,4 @@
+import publicVectors from '../fixtures/identity-assurance-v2-public-vectors.json'
 import { readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
 import {
@@ -6,7 +7,9 @@ import {
   type IdentityCodeExchangeResultVerificationKeySet,
 } from '@/lib/identity/code-exchange-result-envelope'
 
-const RESULT = {
+const LEGACY_RESULT = {
+    version: 2 as const,
+    authentication: { method: 'webauthn_uv' as const, auth_time: Math.floor(Date.now() / 1_000) },
   issuer: 'https://accounts.example.test/auth/v1',
   subject: 'consumer-vector-subject',
   verifiedEmail: 'vector@example.test',
@@ -16,12 +19,12 @@ const RESULT = {
   activation: { status: 'active' as const, revision: 7 },
 }
 
-const VECTOR = {
+const LEGACY_VECTOR = {
   verification: {
     expectedIssuer: 'https://identity.example.test/v1/code/results',
-    expectedAudience: RESULT.audience,
+    expectedAudience: LEGACY_RESULT.audience,
     expectedClientId: 'academy-web',
-    expectedNonce: RESULT.nonce,
+    expectedNonce: LEGACY_RESULT.nonce,
     verificationTime: '2026-08-14T00:00:00.000Z',
     clockSkewSeconds: 10,
     maximumLifetimeSeconds: 90,
@@ -38,6 +41,16 @@ const VECTOR = {
     ['identity-result-rotation-overlap-v1', 'overlap', 'TfHGG_1iBBb-_RYOZBBhZsAZ6OHRBqcHW8mPsEPeTd4', '7g3lIIjkd8B_2JkNpalVmNGi3xJi5JURPxvaqNuwato', 'eyJhbGciOiJFUzI1NiIsImtpZCI6ImlkZW50aXR5LXJlc3VsdC1yb3RhdGlvbi1vdmVybGFwLXYxIiwidHlwIjoiaWRlbnRpdHktY29kZS1leGNoYW5nZS1yZXN1bHQrand0In0.eyJhdWQiOiJodHRwczovL2FjYWRlbXkuZXhhbXBsZS50ZXN0IiwiY2xpZW50SWQiOiJhY2FkZW15LXdlYiIsImV4cCI6MTc4NjY2NTY2MCwiaWF0IjoxNzg2NjY1NjAwLCJpc3MiOiJodHRwczovL2lkZW50aXR5LmV4YW1wbGUudGVzdC92MS9jb2RlL3Jlc3VsdHMiLCJyZXN1bHQiOnsiaXNzdWVyIjoiaHR0cHM6Ly9hY2NvdW50cy5leGFtcGxlLnRlc3QvYXV0aC92MSIsInN1YmplY3QiOiJjb25zdW1lci12ZWN0b3Itc3ViamVjdCIsInZlcmlmaWVkRW1haWwiOiJ2ZWN0b3JAZXhhbXBsZS50ZXN0IiwiYXVkaWVuY2UiOiJodHRwczovL2FjYWRlbXkuZXhhbXBsZS50ZXN0Iiwic2VydmljZUlkIjoiYWNhZGVteSIsIm5vbmNlIjoidmVjdG9yX25vbmNlX3JlZmVyZW5jZV8xMjM0NTY3ODkiLCJhY3RpdmF0aW9uIjp7InN0YXR1cyI6ImFjdGl2ZSIsInJldmlzaW9uIjo3fX19.jwZ5hhn3CxKk0qGWnOrnaibX8ia1r8CHbKtlfgCVmrwyhabqG8usmuF16Dvba0Na6VPkzAssFQtuqf9mO0CyNA'],
     ['identity-result-rotation-retired-v0', 'retired', 'JwmqMvbWg8CnzfU3VKaILuP9D-oNRHwU25QS8Ggvxcc', '9TYLu97eNwzqrceiuGJ_xN1PYA8pFG9NvJsmc-xn7G0', 'eyJhbGciOiJFUzI1NiIsImtpZCI6ImlkZW50aXR5LXJlc3VsdC1yb3RhdGlvbi1yZXRpcmVkLXYwIiwidHlwIjoiaWRlbnRpdHktY29kZS1leGNoYW5nZS1yZXN1bHQrand0In0.eyJhdWQiOiJodHRwczovL2FjYWRlbXkuZXhhbXBsZS50ZXN0IiwiY2xpZW50SWQiOiJhY2FkZW15LXdlYiIsImV4cCI6MTc4NjY2NTY2MCwiaWF0IjoxNzg2NjY1NjAwLCJpc3MiOiJodHRwczovL2lkZW50aXR5LmV4YW1wbGUudGVzdC92MS9jb2RlL3Jlc3VsdHMiLCJyZXN1bHQiOnsiaXNzdWVyIjoiaHR0cHM6Ly9hY2NvdW50cy5leGFtcGxlLnRlc3QvYXV0aC92MSIsInN1YmplY3QiOiJjb25zdW1lci12ZWN0b3Itc3ViamVjdCIsInZlcmlmaWVkRW1haWwiOiJ2ZWN0b3JAZXhhbXBsZS50ZXN0IiwiYXVkaWVuY2UiOiJodHRwczovL2FjYWRlbXkuZXhhbXBsZS50ZXN0Iiwic2VydmljZUlkIjoiYWNhZGVteSIsIm5vbmNlIjoidmVjdG9yX25vbmNlX3JlZmVyZW5jZV8xMjM0NTY3ODkiLCJhY3RpdmF0aW9uIjp7InN0YXR1cyI6ImFjdGl2ZSIsInJldmlzaW9uIjo3fX19.-s2DnwzG8lxv1A_jW7aYbfoYkKa5feXJhyrTJxHp95yHEaXWsPpCy7wRpNQxzV0W5tE8njw92d4Wc7ZnoRLQiA'],
   ] as const,
+}
+
+const vector = publicVectors.vectors.find((value) => value.serviceId === 'academy')!
+const RESULT = vector.result
+const VECTOR = {
+  verification: { expectedIssuer: publicVectors.issuer, expectedAudience: vector.audience,
+    expectedClientId: vector.clientId, expectedNonce: vector.nonce,
+    verificationTime: new Date(publicVectors.now * 1_000).toISOString(), clockSkewSeconds: 30, maximumLifetimeSeconds: 120 },
+  positive: { key: { keyId: publicVectors.keyId, algorithm: 'ES256' as const,
+    state: 'active' as const, publicJwk: publicVectors.publicJwk }, signedResult: vector.cases[0].envelope },
 }
 
 function policy(overrides: Partial<IdentityCodeExchangeResultEnvelopePolicy> = {}): IdentityCodeExchangeResultEnvelopePolicy {
@@ -69,14 +82,20 @@ describe('Identity signed code-exchange result consumer', () => {
   })
 
   it('accepts active and overlap keys and rejects retired keys', async () => {
-    for (const [keyId, state, x, y, signedResult] of VECTOR.rotation) {
-      const candidate = { keyId, state, algorithm: 'ES256' as const, publicJwk: { kty: 'EC', crv: 'P-256', x, y } }
+    for (const state of ['active', 'overlap', 'retired'] as const) {
+      const candidate = { ...VECTOR.positive.key, state }
       const result = await verifyIdentityCodeExchangeResultEnvelope(
-        signedResult,
-        keySet(state === 'active' ? [candidate] : [VECTOR.positive.key, candidate]),
-        policy(),
+        VECTOR.positive.signedResult,
+        keySet(state === 'active' ? [candidate] : [
+          { ...VECTOR.positive.key, keyId: 'identity-result-other-active' }, candidate]), policy(),
       )
       expect(result).toEqual(state === 'retired' ? null : RESULT)
+    }
+  })
+
+  it('rejects the previously valid v1 envelope and all legacy rotation vectors', async () => {
+    for (const signedResult of [LEGACY_VECTOR.positive.signedResult, ...LEGACY_VECTOR.rotation.map((entry) => entry[4])]) {
+      expect(await verifyIdentityCodeExchangeResultEnvelope(signedResult, keySet(), policy())).toBeNull()
     }
   })
 
@@ -88,7 +107,7 @@ describe('Identity signed code-exchange result consumer', () => {
       policy({ expectedNonce: 'wrong_nonce_reference_123456789' }),
       policy({ expectedPrincipalIssuer: 'https://accounts-other.example.test/auth/v1' }),
       policy({ expectedServiceId: 'crux' }),
-      policy({ verificationTime: new Date('2026-08-14T00:01:01.000Z') }),
+      policy({ verificationTime: new Date((publicVectors.now + 61) * 1_000) }),
       policy({ maximumLifetimeSeconds: 59 }),
     ]
     for (const candidate of badPolicies) {

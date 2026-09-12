@@ -9,6 +9,7 @@ import { readIdentityStartForm } from './start-form'
 import type { AuthorizationRequest } from './adapter'
 import {
   createAcademyIdentityRuntimeCompletion,
+  AcademyIdentityReauthenticationRequired,
   isRetryableAcademyIdentityRuntimeCompletionFailure,
 } from './runtime-completion'
 import { academySessionCookie, expireLegacyAcademySessionCookie } from './session-store'
@@ -208,6 +209,10 @@ export function createAcademyIdentityRuntimeBrowserFlow(
             ...(secure ? [expireLegacyAcademySessionCookie()] : []),
           ])
         } catch (error) {
+          if (error instanceof AcademyIdentityReauthenticationRequired) {
+            return redirectResult('/sign-in?reason=reauthentication-required',
+              state === null ? [] : [expireBrowserBindingCookie(state, secure)])
+          }
           const preserveBinding = isRetryableAcademyIdentityRuntimeCompletionFailure(error)
           return errorResult(
             state === null ? 400 : 503,

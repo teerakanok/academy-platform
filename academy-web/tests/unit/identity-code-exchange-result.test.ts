@@ -13,6 +13,8 @@ const expectations: IdentityCodeExchangeResultExpectations = {
 
 function validResult() {
   return {
+    version: 2 as const,
+    authentication: { method: 'webauthn_uv' as const, auth_time: Math.floor(Date.now() / 1_000) },
     issuer: expectations.expectedIssuer,
     subject: 'principal-123',
     verifiedEmail: 'learner@example.test',
@@ -150,7 +152,7 @@ describe('identity code-exchange result verifier', () => {
     expect(ordinaryReads).toBe(0)
     expect(ownKeyReads).toBe(1)
     expect(prototypeReads).toBe(1)
-    expect([...descriptorReads.values()]).toEqual([1, 1, 1, 1, 1, 1, 1])
+    expect([...descriptorReads.values()]).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1])
   })
 
   it('collapses hostile reflection failures to the fixed invalid_result classification', () => {

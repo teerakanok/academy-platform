@@ -1,3 +1,4 @@
+import { snapshotIdentityAuthentication, AcademyIdentityReauthenticationRequired } from './authentication-assurance'
 import { createHash, randomBytes } from 'node:crypto'
 import type { ExchangeResult } from './adapter'
 import { isWellFormedIdentityLifecycleSubject } from './lifecycle-principal'
@@ -39,6 +40,7 @@ const ACTIVE_CLAIM_KEYS = [
 ] as const
 const RECEIPT_KEYS = ['accountId', 'returnPath', 'sessionId'] as const
 const EXCHANGE_RESULT_KEYS = [
+  'version', 'authentication',
   'activation', 'audience', 'issuer', 'nonce', 'serviceId', 'subject', 'verifiedEmail',
 ] as const
 const ACTIVATION_KEYS = ['revision', 'status'] as const
@@ -213,6 +215,9 @@ export class AcademyPostgresIdentityTransactionStore implements IdentityTransact
       p_session_id: sessionIdDigest,
       p_lease_seconds: CLAIM_LEASE_SECONDS,
     })
+    if (snapshotBoundedDataRecord(data, 1)?.status === 'reauthentication_required') {
+      throw new AcademyIdentityReauthenticationRequired()
+    }
     const result = parseClaimResult(data, sessionIdDigest)
     if (!result) throw new IdentityPostgresTransactionStoreFailure()
     if (result.status === 'unknown') {
@@ -260,17 +265,21 @@ export class AcademyPostgresIdentityTransactionStore implements IdentityTransact
       p_verified_email: result.verifiedEmail,
       p_activation_status: result.activation.status,
       p_activation_revision: result.activation.revision,
+      p_auth_time: result.authentication.auth_time,
     }
     for (let attempt = 0; attempt < 2; attempt += 1) {
       try {
         const { data } = await this.callRpc(
-          'checkpoint_identity_authorization_exchange',
+          'checkpoint_identity_authorization_exchange_v2',
           parameters,
         )
         const response = snapshotBoundedDataRecord(data, STATUS_RESPONSE_KEYS.length)
         if (response && hasExactKeys(response, STATUS_RESPONSE_KEYS)
+          && response.status === 'reauthentication_required') throw new AcademyIdentityReauthenticationRequired()
+        if (response && hasExactKeys(response, STATUS_RESPONSE_KEYS)
           && response.status === 'checkpointed') return
-      } catch {
+      } catch (error) {
+        if (error instanceof AcademyIdentityReauthenticationRequired) throw error
         continue
       }
     }
@@ -316,6 +325,8 @@ export class AcademyPostgresIdentityTransactionStore implements IdentityTransact
       p_subject_key: encodeSubjectKey(claim.exchangeResult.subject),
     })
     const result = snapshotBoundedDataRecord(data, STATUS_RESPONSE_KEYS.length)
+    if (result && hasExactKeys(result, STATUS_RESPONSE_KEYS)
+      && result.status === 'reauthentication_required') throw new AcademyIdentityReauthenticationRequired()
     if (!result || !hasExactKeys(result, STATUS_RESPONSE_KEYS) || result.status !== 'completed') {
       throw new IdentityPostgresTransactionStoreFailure()
     }
@@ -356,6 +367,7 @@ function snapshotTtlSeconds(value: unknown): number | null {
     return null
   }
 }
+
 
 function snapshotRequiredDataFields(
   value: unknown,
@@ -527,7 +539,9 @@ function snapshotCheckpointedExchangeResult(
   transaction: PendingIdentityTransaction,
 ): ExchangeResult | null {
   const candidate = snapshotBoundedDataRecord(value, EXCHANGE_RESULT_KEYS.length)
-  if (!candidate || !hasExactKeys(candidate, EXCHANGE_RESULT_KEYS)) return null
+  if (!candidate || !hasExactKeys(candidate, EXCHANGE_RESULT_KEYS) || candidate.version !== 2) return null
+  const authentication = snapshotIdentityAuthentication(candidate.authentication)
+  if (!authentication) return null
   const activation = snapshotBoundedDataRecord(candidate.activation, ACTIVATION_KEYS.length)
   if (!activation || !hasExactKeys(activation, ACTIVATION_KEYS)
     || candidate.issuer !== transaction.client.expectedIssuer
@@ -548,6 +562,8 @@ function snapshotCheckpointedExchangeResult(
     issuer: candidate.issuer,
     subject: candidate.subject,
     verifiedEmail: candidate.verifiedEmail,
+    version: 2,
+    authentication,
     audience: candidate.audience,
     serviceId: candidate.serviceId,
     nonce: candidate.nonce,
@@ -598,6 +614,7 @@ function snapshotRemoteTransaction(value: unknown): PendingIdentityTransaction |
     return null
   }
 }
+
 
 function parseCanonicalInstant(value: unknown): number | null {
   if (typeof value !== 'string') return null

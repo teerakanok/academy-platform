@@ -13,7 +13,7 @@ import {
 } from '@/lib/identity/client-assertion-registration-rehearsal'
 
 const SIBLING_IDENTITY_CONTROL = join(__dirname, '../../../../identity-control')
-const CANONICAL_IDENTITY_CONTROL = '/private/tmp/identity-security-correction-cde63a58'
+const CANONICAL_IDENTITY_CONTROL = '/Users/teerakanok/Dev/continuations/identity-security-recovery-20260912-523a1d40'
 
 describe('Academy client-assertion public-key registration rehearsal', () => {
   it('accepts active/overlap and refuses retired, unknown, tampered, or mismatched assertions', async () => {

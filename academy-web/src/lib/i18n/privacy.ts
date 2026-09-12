@@ -21,7 +21,7 @@ const th: PrivacyDoc = {
   eyebrow: 'PRIVACY NOTICE',
   title: 'นโยบายความเป็นส่วนตัว CYBERSKILLS Academy',
   meta: (v) =>
-    `ฉบับ ${v} · ปรับปรุงล่าสุด 4 สิงหาคม 2026 · ใช้กับข้อมูลที่ CYBERSKILLS Academy ประมวลผล`,
+    `ฉบับ ${v} · ปรับปรุงล่าสุด 11 กันยายน 2026 · ใช้กับข้อมูลที่ CYBERSKILLS Academy ประมวลผล`,
   contactEmail: 'contact@cyberskills.co.th',
   sections: [
     {
@@ -34,7 +34,7 @@ const th: PrivacyDoc = {
       bullets: [
         {
           term: 'รายชื่อรอเปิด',
-          text: 'อีเมล แหล่งที่เข้ามา วันเวลา และข้อความความยินยอม เพื่อส่งข่าวเปิดตัว คอร์ส และโปรโมชั่นที่คุณเลือกรับ',
+          text: 'อีเมล แหล่งที่เข้ามา วันเวลา ข้อความที่ขอ และสถานะรอยืนยัน เพื่อรอการยืนยันความเป็นเจ้าของอีเมล การส่งอีเมลการตลาดยังปิดอยู่ และคำขอนี้ยังไม่ใช่การให้ความยินยอม',
         },
         {
           term: 'บัญชี Academy',
@@ -68,7 +68,7 @@ const th: PrivacyDoc = {
       bullets: [
         {
           term: 'รายชื่อรอเปิดและหลักฐานการถอน',
-          text: '3 ปีนับจากการให้ความยินยอมปัจจุบัน การให้ใหม่หลังหมดอายุ หรือการถอน แล้วลบเมื่อครบกำหนด เว้นแต่มีเหตุจำเป็นตามกฎหมาย',
+          text: 'คำขอที่ยังไม่ยืนยันเก็บ 3 ปีนับจากวันที่ขอ ส่วนความยินยอมที่ให้แล้วเก็บ 3 ปีนับจากการให้ปัจจุบัน การให้ใหม่หลังหมดอายุ หรือการถอน เว้นแต่มีเหตุจำเป็นตามกฎหมาย',
         },
         {
           term: 'ความพยายามสอบที่ไม่ใช่หลักฐานการผ่าน',
@@ -123,7 +123,7 @@ const th: PrivacyDoc = {
 const en: PrivacyDoc = {
   eyebrow: 'PRIVACY NOTICE',
   title: 'CYBERSKILLS Academy privacy notice',
-  meta: (v) => `Version ${v} · Last updated 4 August 2026 · Covers data processed by CYBERSKILLS Academy`,
+  meta: (v) => `Version ${v} · Last updated 11 September 2026 · Covers data processed by CYBERSKILLS Academy`,
   translationNote:
     'This English translation is provided so you can understand how we handle your data. The Thai notice governs legally.',
   contactEmail: 'contact@cyberskills.co.th',
@@ -138,7 +138,7 @@ const en: PrivacyDoc = {
       bullets: [
         {
           term: 'Launch waitlist',
-          text: 'your email, referral source, and the time and wording of your consent, used for the launch, course, and promotional updates you chose to receive.',
+          text: 'your email, referral source, request time, requested wording, and pending status. This request is not consent and does not subscribe you to marketing email.',
         },
         {
           term: 'Academy account',
@@ -172,7 +172,7 @@ const en: PrivacyDoc = {
       bullets: [
         {
           term: 'Waitlist and withdrawal record',
-          text: 'three years from the current grant, a fresh grant after expiry, or withdrawal, then deleted unless the law requires a longer hold.',
+          text: 'unconfirmed requests for three years from the request date; granted records for three years from the current grant, a fresh grant after expiry, or withdrawal, unless the law requires a longer hold.',
         },
         {
           term: 'Exam attempts not used as passing evidence',

@@ -1,3 +1,4 @@
+import { type IdentitySessionAssurance, snapshotIdentitySessionAssurance } from './authentication-assurance'
 import { randomBytes } from 'node:crypto'
 import { chmodSync, existsSync, mkdirSync, readFileSync, renameSync, unlinkSync, writeFileSync } from 'node:fs'
 import { dirname, isAbsolute } from 'node:path'
@@ -20,6 +21,7 @@ export interface IdentitySessionClaims {
   subject: string
   verifiedEmail: string
   activation: { status: ActivationStatus; revision: number }
+  authentication?: IdentitySessionAssurance
   createdAt?: number
   expiresAt?: number
 }
@@ -112,7 +114,7 @@ export class FileIdentitySessionStore {
       }
       const session = {
         id: stableId ?? randomBytes(32).toString('base64url'),
-        claims: { ...input, createdAt, expiresAt },
+        claims: { ...input, authentication: snapshotIdentitySessionAssurance(input.authentication) ?? { method: 'legacy_unknown' as const }, createdAt, expiresAt },
       }
       sessions.push(session)
       this.write(sessions)
@@ -194,6 +196,7 @@ function sameSessionClaims(
     && stored.verifiedEmail === expected.verifiedEmail
     && stored.activation.status === expected.activation.status
     && stored.activation.revision === expected.activation.revision
+    && JSON.stringify(stored.authentication ?? { method: 'legacy_unknown' }) === JSON.stringify(expected.authentication ?? { method: 'legacy_unknown' })
 }
 
 function validateClaims(claims: IdentitySessionClaims): void {

@@ -1,12 +1,13 @@
 import type { ExamAnswers } from './scoring'
 
-// Progress ชั่วคราวใน localStorage แบบ versioned (แผน §4-M2-6)
+// Progress ชั่วคราวแบบ versioned — browser-memory only (แผน §4-M2-6 เดิม)
 // k2 key ต่อ contentId+attemptId; legacy copy เมื่อผูก scope ได้; attributable corrupt → reset
 // โครง type ออกแบบให้ย้ายไป DB ได้ตอน M3 (email identity → user id)
 
 export const PROGRESS_STORE_VERSION = 'v1'
 const LEGACY_PREFIX = `academy.progress.${PROGRESS_STORE_VERSION}`
 const KEY_PREFIX = 'academy.progress.k2:'
+const browserAttemptMemory = new Map<string, string>()
 
 export type AttemptStatus = 'in-progress' | 'submitted'
 
@@ -33,12 +34,39 @@ export interface ProgressStore {
 }
 
 export function browserStore(): ProgressStore {
+  clearLegacyBrowserAttempts()
   return {
-    getItem: (k) => window.localStorage.getItem(k),
-    setItem: (k, v) => window.localStorage.setItem(k, v),
-    removeItem: (k) => window.localStorage.removeItem(k),
-    keys: () => Object.keys(window.localStorage),
+    getItem: (k) => browserAttemptMemory.get(k) ?? null,
+    setItem: (k, v) => void browserAttemptMemory.set(k, v),
+    removeItem: (k) => void browserAttemptMemory.delete(k),
+    keys: () => [...browserAttemptMemory.keys()],
   }
+}
+
+function removePersistentAttempts(storage: Storage, key: string): void {
+  if (key.startsWith(`${LEGACY_PREFIX}:`) || key.startsWith(KEY_PREFIX)) {
+    try {
+      storage.removeItem(key)
+    } catch {
+      // Browser storage can be denied; the in-memory attempt still works.
+    }
+  }
+}
+
+export function clearLegacyBrowserAttempts(): void {
+  if (typeof window === 'undefined') return
+
+  let keys: string[]
+  try {
+    keys = Object.keys(window.localStorage)
+  } catch {
+    return
+  }
+  for (const key of keys) removePersistentAttempts(window.localStorage, key)
+}
+
+export function clearBrowserAttemptMemory(): void {
+  browserAttemptMemory.clear()
 }
 
 function encodeKeySegment(value: string): string {

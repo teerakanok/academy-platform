@@ -1,0 +1,129 @@
+Academy fresh combined acceptance on current dirty state
+Worktree: /Users/teerakanok/Dev/continuations/academy-security-recovery-20260912-523a1d40
+Branch: codex/academy-security-recovery-523a1d40  HEAD: bf74fbffd565694510815593f74f7a4b1a1e4b67 (dirty, 173 git entries)
+Node: v24.18.0 (/Users/teerakanok/.nvm/versions/node/v24.18.0/bin/node)  npm: 11.x (nvm)
+Run window: 2026-09-12 15:40-15:47 +07:00
+Disk before run: / 40Gi available. No cleanup of foreign state performed.
+
+================================================================
+1) FULL UNIT SUITE — npm run test:unit (vitest run --project unit)
+================================================================
+ Test Files  174 passed (174)
+      Tests  3277 passed | 2 skipped (3279)
+   Start at  15:40:33
+   Duration  20.79s (transform 25.03s, setup 0ms, import 69.85s, tests 24.26s, environment 33ms)
+Exit code: 0
+Skips (known, same as prior acceptance): tests/unit/identity-session-digest-migration.test.ts (1) and one other legacy skip; skips are not counted as proof.
+Note: prior admission run failed 1 stale static assertion
+(tests/unit/static-asset-boundary.test.ts expecting '"run_worker_first": ["/media/*"]');
+the corrected assertion ('"run_worker_first": true') is present in the dirty state and this
+rerun confirms the full unit suite is green with zero failures.
+
+================================================================
+2) LINT + TYPECHECK — npm run lint (eslint . && tsc --noEmit && tsc -p tsconfig.worker.json && tsc -p ops/academy-retention-worker/tsconfig.json)
+================================================================
+✖ 22 problems (0 errors, 22 warnings)
+  0 errors and 1 warning potentially fixable with the `--fix` option.
+EXIT_CODE=0
+All 22 warnings are pre-existing (unused vars / unused eslint-disable directive in scripts,
+tools, generated registry, admin courses route imports); identical count to prior acceptance.
+
+================================================================
+3) PRODUCTION OPENNEXT BUILD — npm run build:cf (bash scripts/build-cloudflare.sh)
+================================================================
+Gates executed in order (per build contract test): verify:workerd -> npx opennextjs-cloudflare build -> cache:sync -> asset-guard -> node scripts/check-final-worker-startup.mjs
+- Next production build: completed (route table emitted, middleware 66.2 kB)
+- OpenNext: "Worker saved in `.open-next/worker.js`" / "OpenNext build complete."
+- cache:sync: "Synced 39 OpenNext prerender-cache assets into Workers static assets"
+- asset-guard: "Asset guard passed: no mp4/vtt/pdf/zip payloads in .open-next/assets"
+- final worker startup (real workerd):
+PASS final OpenNext Worker initialized on real workerd; raw-host/static gate HTTP 404; maintenance rejects before bindings; open assets preserve cache; scheduled recovery remains reachable; outbound requests blocked; bundle 16017.6 KiB
+BUILD_EXIT=0
+
+================================================================
+4) REAL WORKERD ACCEPTANCE — npm run verify:workerd (scripts/workerd-signer-check.mjs), fresh standalone rerun
+================================================================
+compatibility ตรงกับแอป: 2025-03-25 ["global_fetch_strictly_public","nodejs_compat"]
+PASS  runtime-is-workerd: Cloudflare-Workers
+PASS  edge-rate-limiter-durable-counters: real workerd DO kept actor and target counters independent
+PASS  authenticated-mutation-quota-durable-binding: OpenNext context resolved the real DO binding and enforced isolated fail-close quotas
+PASS  edge-rate-limit-enforces-and-signs: real DO admitted 10, returned 429, rejected ambiguity, and signed valid markers
+PASS  cryptokey-introspection-shape: prototype type getter: absent; structuredClone: throws DataCloneError
+PASS  signs-and-verifies: 64-byte signature verifies against the public key
+PASS  signer-imports-non-extractable-sign-only: signer imported jwk/ECDSA P-256/extractable=false/["sign"], and workerd refuses to export such a key
+PASS  rejects-a-cryptokey: refused with the one fixed failure
+PASS  rejects-a-parsed-object: refused with the one fixed failure
+PASS  rejects-a-surplus-member: refused with the one fixed failure
+PASS  rejects-non-json: refused with the one fixed failure
+PASS  code-exchange-fetch-init-accepted-by-workerd: workerd accepted the production code exchange RequestInit
+PASS  result-verification-accepts-identity-shape-on-workerd: importer + verifier accepted a 60 s ES256 result of the Identity shape on workerd
+PASS  private-media-delivery-on-workerd-r2: R2 get with Headers range, session-bound 200/206/HEAD, revalidated authorization, and pre-R2 denials
+workerd: 14 checks ผ่านทั้งหมด
+WORKERD_EXIT=0
+
+================================================================
+5a) ISOLATED POSTGRES — IDENTITY LIFECYCLE + ASSURANCE — node scripts/test-identity-lifecycle-page-store-postgres.mjs
+================================================================
+Disposable PostgreSQL arm64 local fixture verified: postgres@sha256:aadf2c0696f5ef357aa7a68da995137f0cf17bad0bf6e1f17de06ae5c769b302 (sha256:aadf2c0696f5ef357aa7a68da995137f0cf17bad0bf6e1f17de06ae5c769b302)
+ ✓ |integration| tests/integration/identity-lifecycle-enforcement.test.ts (31 tests) 1423ms
+ ✓ |integration| tests/integration/identity-lifecycle-page-store.test.ts (28 tests) 1815ms
+ Test Files  2 passed (2)
+      Tests  59 passed (59)
+   Start at  15:45:08
+   Duration  3.69s (transform 107ms, setup 26ms, import 148ms, tests 3.24s, environment 0ms)
+Disposable PostgreSQL cleanup verified
+LIFECYCLE_EXIT=0
+Container name pattern academy-identity-lifecycle-<n>-<nonce> (harness-owned; NOT aclang- prefixed —
+harness enforces strict exact-owned naming + owner label com.cyberskills.test and self-verifies cleanup).
+
+================================================================
+5b) ISOLATED POSTGRES — PENDING WAITLIST — node scripts/test-pending-waitlist-postgres.mjs
+================================================================
+SQL APPLIED MIGRATION: (all 43 migrations, 0001..0044 inclusive of 0040_pending_waitlist_requests.sql,
+0041_identity_lifecycle_first_login_guards.sql, 0043_identity_assurance_and_session_policy.sql,
+0044_attempt_reauthentication_read.sql)
+SQL APPLIED PRIVILEGED: supabase/privileged/academy-retention-api-function-owners.sql
+Pending waitlist PostgreSQL checks passed: 5
+Disposable PostgreSQL cleanup verified
+WAITLIST_EXIT=0
+5 behavior/privilege groups passed (pending intake, grants, return shape, withdrawal preservation, retention),
+matching prior acceptance scope (isolatedPendingConsentPostgres 5 groups).
+Container name pattern academy-pending-waitlist-<n>-<nonce> (harness-owned; same disclosure as 5a).
+
+================================================================
+5c) ISOLATED POSTGRES — F01 CROSS-PRODUCT (Identity publisher -> Academy consumer) — node P/academy-recovery-f01-postgres.mjs
+================================================================
+P = /Users/teerakanok/Dev/cyberskills-director/reports/security/identity-recovery-523a1d40
+Disposable PostgreSQL arm64 local fixture verified: postgres@sha256:aadf2c0696f5ef357aa7a68da995137f0cf17bad0bf6e1f17de06ae5c769b302 (one exact-owned container, separate Identity + Academy databases, PGDATA on 1 GiB noexec,nosuid,nodev tmpfs)
+ ✓ academy-recovery-f01-cross-product.integration.test.ts (1 test) 552ms
+ Test Files  1 passed (1)
+      Tests  1 passed (1)
+   Start at  15:45:31
+   Duration  1.28s (transform 381ms, setup 0ms, import 575ms, tests 552ms, environment 0ms)
+Disposable PostgreSQL cleanup verified
+F01_EXIT=0
+Coverage (unchanged from accepted harness): directly seeded Identity durable-outbox events through the
+real publisher HTTP/signing runtime, Academy client assertion + strict verification + leased SQL projection
++ runtime-role denial of pre-established disabled/deleted sessions; tamper/replay/wrong-audience rejected;
+cursor ack persisted. Limitation unchanged: not administrative-action-to-enforcement E2E, not production evidence.
+
+================================================================
+6) FOCUSED ADMISSION UNIT — vitest run --project unit tests/unit/edge-admission.test.ts
+================================================================
+ ✓ |unit| tests/unit/edge-admission.test.ts (16 tests) 26ms
+ Test Files  1 passed (1)
+      Tests  16 passed (16)
+   Start at  15:46:10
+   Duration  3.12s
+Covers: missing/malformed/maintenance modes (undefined, 'maintenance', '', 'OPEN', ' open', 'false', null, 1)
+-> 503 no-store retry-after 60 with CSP base-uri 'none'; throwing env getter -> 503; explicit 'open' -> admit;
+release-policy rejects absent/implicit mode, non-true run_worker_first (incl. ['/media/*']), and SPA fallback.
+
+================================================================
+7) CONTAINER HYGIENE
+================================================================
+docker ps -a after all suites: no academy-identity-lifecycle-* / academy-pending-waitlist-* / f01 containers remain (grep exit 1).
+14 pre-existing foreign containers (supabase_*_academy-web up 13h, crux-*) untouched throughout.
+Docker CLI authority: /usr/local/bin/docker -> /Applications/Docker.app/Contents/Resources/bin/docker, server 28.3.0.
+
+FRESH COMBINED ACCEPTANCE: ALL GREEN — nothing failed; no fixture or source fix was needed in this rerun.

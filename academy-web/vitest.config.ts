@@ -2,6 +2,8 @@ import { defineConfig } from 'vitest/config'
 import path from 'node:path'
 
 export default defineConfig({
+  // Next preserves JSX for its own compiler; Vite's test pipeline must lower it.
+  oxc: { jsx: { runtime: 'automatic' } },
   resolve: {
     alias: {
       '@': path.resolve(__dirname, 'src'),

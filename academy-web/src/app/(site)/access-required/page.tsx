@@ -1,9 +1,7 @@
 import { notFound, redirect } from 'next/navigation'
 import { AccessRequiredView } from '@/components/course/AccessRequiredView'
-import { CourseLocaleChromeSync } from '@/components/course/CourseLocaleChromeSync'
 import { currentUser } from '@/lib/auth/session'
 import { authorizeCourseResource } from '@/lib/account/course-access'
-import { getCourse } from '@/lib/content/course-source'
 import type { Locale } from '@/lib/content/course-types'
 import { privatePage } from '@/lib/seo'
 
@@ -27,9 +25,7 @@ export default async function AccessRequiredPage({
   const explicitLocale: Locale | undefined = rawLang === 'th' || rawLang === 'en' ? rawLang : undefined
   const locale: Locale | undefined = explicitLocale
     ?? (langValue === 'th' || langValue === 'en' ? langValue : undefined)
-  const course = getCourse(slug, locale)
-  if (!course) notFound()
-  const overview = `/courses/${slug}/learn?lang=${course.locale}`
+  const overview = `/courses/${slug}/learn${locale ? `?lang=${locale}` : ''}`
 
   const user = await currentUser()
   if (!user) redirect(`/sign-in?next=${encodeURIComponent(next ?? overview)}`)
@@ -38,21 +34,15 @@ export default async function AccessRequiredPage({
   const access = await authorizeCourseResource(user.account.id, slug, nodeId)
   if (access.allowed) redirect(next ?? overview)
   if (!access.allowed && access.reason === 'unavailable') throw new Error('Academy access store unavailable')
+  if (!access.allowed && access.reason === 'retired') notFound()
 
   const reason = access.reason === 'inactive'
     ? 'inactive'
     : access.reason === 'locked' ? 'locked' : 'not-enrolled'
   return (
     <>
-      <CourseLocaleChromeSync
-        locale={course.locale}
-        availableLocales={course.structure.availableLocales}
-        requestedLocale={locale}
-        localeParameterPresent={locale !== undefined}
-      />
       <AccessRequiredView
-        courseTitle={course.copy.title}
-        locale={course.locale}
+        locale={locale ?? 'en'}
         reason={reason}
         slug={slug}
       />

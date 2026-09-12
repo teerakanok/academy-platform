@@ -196,6 +196,12 @@ creation reports that Identity Control is not connected.
    candidate-only one-time nonce, create an exact `100/0` split, make one
    nonce-bound version-override request, and restore current-only traffic on
    every outcome or signal.
+   The candidate's application admission is the one-time nonce plus exact
+   version/origin/method scope. It does not verify Access JWT signatures; a
+   JWT-shaped header is not authorization evidence. Verify the Access edge
+   protection separately before any diagnostic operation. The current source
+   removes that misleading syntax check and requires fresh independent review
+   before replacing the historical pinned diagnostic candidate.
 5. Accept only its fixed classification. On import/fingerprint/sign/admission
    failure, design the smallest correction for that exact stage. A successful
    `code_not_found` admission classification proves the existing assertion was

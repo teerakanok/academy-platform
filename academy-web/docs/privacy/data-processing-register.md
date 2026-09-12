@@ -1,13 +1,14 @@
 # Academy data processing register
 
-Last reviewed: 2026-08-04
+Last reviewed: 2026-09-11
 
 This register covers the current Academy release. Recheck it before adding payments,
 certificates, analytics, new processors, or a new data destination.
 
 | Data | Purpose and legal ground | Retention | Enforced by |
 |---|---|---|---|
-| Waitlist email, source, consent time and wording | Send opted-in launch, course, and promotional email; consent | 3 years from the current grant, a fresh grant after expiry, or withdrawal | `active_marketing_leads`; `purge_expired_leads(3)` |
+| Pending waitlist email, source, request time and requested wording | Hold an unconfirmed request until a separate verified ownership flow is implemented; no marketing email is sent from pending state | 3 years from the request | `pending_waitlist_requests`; `purge_expired_leads(3)` |
+| Granted waitlist email, source, consent time and wording | Send opted-in launch, course, and promotional email; consent | 3 years from the current grant, a fresh grant after expiry, or withdrawal | `active_marketing_leads`; `purge_expired_leads(3)` |
 | Consent and withdrawal events | Prove the consent state and honor withdrawal; legal obligation and legitimate interests | 3 years from latest event, through the parent lead lifecycle | `consent_events` cascade; token rotation on withdrawal |
 | Account identity, verified email, display name, last activity | Sign in and attach records to the right learner; service delivery | 2 years after last Academy activity; unresolved appeals and active staff responsibility pause deletion | `purge_inactive_users(2)` |
 | Activation and course entitlement | Authorize Academy and course access; service delivery | Follows account lifecycle | Foreign-key cascade from `users` |
@@ -22,6 +23,7 @@ certificates, analytics, new processors, or a new data destination.
 ## Processing boundaries
 
 - Marketing senders must select recipients only from `academy.active_marketing_leads`.
+- `pending_waitlist_requests` is never a marketing recipient source and cannot activate consent.
 - The unsubscribe URL carries a random recipient token in its fragment
   (`/unsubscribe#<token>`), never a query string. Fragments are not sent to the
   edge; the browser reads the token once, removes it from history, then posts it

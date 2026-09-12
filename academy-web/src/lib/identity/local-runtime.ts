@@ -150,6 +150,7 @@ export function createLocalAcademySession(runtime: IdentityLocalRuntime, exchang
     subject: exchange.subject,
     verifiedEmail: exchange.verifiedEmail,
     activation: { ...exchange.activation },
+    authentication: exchange.authentication,
   })
   return academySessionCookie(created.id, { secure: false, maxAge: 86_400 })
 }

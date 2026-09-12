@@ -113,7 +113,8 @@ describe('adapter ต้องบังคับกฎเดียวกับ�
     const req = { ...request(), codeChallenge: createHash('sha256').update(verifier).digest('base64url') }
     const code = a.issueCodeForTest(req, { subject: 'sub-uri', verifiedEmail: 'u@example.com' })
     await expect(
-      a.exchangeCode({ clientId: req.clientId, clientAssertion: 'test-header.test-payload.test-signature', redirectUri: 'http://evil.example/cb', codeVerifier: verifier, code }),
+      a.exchangeCode({
+    resultVersion: 2 as const, clientId: req.clientId, clientAssertion: 'test-header.test-payload.test-signature', redirectUri: 'http://evil.example/cb', codeVerifier: verifier, code }),
     ).rejects.toThrow()
   })
 
@@ -127,6 +128,8 @@ describe('ชั้นสถานะต้องแยกจากกันจ�
     // นี่คือข้อที่ทิศทางย้ำที่สุด และเป็นข้อที่ระบบเดิมทำผิด
     const user = await findOrCreateUser({ issuer: ISS, subject: 'sub-act-1', email: 'act1@example.com' })
     await syncActivation(user.id, {
+    version: 2 as const,
+    authentication: { method: 'webauthn_uv' as const, auth_time: Math.floor(Date.now() / 1_000) },
       issuer: ISS,
       subject: 'sub-act-1',
       verifiedEmail: 'act1@example.com',
@@ -180,6 +183,8 @@ describe('ชั้นสถานะต้องแยกจากกันจ�
     const user = await findOrCreateUser({ issuer: ISS, subject: 'sub-susp', email: 'susp@example.com' })
     await seedEntitlement(user.id, 'free')
     await syncActivation(user.id, {
+    version: 2 as const,
+    authentication: { method: 'webauthn_uv' as const, auth_time: Math.floor(Date.now() / 1_000) },
       issuer: ISS,
       subject: 'sub-susp',
       verifiedEmail: 'susp@example.com',
@@ -200,6 +205,8 @@ describe('ชั้นสถานะต้องแยกจากกันจ�
   it('เข้า course content ได้เมื่อ activation และ entitlement ผ่านพร้อมกันเท่านั้น', async () => {
     const user = await findOrCreateUser({ issuer: ISS, subject: 'sub-access', email: 'access@example.com' })
     await syncActivation(user.id, {
+    version: 2 as const,
+    authentication: { method: 'webauthn_uv' as const, auth_time: Math.floor(Date.now() / 1_000) },
       issuer: ISS,
       subject: 'sub-access',
       verifiedEmail: 'access@example.com',
@@ -216,6 +223,8 @@ describe('ชั้นสถานะต้องแยกจากกันจ�
   it('activation revision เก่าที่มาช้าห้ามทับสถานะ revision ใหม่', async () => {
     const user = await findOrCreateUser({ issuer: ISS, subject: 'sub-revision', email: 'revision@example.com' })
     const result = (status: 'active' | 'suspended', revision: number) => ({
+    version: 2 as const,
+    authentication: { method: 'webauthn_uv' as const, auth_time: Math.floor(Date.now() / 1_000) },
       issuer: ISS,
       subject: 'sub-revision',
       verifiedEmail: 'revision@example.com',
@@ -234,6 +243,8 @@ describe('ชั้นสถานะต้องแยกจากกันจ�
   it('activation revision เท่ากันแต่สถานะขัดกันต้อง reject ไม่ใช่ last-write-wins', async () => {
     const user = await findOrCreateUser({ issuer: ISS, subject: 'sub-conflict', email: 'conflict@example.com' })
     const base = {
+      version: 2 as const,
+      authentication: { method: 'webauthn_uv' as const, auth_time: Math.floor(Date.now() / 1_000) },
       issuer: ISS,
       subject: 'sub-conflict',
       verifiedEmail: 'conflict@example.com',
@@ -252,6 +263,8 @@ describe('ชั้นสถานะต้องแยกจากกันจ�
   it('activation events ต่าง revision ที่มาพร้อมกันต้องจบที่ revision สูงสุด', async () => {
     const user = await findOrCreateUser({ issuer: ISS, subject: 'sub-race', email: 'race@example.com' })
     const base = {
+      version: 2 as const,
+      authentication: { method: 'webauthn_uv' as const, auth_time: Math.floor(Date.now() / 1_000) },
       issuer: ISS,
       subject: 'sub-race',
       verifiedEmail: 'race@example.com',

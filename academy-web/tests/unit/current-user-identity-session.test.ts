@@ -37,7 +37,7 @@ describe('Academy current user opaque Identity session', () => {
       sessionId,
       sessionStore: { get },
       resolveAccount,
-    })).resolves.toEqual({ account, email: claims.verifiedEmail })
+    })).resolves.toEqual({ account, email: claims.verifiedEmail, authentication: { method: 'legacy_unknown' } })
     expect(get).toHaveBeenCalledWith(sessionId)
     expect(resolveAccount).toHaveBeenCalledWith({
       issuer: claims.issuer,
@@ -81,7 +81,7 @@ describe('Academy current user opaque Identity session', () => {
       sessionId,
       sessionStore: { get: vi.fn().mockResolvedValue(claims) },
       resolveAccount,
-    })).resolves.toEqual({ account: renamedAccount, email: renamedAccount.email })
+    })).resolves.toEqual({ account: renamedAccount, email: renamedAccount.email, authentication: { method: 'legacy_unknown' } })
   })
 
   it('fails closed when the durable session store or account mapping fails', async () => {

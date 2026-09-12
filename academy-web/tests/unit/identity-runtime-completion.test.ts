@@ -551,6 +551,8 @@ function canonicalActivationCommit(): IdentityProfileActivationCommit {
 
 function verifiedResult() {
   return {
+    version: 2 as const,
+    authentication: { method: 'webauthn_uv' as const, auth_time: Math.floor(Date.now() / 1_000) },
     issuer: client.expectedIssuer,
     subject: 'principal-subject',
     verifiedEmail: 'learner@example.com',

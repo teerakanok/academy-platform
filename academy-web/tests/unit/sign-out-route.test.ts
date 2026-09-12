@@ -18,7 +18,7 @@ vi.mock('@/lib/identity/production-runtime', () => ({
 }))
 
 import { POST } from '@/app/(site)/api/auth/sign-out/route'
-import { projectSignOutResponse } from '@/lib/auth/account-response-client'
+import { projectSignOutResponseWithSso } from '@/lib/auth/account-response-client'
 
 function request() {
   return new Request('http://127.0.0.1:3000/api/auth/sign-out', {
@@ -104,8 +104,12 @@ describe('POST /api/auth/sign-out', () => {
       ok: true,
       scope: 'local',
       revocation: 'confirmed',
+      ssoSignoutUrl: 'https://accounts.cyberskills.co.th/v1/sessions/signout',
     })
-    expect(projectSignOutResponse(payload)).toEqual({ revocation: 'confirmed' })
+    expect(projectSignOutResponseWithSso(payload)).toEqual({
+      revocation: 'confirmed',
+      ssoSignoutUrl: 'https://accounts.cyberskills.co.th/v1/sessions/signout',
+    })
     expect(response.headers.getSetCookie()).toEqual([
       '__Host-academy_session=; Path=/; HttpOnly; SameSite=Lax; Secure; Max-Age=0',
       'academy_session=; Path=/; HttpOnly; SameSite=Lax; Secure; Max-Age=0',

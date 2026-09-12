@@ -24,6 +24,7 @@ handling requests other than unsubscribe in production.
   to `POST /api/leads/unsubscribe` without putting it in the initial request URL.
 - A verified email request is processed with `withdraw_marketing_consent_by_email`.
 - Withdrawal takes effect immediately for future selections. Never export recipients directly from `leads`; use `active_marketing_leads`.
+- Unconfirmed `pending_waitlist_requests` rows are excluded from marketing selection and must not be converted into granted consent without a separately verified ownership flow.
 - Do not disclose whether an address was subscribed. Confirm only that the request has been applied where applicable.
 - Withdrawal does not delete or change the Academy account, entitlement, or learning record.
 

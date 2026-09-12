@@ -29,6 +29,7 @@ const REGISTRATION = {
   redirectUris: [CLIENT.redirectUri],
 } as const satisfies LocalIdentityAuthorizationRegistration
 const REQUEST = {
+    resultVersion: 2 as const,
   clientId: CLIENT.clientId,
   clientAssertion: ASSERTION,
   redirectUri: CLIENT.redirectUri,
@@ -145,6 +146,8 @@ describe('Academy Identity code exchange adapter', () => {
           receivedEndpoint = endpoint
           receivedInit = init
           return new Response(JSON.stringify({
+    version: 2 as const,
+    authentication: { method: 'webauthn_uv' as const, auth_time: Math.floor(Date.now() / 1_000) },
             issuer: CLIENT.expectedIssuer,
             subject: 'learner-1',
             verifiedEmail: 'learner@example.test',
@@ -193,6 +196,7 @@ describe('Academy Identity code exchange adapter', () => {
     expect(receivedEndpoint).toBe(CLIENT.clientAssertionAudience)
     expect(receivedInit?.method).toBe('POST')
     expect(JSON.parse(String(receivedInit?.body))).toEqual({
+    resultVersion: 2 as const,
       clientId: CLIENT.clientId,
       clientAssertion: ASSERTION,
       redirectUri: CLIENT.redirectUri,

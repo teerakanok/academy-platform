@@ -1,3 +1,4 @@
+import type { IdentityAuthentication } from './authentication-assurance'
 // ขอบเขตระหว่าง Academy กับ Identity Control
 //
 // ทิศทางที่ล็อกแล้ว (founder 2026-08-01): Identity Control เป็นทางเข้ากลางที่
@@ -23,6 +24,8 @@ export type ActivationStatus = 'pending' | 'active' | 'suspended' | 'deactivated
 
 /** ผลจากการแลก one-time code — ผูกกับ audience ของ product ที่ขอ */
 export interface ExchangeResult {
+  version: 2
+  authentication: IdentityAuthentication
   /** issuer ตามรูปแบบ canonical ของ ecosystem ไม่ใช่ URL ที่ product เดาเอง */
   issuer: string
   subject: string
@@ -56,6 +59,7 @@ export interface IdentityClientAssertionProvider {
 }
 
 export interface IdentityCodeExchangeRequest {
+  resultVersion: 2
   clientId: string
   /** ES256 compact JWS from Academy's server-held signer; never browser input. */
   clientAssertion: string

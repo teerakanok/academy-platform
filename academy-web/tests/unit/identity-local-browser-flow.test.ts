@@ -61,6 +61,8 @@ async function signedLocalResultFixture(nonce: string) {
   )
   const publicJwk = await crypto.subtle.exportKey('jwk', keyPair.publicKey)
   const result = {
+    version: 2 as const,
+    authentication: { method: 'webauthn_uv' as const, auth_time: Math.floor(Date.now() / 1_000) },
     issuer: 'https://identity.local.test/v1',
     subject: 'synthetic-local-subject',
     verifiedEmail: 'learner@example.com',
@@ -73,7 +75,7 @@ async function signedLocalResultFixture(nonce: string) {
   const headerPart = base64Url(encoder.encode(JSON.stringify({
     alg: 'ES256',
     kid: 'identity-result-local-dev-v1',
-    typ: 'identity-code-exchange-result+jwt',
+    typ: 'identity-code-exchange-result-v2+jwt',
   })))
   const claimsPart = base64Url(encoder.encode(JSON.stringify({
     aud: result.audience,
@@ -250,6 +252,8 @@ describe('Academy local Identity Control browser flow', () => {
     })
     const runtime = createIdentityLocalRuntime(request)
     const sessionCookie = createLocalAcademySession(runtime, {
+    version: 2 as const,
+    authentication: { method: 'webauthn_uv' as const, auth_time: Math.floor(Date.now() / 1_000) },
       issuer: 'https://identity.local.test/v1',
       subject: 'synthetic-local-subject',
       verifiedEmail: 'learner@example.com',

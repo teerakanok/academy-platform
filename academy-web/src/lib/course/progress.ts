@@ -1,12 +1,11 @@
 import type { LearnerCourseState } from './roadmap'
 
-// ความคืบหน้าในคอร์ส เก็บใน localStorage แบบมีเวอร์ชัน (เหมือน attempt store ของข้อสอบ)
-// ข้อจำกัดที่ต้องพูดตรงๆ: อยู่กับเบราว์เซอร์ตัวนี้เท่านั้น เปลี่ยนเครื่องแล้วหาย —
-// การย้ายขึ้น DB ต้องรอ M3 (บัญชีผู้เรียน) ซึ่งติดล็อก ADR single-account อยู่
-// โครง type ตั้งใจออกแบบให้ย้ายขึ้น DB ได้โดยไม่ต้องเปลี่ยนหน้าตาข้อมูล
+// ความคืบหน้าในคอร์สที่ยังไม่ส่งเป็น browser-memory fallback เท่านั้น
+// ผลลัพธ์ที่บันทึกแล้วมีฐานข้อมูลเป็น authority เสมอ
 
 export const COURSE_PROGRESS_VERSION = 'v1'
 const PREFIX = `academy.course.${COURSE_PROGRESS_VERSION}`
+const browserCourseMemory = new Map<string, string>()
 
 export interface CourseProgressRecord {
   version: typeof COURSE_PROGRESS_VERSION
@@ -38,12 +37,36 @@ export interface CourseProgressStore {
 }
 
 export function browserCourseStore(): CourseProgressStore {
+  clearLegacyCourseProgress()
   return {
-    getItem: (k) => window.localStorage.getItem(k),
-    setItem: (k, v) => window.localStorage.setItem(k, v),
-    removeItem: (k) => window.localStorage.removeItem(k),
-    keys: () => Object.keys(window.localStorage),
+    getItem: (k) => browserCourseMemory.get(k) ?? null,
+    setItem: (k, v) => void browserCourseMemory.set(k, v),
+    removeItem: (k) => void browserCourseMemory.delete(k),
+    keys: () => [...browserCourseMemory.keys()],
   }
+}
+
+export function clearLegacyCourseProgress(): void {
+  if (typeof window === 'undefined') return
+
+  let keys: string[]
+  try {
+    keys = Object.keys(window.localStorage)
+  } catch {
+    return
+  }
+  for (const key of keys) {
+    if (!key.startsWith(`${PREFIX}:`)) continue
+    try {
+      window.localStorage.removeItem(key)
+    } catch {
+      // Memory-only fallback remains usable when browser storage is denied.
+    }
+  }
+}
+
+export function clearBrowserCourseProgressMemory(): void {
+  browserCourseMemory.clear()
 }
 
 const key = (slug: string) => `${PREFIX}:${slug}`

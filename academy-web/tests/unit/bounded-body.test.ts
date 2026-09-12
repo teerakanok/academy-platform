@@ -1,5 +1,7 @@
+import { existsSync, readdirSync, readFileSync } from 'node:fs'
+import { join, relative } from 'node:path'
 import { describe, expect, it } from 'vitest'
-import { readBoundedBody } from '@/lib/http/bounded-body'
+import { readBoundedBody, readBoundedJson } from '@/lib/http/bounded-body'
 
 // เพดานขนาด body ต้อง "หยุดอ่าน" ไม่ใช่ "อ่านจบแล้วค่อยบ่น"
 //
@@ -8,6 +10,7 @@ import { readBoundedBody } from '@/lib/http/bounded-body'
 // limit ต่อ isolate นี่คือช่องที่ผู้ใช้ล็อกอินคนเดียวทำให้บริการล่มได้
 
 const MAX = 1024
+const ROUTE_ROOT = join(__dirname, '..', '..', 'src', 'app')
 
 function request(body: BodyInit | null, headers: Record<string, string> = {}): Request {
   return new Request('https://example.test/api', { method: 'POST', body, headers })
@@ -66,6 +69,63 @@ function failingStream(): { body: ReadableStream<Uint8Array>; boom: Error } {
       },
     }),
   }
+}
+
+function stalledStream(): ReadableStream<Uint8Array> {
+  return new ReadableStream({
+    pull() {
+      return new Promise<void>(() => undefined)
+    },
+  })
+}
+
+function hangingCancelStream(firstChunkBytes = 0): {
+  body: ReadableStream<Uint8Array>
+  cancelStarted: () => boolean
+} {
+  let cancelStarted = false
+  return {
+    cancelStarted: () => cancelStarted,
+    body: new ReadableStream({
+      pull(controller) {
+        if (firstChunkBytes > 0) controller.enqueue(new Uint8Array(firstChunkBytes))
+        return new Promise<void>(() => undefined)
+      },
+      cancel() {
+        cancelStarted = true
+        return new Promise<void>(() => undefined)
+      },
+    }),
+  }
+}
+
+function streamRequest(
+  body: ReadableStream<Uint8Array>,
+  headers: Record<string, string> = {},
+  signal?: AbortSignal,
+): Request {
+  return new Request('https://example.test/api', {
+    method: 'POST',
+    body,
+    headers,
+    signal,
+    // @ts-expect-error — undici requires duplex for a stream request body
+    duplex: 'half',
+  })
+}
+
+function routeFiles(directory: string): string[] {
+  return readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
+    const path = join(directory, entry.name)
+    if (entry.isDirectory()) return routeFiles(path)
+    return entry.name === 'route.ts' ? [path] : []
+  }).sort()
+}
+
+function routeName(path: string): string {
+  return relative(join(__dirname, '..', '..'), path)
+    .replaceAll('\\', '/')
+    .replace('src/app/(site)/', 'src/app/')
 }
 
 describe('readBoundedBody', () => {
@@ -162,5 +222,110 @@ describe('readBoundedBody', () => {
 
   it('body ว่างไม่พัง', async () => {
     expect(await readBoundedBody(request(null), MAX)).toEqual({ ok: true, text: '' })
+  })
+
+  it('stream ที่ไม่ resolve ต้องจบตาม deadline รวม', async () => {
+    const startedAt = Date.now()
+    const body = stalledStream()
+    const outcome = readBoundedBody(streamRequest(body), MAX, { timeoutMs: 20 })
+    await expect(outcome).rejects.toMatchObject({ name: 'TimeoutError' })
+    expect(Date.now() - startedAt).toBeLessThan(1_000)
+    expect(body.locked).toBe(false)
+  })
+
+  it.each([
+    ['declared oversize', true],
+    ['stream overflow', false],
+  ])('cancel ที่ค้างตอน %s ต้องไม่ block เกิน deadline', async (_name, declaredOversize) => {
+    const stream = hangingCancelStream(declaredOversize ? 0 : MAX + 1)
+    const headers: Record<string, string> = declaredOversize
+      ? { 'content-length': String(MAX * 100) }
+      : {}
+    const startedAt = Date.now()
+    const result = await readBoundedBody(
+      streamRequest(stream.body, headers),
+      MAX,
+      { timeoutMs: 20 },
+    )
+    expect(result).toEqual({ ok: false, reason: 'too-large' })
+    expect(stream.cancelStarted()).toBe(true)
+    expect(Date.now() - startedAt).toBeLessThan(1_000)
+    expect(stream.body.locked).toBe(false)
+  })
+
+  it('request signal ที่ abort ก่อนอ่านต้อง propagate เหตุผลเดิม', async () => {
+    const controller = new AbortController()
+    const reason = new Error('stop before read')
+    const req = streamRequest(stalledStream(), {}, controller.signal)
+    controller.abort(reason)
+    await expect(readBoundedBody(req, MAX, { timeoutMs: 1_000 })).rejects.toBe(reason)
+  })
+
+  it('request signal ที่ abort กลาง read ต้อง propagate เหตุผลเดิม', async () => {
+    const controller = new AbortController()
+    const reason = new Error('stop during read')
+    const outcome = readBoundedBody(
+      streamRequest(stalledStream(), {}, controller.signal),
+      MAX,
+      { timeoutMs: 1_000 },
+    )
+    await new Promise((resolve) => setTimeout(resolve, 0))
+    controller.abort(reason)
+    await expect(outcome).rejects.toBe(reason)
+  })
+
+  it('empty chunk ที่ไม่ done ต้องถูกจับทันที ไม่ปล่อยวน microtask', async () => {
+    let pulls = 0
+    const body = new ReadableStream<Uint8Array>({
+      pull(controller) {
+        pulls += 1
+        controller.enqueue(new Uint8Array(0))
+      },
+    })
+    await expect(readBoundedBody(streamRequest(body), MAX)).rejects.toBeInstanceOf(RangeError)
+    expect(pulls).toBeLessThanOrEqual(2)
+  })
+
+  it('reject bound ที่ไม่ deterministic และ deadline ที่ขยายเกิน default ไม่ได้', async () => {
+    for (const invalidBytes of [0, -1, 1.5, Number.MAX_SAFE_INTEGER + 1]) {
+      await expect(readBoundedBody(request('{}'), invalidBytes)).rejects.toThrow(RangeError)
+    }
+    await expect(readBoundedBody(request('{}'), MAX, { timeoutMs: 0 }))
+      .rejects.toThrow(RangeError)
+    await expect(readBoundedBody(request('{}'), MAX, { timeoutMs: 6_000 }))
+      .rejects.toThrow(RangeError)
+  })
+
+  it('readBoundedJson แปลง read error เป็น read-error', async () => {
+    const stream = failingStream()
+    await expect(readBoundedJson(streamRequest(stream.body), MAX))
+      .resolves.toEqual({ ok: false, reason: 'read-error' })
+  })
+
+  it('actual JSON routes ใช้ bounded parser ไม่ใช่ raw request body reader', () => {
+    if (!existsSync(ROUTE_ROOT)) throw new Error('Academy route root is missing')
+    const routes = routeFiles(ROUTE_ROOT)
+    expect(routes).not.toHaveLength(0)
+    for (const route of routes) {
+      expect(readFileSync(route, 'utf8')).not.toMatch(
+        /\brequest\.(?:json|formData|arrayBuffer|text)\s*\(/,
+      )
+    }
+    expect(routes.filter((route) => readFileSync(route, 'utf8').includes('readBoundedJson')).map(routeName))
+      .toEqual([
+        'src/app/api/admin/courses/[slug]/route.ts',
+        'src/app/api/admin/courses/route.ts',
+        'src/app/api/attempts/reauthenticate/route.ts',
+        'src/app/api/attempts/route.ts',
+        'src/app/api/auth/activity/route.ts',
+        'src/app/api/auth/otp/route.ts',
+        'src/app/api/auth/verify/route.ts',
+        'src/app/api/courses/[slug]/certificate/route.ts',
+        'src/app/api/leads/route.ts',
+        'src/app/api/leads/unsubscribe/route.ts',
+        'src/app/api/practice/simulation/route.ts',
+        'src/app/api/progress/route.ts',
+        'src/app/api/security/csp-report/route.ts',
+      ])
   })
 })

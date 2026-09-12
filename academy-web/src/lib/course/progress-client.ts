@@ -153,6 +153,7 @@ export interface ProgressSyncFailure {
   nodeId: string
   message: string
   accessLost?: boolean
+  signedOut?: boolean
   /**
    * โจทย์ชุดนี้ใช้ไม่ได้แล้ว (หมดอายุ / ถูกใช้ไปแล้ว) — ต้องเริ่มด้วยโจทย์ชุดใหม่
    *
@@ -450,6 +451,7 @@ export async function pushProgress(event: ProgressAction): Promise<{
           nodeId: event.nodeId,
           message: progressFailureMessage(code),
           accessLost: res.status === 401 || res.status === 403,
+          ...(res.status === 401 ? { signedOut: true } : {}),
           // claim-replaced อาจมีอีก request บันทึกผลสำเร็จแล้ว จึงห้ามออกใบใหม่ทันที
           needsNewAttempt:
             failureBodyValid && (code === 'attempt-invalid' ||

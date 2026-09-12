@@ -1,3 +1,4 @@
+import { snapshotIdentityAuthentication, snapshotIdentitySessionAssurance, IDENTITY_SESSION_ABSOLUTE_SECONDS } from './authentication-assurance'
 import { randomBytes } from 'node:crypto'
 import type { ActivationStatus } from './adapter'
 import {
@@ -10,16 +11,16 @@ import type { IdentitySessionClaims } from './session-store'
 const FAILURE_MESSAGE = 'Identity durable session operation failed'
 const SESSION_ID = /^[A-Za-z0-9_-]{43}$/
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-const INPUT_KEYS = ['activation', 'issuer', 'subject', 'verifiedEmail'] as const
+const INPUT_KEYS = ['authentication', 'activation', 'issuer', 'subject', 'verifiedEmail'] as const
 const ACTIVATION_KEYS = ['revision', 'status'] as const
 const SESSION_KEYS = ['claims', 'id'] as const
 const WIRE_STORED_CLAIM_KEYS = [
-  'activation', 'createdAt', 'expiresAt', 'issuer', 'subjectKey', 'verifiedEmail',
+  'authentication', 'activation', 'createdAt', 'expiresAt', 'issuer', 'subjectKey', 'verifiedEmail',
 ] as const
 const CREATE_KEYS = ['session', 'status'] as const
 const STATUS_KEYS = ['status'] as const
-const MAX_TTL_SECONDS = 30 * 24 * 60 * 60
-const DEFAULT_TTL_SECONDS = 24 * 60 * 60
+const MAX_TTL_SECONDS = IDENTITY_SESSION_ABSOLUTE_SECONDS
+const DEFAULT_TTL_SECONDS = IDENTITY_SESSION_ABSOLUTE_SECONDS
 const MAX_CREATE_ATTEMPTS = 2
 const ACTIVATION_STATUSES = new Set<ActivationStatus>([
   'pending', 'active', 'suspended', 'deactivated',
@@ -33,6 +34,7 @@ export type IdentitySessionReceipt = {
 export interface IdentityDurableSessionPort {
   create(input: IdentitySessionClaims): Promise<IdentitySessionReceipt>
   get(id: string): Promise<IdentitySessionReceipt['claims'] | null>
+  peek?(id: string): Promise<IdentitySessionReceipt['claims'] | null>
   revoke(id: string): Promise<void>
 }
 
@@ -93,7 +95,7 @@ export class AcademyPostgresIdentitySessionStore implements IdentityDurableSessi
     stableIdValue?: string,
   ): Promise<IdentitySessionReceipt> {
     const input = snapshotInput(inputValue)
-    if (!input || (stableIdValue !== undefined && !SESSION_ID.test(stableIdValue))) {
+    if (!input || !snapshotIdentityAuthentication(input.authentication) || (stableIdValue !== undefined && !SESSION_ID.test(stableIdValue))) {
       throw new IdentityPostgresSessionStoreFailure()
     }
 
@@ -101,7 +103,7 @@ export class AcademyPostgresIdentitySessionStore implements IdentityDurableSessi
     for (let attempt = 0; attempt < maximumAttempts; attempt += 1) {
       const sessionId = stableIdValue ?? randomBytes(32).toString('base64url')
       const sessionIdDigest = digestAcademySessionId(sessionId)
-      const data = await this.callRpc('create_identity_session_digest', {
+      const data = await this.callRpc('create_identity_session_digest_v2', {
         p_session_id: sessionIdDigest,
         p_issuer: input.issuer,
         p_subject_key: encodeSubjectKey(input.subject),
@@ -109,6 +111,7 @@ export class AcademyPostgresIdentitySessionStore implements IdentityDurableSessi
         p_activation_status: input.activation.status,
         p_activation_revision: input.activation.revision,
         p_ttl_seconds: this.ttlSeconds,
+        p_auth_time: snapshotIdentityAuthentication(input.authentication)!.auth_time,
       })
       const duplicate = snapshotExactDataRecord(data, STATUS_KEYS)
       if (duplicate?.status === 'duplicate') {
@@ -135,6 +138,11 @@ export class AcademyPostgresIdentitySessionStore implements IdentityDurableSessi
   async get(id: string): Promise<IdentitySessionReceipt['claims'] | null> {
     if (!SESSION_ID.test(id)) return null
     return (await this.readReceipt(digestAcademySessionId(id), id))?.claims ?? null
+  }
+
+  async peek(id: string): Promise<IdentitySessionReceipt['claims'] | null> {
+    if (!SESSION_ID.test(id)) return null
+    return (await this.readReceipt(digestAcademySessionId(id), id, false))?.claims ?? null
   }
 
   async revoke(id: string): Promise<void> {
@@ -165,9 +173,10 @@ export class AcademyPostgresIdentitySessionStore implements IdentityDurableSessi
   private async readReceipt(
     sessionIdDigest: string,
     rawSessionId: string,
+    recordActivity = true,
   ): Promise<IdentitySessionReceipt | null> {
     const data = await this.callRpc(
-      'read_identity_session_digest',
+      recordActivity ? 'read_identity_session_digest' : 'peek_identity_session_digest',
       { p_session_id: sessionIdDigest },
     )
     const status = snapshotExactDataRecord(data, STATUS_KEYS)
@@ -198,6 +207,8 @@ function snapshotTtlSeconds(value: unknown): number | null {
 function snapshotInput(value: unknown): IdentitySessionClaims | null {
   const input = snapshotExactDataRecord(value, INPUT_KEYS)
   if (!input) return null
+  const authentication = snapshotIdentitySessionAssurance(input.authentication)
+  if (!authentication) return null
   const activation = snapshotExactDataRecord(input.activation, ACTIVATION_KEYS)
   if (!activation
     || !isCanonicalIdentityLifecyclePrincipalIssuer(input.issuer)
@@ -214,6 +225,7 @@ function snapshotInput(value: unknown): IdentitySessionClaims | null {
     return null
   }
   return Object.freeze({
+    authentication,
     issuer: input.issuer,
     subject: input.subject,
     verifiedEmail: input.verifiedEmail,
@@ -253,6 +265,7 @@ function snapshotSession(value: unknown): IdentitySessionReceipt | null {
   const subject = decodeSubjectKey(claims.subjectKey)
   if (subject === null) return null
   const input = snapshotInput({
+    authentication: claims.authentication,
     issuer: claims.issuer,
     subject,
     verifiedEmail: claims.verifiedEmail,
@@ -271,7 +284,8 @@ function samePrincipal(
   actual: IdentitySessionReceipt['claims'],
   expected: IdentitySessionClaims,
 ): boolean {
-  return actual.issuer === expected.issuer
+  return JSON.stringify(actual.authentication) === JSON.stringify(expected.authentication)
+    && actual.issuer === expected.issuer
     && actual.subject === expected.subject
     && actual.verifiedEmail === expected.verifiedEmail
     && actual.activation.status === expected.activation.status

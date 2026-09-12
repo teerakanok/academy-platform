@@ -1,7 +1,7 @@
 import 'server-only'
 import type { Locale } from './course-types'
-import { getPublicCourse } from './course-source'
 import { isUiLocale } from '@/lib/i18n/ui'
+import { getVisiblePublicCourse } from '@/lib/course/visibility'
 
 export type LegacyCourseSearchParams = Record<string, string | string[] | undefined>
 
@@ -10,14 +10,14 @@ function singleLocale(searchParams: LegacyCourseSearchParams): Locale | undefine
   return typeof value === 'string' && isUiLocale(value) ? value : undefined
 }
 
-export function legacyCourseRedirectPath({
+export async function legacyCourseRedirectPath({
   slug,
   searchParams,
 }: {
   slug: string
   searchParams: LegacyCourseSearchParams
-}): string | null {
-  const course = getPublicCourse(slug, singleLocale(searchParams))
+}): Promise<string | null> {
+  const course = await getVisiblePublicCourse(slug, singleLocale(searchParams))
   if (!course) return null
 
   const query = new URLSearchParams()

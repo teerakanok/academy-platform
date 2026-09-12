@@ -92,6 +92,7 @@ export class FakeIdentityAdapter implements IdentityAdapter {
   }
 
   async exchangeCode(input: {
+    resultVersion?: 2
     clientId: string
     clientAssertion: string
     redirectUri: string
@@ -113,6 +114,8 @@ export class FakeIdentityAdapter implements IdentityAdapter {
     }
 
     return {
+      version: 2,
+      authentication: { method: 'webauthn_uv', auth_time: Math.floor(Date.now() / 1_000) },
       issuer: tx.principal.issuer,
       subject: tx.principal.subject,
       verifiedEmail: tx.principal.verifiedEmail,

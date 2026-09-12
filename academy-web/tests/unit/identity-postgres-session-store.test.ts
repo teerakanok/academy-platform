@@ -11,6 +11,7 @@ const CREATED_AT = '2030-01-02T03:04:05.000Z'
 const EXPIRES_AT = '2030-01-03T03:04:05.000Z'
 
 const claims = {
+  authentication: { method: 'webauthn_uv' as const, auth_time: Math.floor(Date.parse(CREATED_AT) / 1_000) },
   issuer: 'https://accounts.example.test/auth/v1',
   subject: 'academy-learner-1',
   verifiedEmail: 'learner@example.test',
@@ -21,6 +22,7 @@ function session(id = 'A'.repeat(43), overrides: Record<string, unknown> = {}) {
   return {
     id,
     claims: {
+      authentication: claims.authentication,
       issuer: claims.issuer,
       subjectKey: encodeSubjectKey(claims.subject),
       verifiedEmail: claims.verifiedEmail,
@@ -90,7 +92,7 @@ async function fixedFailure(run: () => Promise<unknown>) {
 describe('AcademyPostgresIdentitySessionStore', () => {
   it('creates an opaque high-entropy session with exact runtime-completion claims', async () => {
     const db = createdClient()
-    const store = new AcademyPostgresIdentitySessionStore(db, { ttlSeconds: 86_400 })
+    const store = new AcademyPostgresIdentitySessionStore(db, { ttlSeconds: 43_200 })
 
     const created = await store.create(claims)
 
@@ -101,16 +103,16 @@ describe('AcademyPostgresIdentitySessionStore', () => {
       expiresAt: Date.parse(EXPIRES_AT),
     })
     expect(Reflect.ownKeys(created.claims)).toEqual([
-      'issuer', 'subject', 'verifiedEmail', 'activation', 'createdAt', 'expiresAt',
+      'authentication', 'issuer', 'subject', 'verifiedEmail', 'activation', 'createdAt', 'expiresAt',
     ])
-    expect(db.rpc).toHaveBeenCalledWith('create_identity_session_digest', expect.objectContaining({
+    expect(db.rpc).toHaveBeenCalledWith('create_identity_session_digest_v2', expect.objectContaining({
       p_session_id: storedSessionId(created.id),
       p_issuer: claims.issuer,
       p_subject_key: encodeSubjectKey(claims.subject),
       p_verified_email: claims.verifiedEmail,
       p_activation_status: 'active',
       p_activation_revision: 7,
-      p_ttl_seconds: 86_400,
+      p_ttl_seconds: 43_200,
     }))
     expect(JSON.stringify(db.rpc.mock.calls)).not.toMatch(/course|entitlement|service_role/i)
   })
@@ -127,7 +129,7 @@ describe('AcademyPostgresIdentitySessionStore', () => {
     const db = {
       rpc: vi.fn().mockImplementation((_name: string, parameters: Record<string, unknown>) => {
         const digest = parameters.p_session_id as string
-        if (_name === 'create_identity_session_digest') {
+        if (_name === 'create_identity_session_digest_v2') {
           stored.set(digest, session(digest))
           return Promise.resolve({
             data: { status: 'created', session: stored.get(digest) },
@@ -198,7 +200,7 @@ describe('AcademyPostgresIdentitySessionStore', () => {
     const db = createdClient()
     await expect(new AcademyPostgresIdentitySessionStore(db).create(input))
       .resolves.toMatchObject({ claims: { subject } })
-    expect(db.rpc).toHaveBeenCalledWith('create_identity_session_digest', expect.objectContaining({
+    expect(db.rpc).toHaveBeenCalledWith('create_identity_session_digest_v2', expect.objectContaining({
       p_subject_key: encodeSubjectKey(subject),
     }))
   })
@@ -220,7 +222,7 @@ describe('AcademyPostgresIdentitySessionStore', () => {
       }
       await expect(new AcademyPostgresIdentitySessionStore(db).create(input))
         .resolves.toMatchObject({ claims: { activation: { revision } } })
-      expect(db.rpc).toHaveBeenCalledWith('create_identity_session_digest', expect.objectContaining({
+      expect(db.rpc).toHaveBeenCalledWith('create_identity_session_digest_v2', expect.objectContaining({
         p_activation_revision: revision,
       }))
     },
@@ -299,7 +301,7 @@ describe('AcademyPostgresIdentitySessionStore', () => {
     ])
     await expect(new AcademyPostgresIdentitySessionStore(exact).create(claims, stableId))
       .resolves.toMatchObject({ id: stableId, claims })
-    expect(exact.rpc).toHaveBeenNthCalledWith(1, 'create_identity_session_digest', expect.objectContaining({
+    expect(exact.rpc).toHaveBeenNthCalledWith(1, 'create_identity_session_digest_v2', expect.objectContaining({
       p_session_id: storedSessionId(stableId),
     }))
     expect(exact.rpc).toHaveBeenNthCalledWith(2, 'read_identity_session_digest', {
@@ -433,11 +435,12 @@ describe('supabase-js response envelope', () => {
         calls.push({ functionName })
         const now = new Date('2026-09-03T23:20:41.674Z')
         const later = new Date('2026-09-04T23:20:41.674Z')
-        if (functionName === 'create_identity_session_digest') {
+        if (functionName === 'create_identity_session_digest_v2') {
           // jsonb key order as PostgreSQL emits it (shorter keys first), not TS declaration order
           stored.set(parameters.p_session_id as string, {
             id: parameters.p_session_id,
             claims: {
+              authentication: claims.authentication,
               issuer: parameters.p_issuer,
               createdAt: now.toISOString(),
               expiresAt: later.toISOString(),
@@ -450,7 +453,7 @@ describe('supabase-js response envelope', () => {
         const session = stored.get(parameters.p_session_id as string)
         const data = functionName === 'revoke_identity_session_digest'
           ? { status: 'revoked' }
-          : { status: functionName === 'create_identity_session_digest' ? 'created' : 'active', session }
+          : { status: functionName === 'create_identity_session_digest_v2' ? 'created' : 'active', session }
         return Promise.resolve({ data, error: null, count: null, status: 200, statusText: 'OK' })
       },
     }
@@ -462,7 +465,7 @@ describe('supabase-js response envelope', () => {
     await expect(store.get(stableId)).resolves.toMatchObject({ verifiedEmail: claims.verifiedEmail })
     await expect(store.revoke(stableId)).resolves.toBeUndefined()
     expect(calls.map((call) => call.functionName)).toEqual([
-      'create_identity_session_digest', 'read_identity_session_digest', 'revoke_identity_session_digest',
+      'create_identity_session_digest_v2', 'read_identity_session_digest', 'revoke_identity_session_digest',
     ])
   })
 })

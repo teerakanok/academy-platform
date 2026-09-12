@@ -4,6 +4,7 @@ import { currentUser } from '@/lib/auth/session'
 import { hasStaffRole } from '@/lib/staff/authorization'
 import { getCourseStructure } from '@/lib/content/course-source'
 import { academyDb } from '@/lib/db/server'
+import { certificateAssessmentReady } from '@/lib/course/certificate-assessment-readiness'
 import { readBoundedJson } from '@/lib/http/bounded-body'
 import { validateMutationRequest } from '@/lib/http/mutation-security'
 
@@ -45,6 +46,14 @@ export async function PATCH(
   const structure = getCourseStructure(slug)
   if (!structure) return NextResponse.json({ ok: false, error: 'ไม่พบคอร์สนี้' }, { status: 404 })
 
+  const publishing = parsed.data.visibility === 'published'
+    || (parsed.data.visibility === 'inherit' && structure.publicAvailability === 'syllabus-preview')
+  if (publishing && !certificateAssessmentReady(structure)) {
+    return NextResponse.json(
+      { ok: false, error: 'ยังเผยแพร่ไม่ได้: คลังข้อสอบ capstone ต้องพร้อมอย่างน้อย 15 ข้อต่อบทและภาษาที่เปิดสอน' },
+      { status: 409, headers: NO_STORE },
+    )
+  }
   const visibility = parsed.data.visibility === 'inherit' ? null : parsed.data.visibility ?? undefined
   const updates: Record<string, unknown> = { edited_by: user.account.id, edited_at: new Date().toISOString() }
   if (parsed.data.title !== undefined) updates.title_override = parsed.data.title

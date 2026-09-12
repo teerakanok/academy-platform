@@ -112,6 +112,8 @@ describe('local identity transaction boundary', () => {
       verifiedEmail: 'signed-result@example.test',
     })
     const verify = vi.fn(async () => ({
+    version: 2 as const,
+    authentication: { method: 'webauthn_uv' as const, auth_time: Math.floor(Date.now() / 1_000) },
       issuer: LOCAL_ISSUER,
       subject: 'signed-result-principal',
       verifiedEmail: 'signed-result@example.test',

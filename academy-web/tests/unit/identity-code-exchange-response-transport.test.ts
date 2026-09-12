@@ -15,6 +15,7 @@ import { readStrictJsonResponse } from '@/lib/http/strict-json-response'
 const ENDPOINT = 'https://accounts.example.test/v1/code/exchange'
 const ASSERTION = `${'a'.repeat(32)}.${'b'.repeat(32)}.${'c'.repeat(32)}`
 const REQUEST: IdentityCodeExchangeRequest = {
+    resultVersion: 2 as const,
   clientId: 'academy-web',
   clientAssertion: ASSERTION,
   redirectUri: 'https://academy.example.test/auth/callback',
@@ -22,6 +23,8 @@ const REQUEST: IdentityCodeExchangeRequest = {
   codeVerifier: 'v'.repeat(48),
 }
 const RESULT = {
+    version: 2 as const,
+    authentication: { method: 'webauthn_uv' as const, auth_time: Math.floor(Date.now() / 1_000) },
   issuer: 'https://identity.example.test/auth/v1',
   subject: 'learner-1',
   verifiedEmail: 'learner@example.test',
@@ -114,6 +117,7 @@ describe('Academy Identity code exchange response transport', () => {
     expect(Reflect.ownKeys(JSON.parse(String(receivedInit?.body)))).toEqual([
       'clientId',
       'clientAssertion',
+      'resultVersion',
       'redirectUri',
       'code',
       'codeVerifier',
