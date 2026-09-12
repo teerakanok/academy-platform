@@ -1,8 +1,10 @@
-import { readFile } from 'node:fs/promises'
-import { join } from 'node:path'
 import { ImageResponse } from 'next/og'
 import { courseStepCounts } from '@/lib/content/course-step-summary'
 import type { Locale, PublicCourse } from '@/lib/content/course-types'
+import {
+  NOTO_SANS_THAI_BOLD_B64,
+  NOTO_SANS_THAI_REGULAR_B64,
+} from '@/lib/course-share-fonts.generated'
 
 export const COURSE_SHARE_IMAGE_SIZE = { width: 1200, height: 630 }
 
@@ -19,16 +21,22 @@ export function publicCourseShareImagePath(slug: string, locale: Locale): string
   return `/courses/${slug}/share/${locale}`
 }
 
-async function shareImageFonts() {
-  const fontRoot = join(process.cwd(), 'assets', 'fonts', 'noto-sans-thai')
-  const [regular, bold] = await Promise.all([
-    readFile(join(fontRoot, 'NotoSansThai-Regular.ttf')),
-    readFile(join(fontRoot, 'NotoSansThai-Bold.ttf')),
-  ])
+// ฟอนต์ต้องมาจาก base64 module (generate-share-fonts.mjs) เท่านั้น — workerd
+// ที่เสิร์ฟ request จริงไม่มี filesystem ให้ node:fs.readFile อ่าน .ttf
+// (production 2026-09-12: เส้นทางนี้เคย 500 เพราะอ่านฟอนต์จาก process.cwd())
+function shareImageFonts() {
   return [
-    { name: 'Noto Sans Thai', data: regular, weight: 400 as const, style: 'normal' as const },
-    { name: 'Noto Sans Thai', data: bold, weight: 700 as const, style: 'normal' as const },
+    { name: 'Noto Sans Thai', data: decodeBase64(NOTO_SANS_THAI_REGULAR_B64), weight: 400 as const, style: 'normal' as const },
+    { name: 'Noto Sans Thai', data: decodeBase64(NOTO_SANS_THAI_BOLD_B64), weight: 700 as const, style: 'normal' as const },
   ]
+}
+
+function decodeBase64(value: string): Buffer {
+  const binary = atob(value)
+  const bytes = new Uint8Array(binary.length)
+  for (let index = 0; index < binary.length; index++) bytes[index] = binary.charCodeAt(index)
+  // Buffer ตาม type ของ @vercel/og — ใช้ได้ทั้ง Node และ workerd (nodejs_compat)
+  return Buffer.from(bytes)
 }
 
 export async function renderPublicCourseShareImage(course: PublicCourse): Promise<ImageResponse> {
@@ -124,6 +132,6 @@ export async function renderPublicCourseShareImage(course: PublicCourse): Promis
         </div>
       </div>
     ),
-    { ...COURSE_SHARE_IMAGE_SIZE, fonts: await shareImageFonts() },
+    { ...COURSE_SHARE_IMAGE_SIZE, fonts: shareImageFonts() },
   )
 }

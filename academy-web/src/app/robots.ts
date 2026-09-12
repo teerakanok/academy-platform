@@ -1,6 +1,15 @@
 import type { MetadataRoute } from 'next'
 import { absoluteUrl, searchIndexingEnabled } from '@/lib/seo'
 
+// ต้องอ่าน NEXT_PUBLIC_SEARCH_INDEXING ตอน request ไม่ใช่ตอน build — เหมือน
+// sitemap.ts ที่ใช้ force-dynamic อยู่แล้ว. ถ้าปล่อยให้ prerender ตอน build
+// (สภาพแวดล้อม build ยังไม่เปิดสวิตช์) /robots.txt จะถูกแช่แข็งเป็น `Disallow: /`
+// ตลอดอายุเวอร์ชันนั้น ขณะที่ /sitemap.xml ประกาศ URL เต็มรูปแบบจาก env runtime —
+// ขัดกันเองและปิดช่องทาง AI SEO ที่ founder เลือกไว้. เจอจริงบน production
+// 2026-09-12 (worker 73cc26e6 จาก source 73ac223): robots เสิร์ฟสาขาปิด
+// ทั้งที่ deployed var = on.
+export const dynamic = 'force-dynamic'
+
 // AI SEO เป็นหนึ่งในช่องทางที่ founder เลือก (2026-08-01) จึงอนุญาต crawler ของ
 // ผู้ช่วย AI ให้อ่านหน้าร้านได้เหมือน search engine ปกติ — ถ้าอยากให้ผู้ช่วย AI
 // แนะนำเรา มันต้องอ่านเราได้ก่อน
