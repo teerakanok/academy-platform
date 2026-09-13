@@ -53,3 +53,7 @@ deploy runbook, which is owner-gated.
 Nine privacy facts (processors, countries, transfer grounds, retention)
 block finalizing `academy-web/docs/privacy/*` placeholders — enumerated in
 `reports/academy-lane-report-20260912.md` §6. No facts were invented.
+
+## F-2 convergence addendum — 2026-09-13
+- Lifecycle pull live: worker config identity-events audience + producer values; cron */5 pulls; converged (checkpoint cursor 7, 7 active projections, academy-web ack 7). Root causes fixed: modules-worker fetch receiver (bind), envelope signer issuer is the identity-control origin, sync_service_activation EXECUTE granted to definer role postgres via supabase_admin.
+- published_at remains 0 until crux-control (not yet wired) acknowledges — owner item.
