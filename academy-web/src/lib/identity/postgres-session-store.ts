@@ -103,7 +103,7 @@ export class AcademyPostgresIdentitySessionStore implements IdentityDurableSessi
     for (let attempt = 0; attempt < maximumAttempts; attempt += 1) {
       const sessionId = stableIdValue ?? randomBytes(32).toString('base64url')
       const sessionIdDigest = digestAcademySessionId(sessionId)
-      const data = await this.callRpc('create_identity_session_digest_v2', {
+      const data = await this.callRpc('create_identity_session_digest_v3', {
         p_session_id: sessionIdDigest,
         p_issuer: input.issuer,
         p_subject_key: encodeSubjectKey(input.subject),
@@ -112,6 +112,7 @@ export class AcademyPostgresIdentitySessionStore implements IdentityDurableSessi
         p_activation_revision: input.activation.revision,
         p_ttl_seconds: this.ttlSeconds,
         p_auth_time: snapshotIdentityAuthentication(input.authentication)!.auth_time,
+        p_auth_method: snapshotIdentityAuthentication(input.authentication)!.method,
       })
       const duplicate = snapshotExactDataRecord(data, STATUS_KEYS)
       if (duplicate?.status === 'duplicate') {

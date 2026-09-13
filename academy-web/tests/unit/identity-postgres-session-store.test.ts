@@ -105,7 +105,7 @@ describe('AcademyPostgresIdentitySessionStore', () => {
     expect(Reflect.ownKeys(created.claims)).toEqual([
       'authentication', 'issuer', 'subject', 'verifiedEmail', 'activation', 'createdAt', 'expiresAt',
     ])
-    expect(db.rpc).toHaveBeenCalledWith('create_identity_session_digest_v2', expect.objectContaining({
+    expect(db.rpc).toHaveBeenCalledWith('create_identity_session_digest_v3', expect.objectContaining({
       p_session_id: storedSessionId(created.id),
       p_issuer: claims.issuer,
       p_subject_key: encodeSubjectKey(claims.subject),
@@ -129,7 +129,7 @@ describe('AcademyPostgresIdentitySessionStore', () => {
     const db = {
       rpc: vi.fn().mockImplementation((_name: string, parameters: Record<string, unknown>) => {
         const digest = parameters.p_session_id as string
-        if (_name === 'create_identity_session_digest_v2') {
+        if (_name === 'create_identity_session_digest_v3') {
           stored.set(digest, session(digest))
           return Promise.resolve({
             data: { status: 'created', session: stored.get(digest) },
@@ -200,7 +200,7 @@ describe('AcademyPostgresIdentitySessionStore', () => {
     const db = createdClient()
     await expect(new AcademyPostgresIdentitySessionStore(db).create(input))
       .resolves.toMatchObject({ claims: { subject } })
-    expect(db.rpc).toHaveBeenCalledWith('create_identity_session_digest_v2', expect.objectContaining({
+    expect(db.rpc).toHaveBeenCalledWith('create_identity_session_digest_v3', expect.objectContaining({
       p_subject_key: encodeSubjectKey(subject),
     }))
   })
@@ -222,7 +222,7 @@ describe('AcademyPostgresIdentitySessionStore', () => {
       }
       await expect(new AcademyPostgresIdentitySessionStore(db).create(input))
         .resolves.toMatchObject({ claims: { activation: { revision } } })
-      expect(db.rpc).toHaveBeenCalledWith('create_identity_session_digest_v2', expect.objectContaining({
+      expect(db.rpc).toHaveBeenCalledWith('create_identity_session_digest_v3', expect.objectContaining({
         p_activation_revision: revision,
       }))
     },
@@ -301,7 +301,7 @@ describe('AcademyPostgresIdentitySessionStore', () => {
     ])
     await expect(new AcademyPostgresIdentitySessionStore(exact).create(claims, stableId))
       .resolves.toMatchObject({ id: stableId, claims })
-    expect(exact.rpc).toHaveBeenNthCalledWith(1, 'create_identity_session_digest_v2', expect.objectContaining({
+    expect(exact.rpc).toHaveBeenNthCalledWith(1, 'create_identity_session_digest_v3', expect.objectContaining({
       p_session_id: storedSessionId(stableId),
     }))
     expect(exact.rpc).toHaveBeenNthCalledWith(2, 'read_identity_session_digest', {
@@ -435,7 +435,7 @@ describe('supabase-js response envelope', () => {
         calls.push({ functionName })
         const now = new Date('2026-09-03T23:20:41.674Z')
         const later = new Date('2026-09-04T23:20:41.674Z')
-        if (functionName === 'create_identity_session_digest_v2') {
+        if (functionName === 'create_identity_session_digest_v3') {
           // jsonb key order as PostgreSQL emits it (shorter keys first), not TS declaration order
           stored.set(parameters.p_session_id as string, {
             id: parameters.p_session_id,
@@ -453,7 +453,7 @@ describe('supabase-js response envelope', () => {
         const session = stored.get(parameters.p_session_id as string)
         const data = functionName === 'revoke_identity_session_digest'
           ? { status: 'revoked' }
-          : { status: functionName === 'create_identity_session_digest_v2' ? 'created' : 'active', session }
+          : { status: functionName === 'create_identity_session_digest_v3' ? 'created' : 'active', session }
         return Promise.resolve({ data, error: null, count: null, status: 200, statusText: 'OK' })
       },
     }
@@ -465,7 +465,7 @@ describe('supabase-js response envelope', () => {
     await expect(store.get(stableId)).resolves.toMatchObject({ verifiedEmail: claims.verifiedEmail })
     await expect(store.revoke(stableId)).resolves.toBeUndefined()
     expect(calls.map((call) => call.functionName)).toEqual([
-      'create_identity_session_digest_v2', 'read_identity_session_digest', 'revoke_identity_session_digest',
+      'create_identity_session_digest_v3', 'read_identity_session_digest', 'revoke_identity_session_digest',
     ])
   })
 })

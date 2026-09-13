@@ -715,7 +715,7 @@ async function completeIdentityCallbackWithVerification(
   const exchangeValue = await adapter.exchangeCode({
     clientId: transaction.client.clientId,
     clientAssertion,
-    resultVersion: 2,
+    resultVersion: 3,
     redirectUri: transaction.client.redirectUri,
     code: callback.code,
     codeVerifier: transaction.codeVerifier,

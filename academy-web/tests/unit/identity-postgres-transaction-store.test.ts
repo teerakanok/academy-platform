@@ -205,7 +205,7 @@ describe('AcademyPostgresIdentityTransactionStore', () => {
     })
 
     await store.checkpoint(first, exchanged)
-    expect(rpc.mock.calls[1]?.[0]).toBe('checkpoint_identity_authorization_exchange_v2')
+    expect(rpc.mock.calls[1]?.[0]).toBe('checkpoint_identity_authorization_exchange_v3')
     expect(rpc.mock.calls[1]?.[1]).toMatchObject({
       p_state: input.state,
       p_claim_digest: rpc.mock.calls[0]?.[1].p_claim_digest,
@@ -323,8 +323,8 @@ describe('AcademyPostgresIdentityTransactionStore', () => {
 
     await expect(store.checkpoint(claim, exchangeResult(input))).resolves.toBeUndefined()
     expect(rpc.mock.calls.slice(1).map(([name]) => name)).toEqual([
-      'checkpoint_identity_authorization_exchange_v2',
-      'checkpoint_identity_authorization_exchange_v2',
+      'checkpoint_identity_authorization_exchange_v3',
+      'checkpoint_identity_authorization_exchange_v3',
     ])
     expect(rpc.mock.calls[1]?.[1]).toEqual(rpc.mock.calls[2]?.[1])
   })

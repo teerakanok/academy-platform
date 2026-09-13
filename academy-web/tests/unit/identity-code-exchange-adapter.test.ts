@@ -196,7 +196,7 @@ describe('Academy Identity code exchange adapter', () => {
     expect(receivedEndpoint).toBe(CLIENT.clientAssertionAudience)
     expect(receivedInit?.method).toBe('POST')
     expect(JSON.parse(String(receivedInit?.body))).toEqual({
-    resultVersion: 2 as const,
+    resultVersion: 3 as const,
       clientId: CLIENT.clientId,
       clientAssertion: ASSERTION,
       redirectUri: CLIENT.redirectUri,

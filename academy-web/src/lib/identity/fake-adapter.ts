@@ -92,7 +92,7 @@ export class FakeIdentityAdapter implements IdentityAdapter {
   }
 
   async exchangeCode(input: {
-    resultVersion?: 2
+    resultVersion?: 2 | 3
     clientId: string
     clientAssertion: string
     redirectUri: string

@@ -1,4 +1,4 @@
-import { snapshotIdentityAuthentication } from './authentication-assurance'
+import { snapshotVersionedIdentityAuthentication } from './authentication-assurance'
 import type { ExchangeResult } from './adapter'
 
 const RESULT_KEYS = [
@@ -47,8 +47,8 @@ export function verifyIdentityCodeExchangeResult(
     }
 
     const result = snapshotExactDataProperties(resultValue, RESULT_KEYS)
-    if (!result || result.version !== 2) return invalidResult()
-    const authentication = snapshotIdentityAuthentication(result.authentication)
+    if (!result || ![2, 3].includes(result.version as number)) return invalidResult()
+    const authentication = snapshotVersionedIdentityAuthentication(result.version, result.authentication)
     if (!authentication) return invalidResult()
     const activation = snapshotExactDataProperties(result.activation, ACTIVATION_KEYS)
     if (!activation) return invalidResult()
@@ -78,7 +78,7 @@ export function verifyIdentityCodeExchangeResult(
     return {
       ok: true,
       result: {
-        version: 2,
+        version: result.version as 2 | 3,
         authentication,
         issuer: result.issuer,
         subject: result.subject,

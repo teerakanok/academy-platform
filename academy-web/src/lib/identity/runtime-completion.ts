@@ -1,4 +1,4 @@
-import { snapshotIdentityAuthentication, isAcceptableIdentityAuthenticationReceipt, AcademyIdentityReauthenticationRequired } from './authentication-assurance'
+import { snapshotVersionedIdentityAuthentication, snapshotIdentityAuthentication, isAcceptableIdentityAuthenticationReceipt, AcademyIdentityReauthenticationRequired } from './authentication-assurance'
 import type {
   ExchangeResult,
   IdentityClientAssertionProvider,
@@ -385,8 +385,8 @@ function snapshotCheckpointExchangeResult(
     ['activation', 'audience', 'issuer', 'nonce', 'serviceId', 'subject', 'verifiedEmail', 'version', 'authentication'] as const,
   )
   const activation = snapshotExactDataRecord(candidate.activation, ACTIVATION_KEYS)
-  const authentication = snapshotIdentityAuthentication(candidate.authentication)
-  if (candidate.version !== 2 || !authentication) throw new Error(FAILURE_MESSAGE)
+  const authentication = snapshotVersionedIdentityAuthentication(candidate.version, candidate.authentication)
+  if (![2, 3].includes(candidate.version as number) || !authentication) throw new Error(FAILURE_MESSAGE)
   if (typeof candidate.issuer !== 'string' || candidate.issuer.length < 1
     || typeof candidate.subject !== 'string' || candidate.subject.length < 1
     || candidate.subject.length > 512 || candidate.subject.includes('\0')
@@ -411,7 +411,7 @@ function snapshotCheckpointExchangeResult(
     issuer: candidate.issuer,
     subject: candidate.subject,
     verifiedEmail,
-    version: 2,
+    version: candidate.version as 2 | 3,
     authentication,
     audience: candidate.audience,
     serviceId: candidate.serviceId,
@@ -550,5 +550,5 @@ function assertFreshCompletion(result: ExchangeResult): void {
 function sameAuthentication(actual: unknown, expected: unknown): boolean {
   const left = snapshotIdentityAuthentication(actual)
   const right = snapshotIdentityAuthentication(expected)
-  return !!left && !!right && left.auth_time === right.auth_time
+  return !!left && !!right && left.method === right.method && left.auth_time === right.auth_time
 }

@@ -115,7 +115,7 @@ function parseEnvelope(value: unknown, policy: VerificationPlan): ParsedEnvelope
     || !hasExactKeys(header, HEADER_KEYS)
     || !hasExactKeys(claims, CLAIM_KEYS)
     || header.alg !== 'ES256'
-    || header.typ !== 'identity-code-exchange-result-v2+jwt'
+    || !['identity-code-exchange-result-v2+jwt', 'identity-code-exchange-result-v3+jwt'].includes(String(header.typ))
     || typeof header.kid !== 'string'
     || !RESULT_KEY_ID.test(header.kid)
     || claims.iss !== policy.expectedIssuer
@@ -134,6 +134,8 @@ function parseEnvelope(value: unknown, policy: VerificationPlan): ParsedEnvelope
   if (!verifiedResult.ok
     || !isCanonicalIdentityLifecyclePrincipalIssuer(verifiedResult.result.issuer)
     || !isWellFormedIdentityLifecycleSubject(verifiedResult.result.subject)) return null
+
+  if (header.typ !== `identity-code-exchange-result-v${verifiedResult.result.version}+jwt`) return null
 
   const now = Math.floor(policy.verificationTimeMs / 1_000)
   const issuedAt = claims.iat as number

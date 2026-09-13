@@ -697,7 +697,7 @@ describe('Academy v2 assurance and authoritative session lifetime', () => {
       expect(settled.value).toEqual({ status: 'expired' })
     } finally { await blocker.query('rollback'); await blocker.end(); await reader.end() }
   })
-  async function checkpointFixture() {
+  async function checkpointFixture(method: 'webauthn_uv' | 'email_otp' = 'webauthn_uv') {
     const state = 'S'.repeat(43), binding = 'B'.repeat(43), claim = 'C'.repeat(43)
     const now = Number((await admin.query('select floor(extract(epoch from clock_timestamp()))::bigint as now')).rows[0].now)
     await admin.query(`select academy.create_identity_authorization_transaction(
@@ -705,11 +705,43 @@ describe('Academy v2 assurance and authoritative session lifetime', () => {
       'https://academy.example.test',$5,'https://accounts.example.test/v1/code/exchange','/dashboard',600)`,
     [state, 'P'.repeat(43), 'N'.repeat(43), binding, ISSUER])
     await admin.query(`select academy.claim_identity_authorization_transaction_digest($1,$2,$3,$4,60)`, [state,binding,claim,digest])
-    const response = await admin.query(`select academy.checkpoint_identity_authorization_exchange_v2(
-      $1,$2,$3,$4,$5,'active',1,$6::bigint) as result`, [state,claim,ISSUER,subject,email,now-300])
+    const response = method === 'webauthn_uv'
+      ? await admin.query(`select academy.checkpoint_identity_authorization_exchange_v2(
+        $1,$2,$3,$4,$5,'active',1,$6::bigint) as result`, [state,claim,ISSUER,subject,email,now-300])
+      : await admin.query(`select academy.checkpoint_identity_authorization_exchange_v3(
+        $1,$2,$3,$4,$5,'active',1,$6::bigint,$7,3) as result`, [state,claim,ISSUER,subject,email,now-300,method])
     expect(response.rows[0].result).toEqual({ status: 'checkpointed' })
     return { state, binding, claim, authTime: now-300 }
   }
+  it('preserves explicit v3 OTP through durable retry, session read and exact finalization', async () => {
+    const accountId = await activate(subject, email)
+    const fixture = await checkpointFixture('email_otp')
+    await admin.query(`select academy.release_identity_authorization_transaction_claim($1,$2,'profile_activation')`, [fixture.state, fixture.claim])
+    const resumed = await admin.query(`select academy.claim_identity_authorization_transaction_digest($1,$2,$3,$4,60) as result`,
+      [fixture.state, fixture.binding, fixture.claim, digest])
+    expect(resumed.rows[0].result.exchangeResult).toMatchObject({ version: 3,
+      authentication: { method: 'email_otp', auth_time: fixture.authTime } })
+    const created = await admin.query(`select academy.create_identity_session_digest_v3(
+      $1,$2,$3,$4,'active',1,43200,$5::bigint,'email_otp') as result`,
+      [digest, ISSUER, subjectKey(subject), email, fixture.authTime])
+    expect(created.rows[0].result.session.claims.authentication).toEqual({ method: 'email_otp', auth_time: fixture.authTime })
+    expect((await read()).session.claims.authentication).toEqual({ method: 'email_otp', auth_time: fixture.authTime })
+    const downgrade = await admin.query(`select academy.checkpoint_identity_authorization_exchange_v2(
+      $1,$2,$3,$4,$5,'active',1,$6::bigint) as result`,
+      [fixture.state,fixture.claim,ISSUER,subject,email,fixture.authTime])
+    expect(downgrade.rows[0].result).toEqual({ status: 'result_mismatch' })
+    const completed = await admin.query(`select academy.finalize_identity_authorization_transaction_digest($1,$2,$3,$4,$5) as result`,
+      [fixture.state,fixture.claim,accountId,digest,subjectKey(subject)])
+    expect(completed.rows[0].result).toEqual({ status: 'completed' })
+  })
+  it('rejects v2 OTP and unknown methods without checkpointing', async () => {
+    const fixture = await checkpointFixture()
+    for (const [method, version] of [['email_otp', 2], ['password', 3], ['email_otp', 4]]) {
+      await expect(admin.query(`select academy.checkpoint_identity_authorization_exchange_v3(
+        $1,$2,$3,$4,$5,'active',1,$6::bigint,$7,$8)`,
+        [fixture.state,fixture.claim,ISSUER,subject,email,fixture.authTime,method,version])).rejects.toThrow(/invalid versioned authentication method/)
+    }
+  })
   it('preserves auth_time on checkpoint retry and refuses replacing it with a newer time', async () => {
     const fixture = await checkpointFixture()
     const mismatch = await admin.query(`select academy.checkpoint_identity_authorization_exchange_v2(
@@ -725,7 +757,7 @@ describe('Academy v2 assurance and authoritative session lifetime', () => {
   it('requires explicit reauthentication for stale or legacy checkpoint resume', async () => {
     const fixture = await checkpointFixture()
     for (const oldTime of [1, null]) {
-      await admin.query('update academy.identity_authorization_transaction set result_authentication_time=$2 where state=$1', [fixture.state,oldTime])
+      await admin.query('update academy.identity_authorization_transaction set result_authentication_time=$2, result_authentication_method=case when $2::bigint is null then null else result_authentication_method end, result_version=case when $2::bigint is null then null else result_version end where state=$1', [fixture.state,oldTime])
       const resumed = await admin.query(`select academy.claim_identity_authorization_transaction_digest($1,$2,$3,$4,60) as result`,
         [fixture.state,fixture.binding,fixture.claim,digest])
       expect(resumed.rows[0].result).toEqual({ status: 'reauthentication_required' })

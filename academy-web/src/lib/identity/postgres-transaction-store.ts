@@ -1,4 +1,4 @@
-import { snapshotIdentityAuthentication, AcademyIdentityReauthenticationRequired } from './authentication-assurance'
+import { snapshotVersionedIdentityAuthentication, AcademyIdentityReauthenticationRequired } from './authentication-assurance'
 import { createHash, randomBytes } from 'node:crypto'
 import type { ExchangeResult } from './adapter'
 import { isWellFormedIdentityLifecycleSubject } from './lifecycle-principal'
@@ -266,11 +266,13 @@ export class AcademyPostgresIdentityTransactionStore implements IdentityTransact
       p_activation_status: result.activation.status,
       p_activation_revision: result.activation.revision,
       p_auth_time: result.authentication.auth_time,
+      p_auth_method: result.authentication.method,
+      p_result_version: result.version,
     }
     for (let attempt = 0; attempt < 2; attempt += 1) {
       try {
         const { data } = await this.callRpc(
-          'checkpoint_identity_authorization_exchange_v2',
+          'checkpoint_identity_authorization_exchange_v3',
           parameters,
         )
         const response = snapshotBoundedDataRecord(data, STATUS_RESPONSE_KEYS.length)
@@ -539,8 +541,8 @@ function snapshotCheckpointedExchangeResult(
   transaction: PendingIdentityTransaction,
 ): ExchangeResult | null {
   const candidate = snapshotBoundedDataRecord(value, EXCHANGE_RESULT_KEYS.length)
-  if (!candidate || !hasExactKeys(candidate, EXCHANGE_RESULT_KEYS) || candidate.version !== 2) return null
-  const authentication = snapshotIdentityAuthentication(candidate.authentication)
+  if (!candidate || !hasExactKeys(candidate, EXCHANGE_RESULT_KEYS) || ![2, 3].includes(candidate.version as number)) return null
+  const authentication = snapshotVersionedIdentityAuthentication(candidate.version, candidate.authentication)
   if (!authentication) return null
   const activation = snapshotBoundedDataRecord(candidate.activation, ACTIVATION_KEYS.length)
   if (!activation || !hasExactKeys(activation, ACTIVATION_KEYS)
@@ -562,7 +564,7 @@ function snapshotCheckpointedExchangeResult(
     issuer: candidate.issuer,
     subject: candidate.subject,
     verifiedEmail: candidate.verifiedEmail,
-    version: 2,
+    version: candidate.version as 2 | 3,
     authentication,
     audience: candidate.audience,
     serviceId: candidate.serviceId,

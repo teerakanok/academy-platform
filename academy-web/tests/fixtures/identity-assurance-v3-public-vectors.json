@@ -1,0 +1,59 @@
+{
+  "schema": "identity-code-exchange-result-v3-public-vectors/v1",
+  "description": "Synthetic offline fixtures only. Ephemeral signing key discarded; public key and signatures only.",
+  "nowSeconds": 1789311600,
+  "issuer": "https://identity.example.test/v1/code/results",
+  "audience": "https://consumer.example.test",
+  "clientId": "crux-web",
+  "nonce": "synthetic_nonce_reference_12345",
+  "keyId": "identity-result-v3-fixture",
+  "publicJwk": {
+    "kty": "EC",
+    "x": "mNxFWFa7TOfzgHDxtTVrdjQvIMApAqcDLXEA8jjcU5s",
+    "y": "fyVB-emnHnfxVfd1AHCEn_wtdOAJ15wWhf0aEAklF0I",
+    "crv": "P-256"
+  },
+  "vectors": [
+    {
+      "name": "otp-v3",
+      "expectedVersion": 3,
+      "valid": true,
+      "signedResult": "eyJhbGciOiJFUzI1NiIsImtpZCI6ImlkZW50aXR5LXJlc3VsdC12My1maXh0dXJlIiwidHlwIjoiaWRlbnRpdHktY29kZS1leGNoYW5nZS1yZXN1bHQtdjMrand0In0.eyJhdWQiOiJodHRwczovL2NvbnN1bWVyLmV4YW1wbGUudGVzdCIsImNsaWVudElkIjoiY3J1eC13ZWIiLCJleHAiOjE3ODkzMTE2NjAsImlhdCI6MTc4OTMxMTYwMCwiaXNzIjoiaHR0cHM6Ly9pZGVudGl0eS5leGFtcGxlLnRlc3QvdjEvY29kZS9yZXN1bHRzIiwicmVzdWx0Ijp7InZlcnNpb24iOjMsImF1dGhlbnRpY2F0aW9uIjp7Im1ldGhvZCI6ImVtYWlsX290cCIsImF1dGhfdGltZSI6MTc4OTMxMTU4MH0sImlzc3VlciI6Imh0dHBzOi8vaXNzdWVyLmV4YW1wbGUudGVzdC9hdXRoL3YxIiwic3ViamVjdCI6InN5bnRoZXRpYy12My1wcmluY2lwYWwiLCJ2ZXJpZmllZEVtYWlsIjoic3ludGhldGljQGV4YW1wbGUudGVzdCIsImF1ZGllbmNlIjoiaHR0cHM6Ly9jb25zdW1lci5leGFtcGxlLnRlc3QiLCJzZXJ2aWNlSWQiOiJjcnV4Iiwibm9uY2UiOiJzeW50aGV0aWNfbm9uY2VfcmVmZXJlbmNlXzEyMzQ1IiwiYWN0aXZhdGlvbiI6eyJzdGF0dXMiOiJhY3RpdmUiLCJyZXZpc2lvbiI6MX19fQ.qp9aiJTXV41lquE284lXLvgkNxr1HQwmRs4Q3roswG9vLjmFyQSpI65zDRMsre-0Fkk1W8rbcvcQmmGhSk178Q",
+      "result": {
+        "issuer": "https://issuer.example.test/auth/v1",
+        "subject": "synthetic-v3-principal",
+        "verifiedEmail": "synthetic@example.test",
+        "audience": "https://consumer.example.test",
+        "serviceId": "crux",
+        "nonce": "synthetic_nonce_reference_12345",
+        "activation": {
+          "status": "active",
+          "revision": 1
+        },
+        "version": 3,
+        "authentication": {
+          "method": "email_otp",
+          "auth_time": 1789311580
+        }
+      }
+    },
+    {
+      "name": "webauthn-v3",
+      "expectedVersion": 3,
+      "valid": true,
+      "signedResult": "eyJhbGciOiJFUzI1NiIsImtpZCI6ImlkZW50aXR5LXJlc3VsdC12My1maXh0dXJlIiwidHlwIjoiaWRlbnRpdHktY29kZS1leGNoYW5nZS1yZXN1bHQtdjMrand0In0.eyJhdWQiOiJodHRwczovL2NvbnN1bWVyLmV4YW1wbGUudGVzdCIsImNsaWVudElkIjoiY3J1eC13ZWIiLCJleHAiOjE3ODkzMTE2NjAsImlhdCI6MTc4OTMxMTYwMCwiaXNzIjoiaHR0cHM6Ly9pZGVudGl0eS5leGFtcGxlLnRlc3QvdjEvY29kZS9yZXN1bHRzIiwicmVzdWx0Ijp7InZlcnNpb24iOjMsImF1dGhlbnRpY2F0aW9uIjp7Im1ldGhvZCI6IndlYmF1dGhuX3V2IiwiYXV0aF90aW1lIjoxNzg5MzExNTgwfSwiaXNzdWVyIjoiaHR0cHM6Ly9pc3N1ZXIuZXhhbXBsZS50ZXN0L2F1dGgvdjEiLCJzdWJqZWN0Ijoic3ludGhldGljLXYzLXByaW5jaXBhbCIsInZlcmlmaWVkRW1haWwiOiJzeW50aGV0aWNAZXhhbXBsZS50ZXN0IiwiYXVkaWVuY2UiOiJodHRwczovL2NvbnN1bWVyLmV4YW1wbGUudGVzdCIsInNlcnZpY2VJZCI6ImNydXgiLCJub25jZSI6InN5bnRoZXRpY19ub25jZV9yZWZlcmVuY2VfMTIzNDUiLCJhY3RpdmF0aW9uIjp7InN0YXR1cyI6ImFjdGl2ZSIsInJldmlzaW9uIjoxfX19.NNeEIxKKUtd8S02DLD_Um0sUNzPdB_6V3esxkct3qpIgfrt1Mhl1PHIZsw4eZoeImMaP32OAjPhNnxB9bHWCiw"
+    },
+    {
+      "name": "otp-v3-refused-by-v2",
+      "expectedVersion": 2,
+      "valid": false,
+      "signedResult": "eyJhbGciOiJFUzI1NiIsImtpZCI6ImlkZW50aXR5LXJlc3VsdC12My1maXh0dXJlIiwidHlwIjoiaWRlbnRpdHktY29kZS1leGNoYW5nZS1yZXN1bHQtdjMrand0In0.eyJhdWQiOiJodHRwczovL2NvbnN1bWVyLmV4YW1wbGUudGVzdCIsImNsaWVudElkIjoiY3J1eC13ZWIiLCJleHAiOjE3ODkzMTE2NjAsImlhdCI6MTc4OTMxMTYwMCwiaXNzIjoiaHR0cHM6Ly9pZGVudGl0eS5leGFtcGxlLnRlc3QvdjEvY29kZS9yZXN1bHRzIiwicmVzdWx0Ijp7InZlcnNpb24iOjMsImF1dGhlbnRpY2F0aW9uIjp7Im1ldGhvZCI6ImVtYWlsX290cCIsImF1dGhfdGltZSI6MTc4OTMxMTU4MH0sImlzc3VlciI6Imh0dHBzOi8vaXNzdWVyLmV4YW1wbGUudGVzdC9hdXRoL3YxIiwic3ViamVjdCI6InN5bnRoZXRpYy12My1wcmluY2lwYWwiLCJ2ZXJpZmllZEVtYWlsIjoic3ludGhldGljQGV4YW1wbGUudGVzdCIsImF1ZGllbmNlIjoiaHR0cHM6Ly9jb25zdW1lci5leGFtcGxlLnRlc3QiLCJzZXJ2aWNlSWQiOiJjcnV4Iiwibm9uY2UiOiJzeW50aGV0aWNfbm9uY2VfcmVmZXJlbmNlXzEyMzQ1IiwiYWN0aXZhdGlvbiI6eyJzdGF0dXMiOiJhY3RpdmUiLCJyZXZpc2lvbiI6MX19fQ.qp9aiJTXV41lquE284lXLvgkNxr1HQwmRs4Q3roswG9vLjmFyQSpI65zDRMsre-0Fkk1W8rbcvcQmmGhSk178Q"
+    },
+    {
+      "name": "signed-otp-must-not-satisfy-v2",
+      "expectedVersion": 2,
+      "valid": false,
+      "signedResult": "eyJhbGciOiJFUzI1NiIsImtpZCI6ImlkZW50aXR5LXJlc3VsdC12My1maXh0dXJlIiwidHlwIjoiaWRlbnRpdHktY29kZS1leGNoYW5nZS1yZXN1bHQtdjIrand0In0.eyJhdWQiOiJodHRwczovL2NvbnN1bWVyLmV4YW1wbGUudGVzdCIsImNsaWVudElkIjoiY3J1eC13ZWIiLCJleHAiOjE3ODkzMTE2NjAsImlhdCI6MTc4OTMxMTYwMCwiaXNzIjoiaHR0cHM6Ly9pZGVudGl0eS5leGFtcGxlLnRlc3QvdjEvY29kZS9yZXN1bHRzIiwicmVzdWx0Ijp7Imlzc3VlciI6Imh0dHBzOi8vaXNzdWVyLmV4YW1wbGUudGVzdC9hdXRoL3YxIiwic3ViamVjdCI6InN5bnRoZXRpYy12My1wcmluY2lwYWwiLCJ2ZXJpZmllZEVtYWlsIjoic3ludGhldGljQGV4YW1wbGUudGVzdCIsImF1ZGllbmNlIjoiaHR0cHM6Ly9jb25zdW1lci5leGFtcGxlLnRlc3QiLCJzZXJ2aWNlSWQiOiJjcnV4Iiwibm9uY2UiOiJzeW50aGV0aWNfbm9uY2VfcmVmZXJlbmNlXzEyMzQ1IiwiYWN0aXZhdGlvbiI6eyJzdGF0dXMiOiJhY3RpdmUiLCJyZXZpc2lvbiI6MX0sInZlcnNpb24iOjIsImF1dGhlbnRpY2F0aW9uIjp7Im1ldGhvZCI6ImVtYWlsX290cCIsImF1dGhfdGltZSI6MTc4OTMxMTU4MH19fQ.59AMJ0sCGUKH8WNzIZTGVABVs1SBLjOv6d1a3B2_yyQPrHHAptqrkH6FodqIxf319uCrWO8A0PyuUI6XgjLUBw"
+    }
+  ]
+}

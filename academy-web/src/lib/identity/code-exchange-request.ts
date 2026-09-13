@@ -39,7 +39,7 @@ export function projectIdentityCodeExchangeRequest(
     if (typeof snapshot.clientId !== 'string'
       || snapshot.clientId.length < 1
       || snapshot.clientId.length > 80
-      || snapshot.resultVersion !== 2
+      || !([2, 3] as unknown[]).includes(snapshot.resultVersion)
       || typeof snapshot.clientAssertion !== 'string'
       || snapshot.clientAssertion.length < 32
       || snapshot.clientAssertion.length > 4096
@@ -56,7 +56,7 @@ export function projectIdentityCodeExchangeRequest(
     return {
       clientId: snapshot.clientId,
       clientAssertion: snapshot.clientAssertion,
-      resultVersion: 2,
+      resultVersion: snapshot.resultVersion as 2 | 3,
       redirectUri: snapshot.redirectUri,
       code: snapshot.code,
       codeVerifier: snapshot.codeVerifier,
