@@ -4,6 +4,7 @@ export const EDGE_RATE_LIMIT_MARKER_VERSION = 'v2'
 export type EdgeRateLimitScope = 'actor' | 'target' | 'global'
 
 export type EdgeRateLimitOperation =
+  | 'account-consent'
   | 'leads'
   | 'unsubscribe'
   | 'otp'
@@ -39,6 +40,8 @@ const MARKER_MAX_AGE_MS = 120_000
 const MARKER_FUTURE_SKEW_MS = 30_000
 
 const rules = new Map([
+  ['POST:/api/account/consents/state', { operation: 'account-consent' as const, globalLimit: 600, limit: 60, windowMs: WINDOW_MS }],
+  ['POST:/api/account/consents/withdraw', { operation: 'account-consent' as const, globalLimit: 600, limit: 30, windowMs: WINDOW_MS }],
   ['POST:/api/leads', {
     operation: 'leads' as const,
     globalLimit: 300,

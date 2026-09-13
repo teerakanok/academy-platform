@@ -23,7 +23,7 @@ describe('learner dashboard page', () => {
     internalSurfacesEnabled.mockReturnValue(false)
 
     const page = await DashboardPage()
-    const dashboard = (page as { props: { children: { props: Record<string, unknown> } } }).props.children
+    const dashboard = (page as { props: { children: { props: Record<string, unknown> }[] } }).props.children[0]
 
     expect(currentUser).toHaveBeenCalledTimes(1)
     expect(dashboard.props).not.toHaveProperty('courses')

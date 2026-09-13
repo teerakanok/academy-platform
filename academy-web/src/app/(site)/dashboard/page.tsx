@@ -5,6 +5,7 @@ import { currentUser } from '@/lib/auth/session'
 import { privatePage } from '@/lib/seo'
 import { CourseDashboard } from '@/components/course/CourseDashboard'
 import { internalSurfacesEnabled } from '@/lib/internal-surface'
+import { ConsentPreferences } from '@/components/account/ConsentPreferences'
 
 export const metadata: Metadata = privatePage('My learning')
 
@@ -17,6 +18,7 @@ export default async function DashboardPage() {
       <CourseDashboard
         showInternalSurfaces={internalSurfacesEnabled()}
       />
+      <ConsentPreferences />
     </div>
   )
 }

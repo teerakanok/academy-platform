@@ -1,0 +1,103 @@
+{
+  "schema": "consumer-consent-public-vectors/v1",
+  "origin": "https://accounts.example.test",
+  "now": 1789300800,
+  "publicJwk": {
+    "kty": "EC",
+    "x": "L11xlUv3c43QSY6uwuj_HuMl7Q_0w_g0tkf1pA8kTOo",
+    "y": "J7GxydMcDr6XsRooqaS54QAFHmxTJIrKg8NXFU49PAc",
+    "crv": "P-256"
+  },
+  "vectors": [
+    {
+      "name": "state-valid",
+      "operation": "state",
+      "body": {
+        "version": 1,
+        "clientId": "academy-web",
+        "principal": {
+          "issuer": "https://issuer.example.test/auth/v1",
+          "subject": "00000000-0000-4000-8000-000000000001"
+        }
+      },
+      "jwt": "eyJhbGciOiJFUzI1NiIsImtpZCI6ImNvbnNlbnQtZml4dHVyZSIsInR5cCI6ImlkZW50aXR5LWNvbnNlbnQtZGVsZWdhdGlvbi12MStqd3QifQ.eyJpc3MiOiJhY2FkZW15LXdlYiIsInN1YiI6ImFjYWRlbXktd2ViIiwiYXVkIjoiaHR0cHM6Ly9hY2NvdW50cy5leGFtcGxlLnRlc3QvdjEvY29uc3VtZXItY29uc2VudHMvc3RhdGUiLCJpYXQiOjE3ODkzMDA4MDAsImV4cCI6MTc4OTMwMDg2MCwianRpIjoiY29uc2VudF9maXh0dXJlX3N0YXRlIiwicHVycG9zZSI6ImNvbnNlbnQuc3RhdGUiLCJyZXF1ZXN0RGlnZXN0IjoiNWExMDBmNTMxNDYwODRkZmQ2N2FmYTc3Y2FjZjBjMDIzYjY5YjM0Yzg0NjhjMjliOWU1MDdjNmJiOGRkNTczYSJ9.dlD0heQ2Q53VwxTORlX1TZd-sKfsvazpPTloglwa0lwwsELFVDRlBDDcJise3aOaQg9WM8DCwrTaBJPl8MCZ-g",
+      "expected": true
+    },
+    {
+      "name": "withdraw-valid",
+      "operation": "withdraw",
+      "body": {
+        "version": 1,
+        "clientId": "academy-web",
+        "principal": {
+          "issuer": "https://issuer.example.test/auth/v1",
+          "subject": "00000000-0000-4000-8000-000000000001"
+        },
+        "type": "marketing_email",
+        "operationId": "00000000-0000-4000-8000-000000000002",
+        "expectedRevision": "17"
+      },
+      "jwt": "eyJhbGciOiJFUzI1NiIsImtpZCI6ImNvbnNlbnQtZml4dHVyZSIsInR5cCI6ImlkZW50aXR5LWNvbnNlbnQtZGVsZWdhdGlvbi12MStqd3QifQ.eyJpc3MiOiJhY2FkZW15LXdlYiIsInN1YiI6ImFjYWRlbXktd2ViIiwiYXVkIjoiaHR0cHM6Ly9hY2NvdW50cy5leGFtcGxlLnRlc3QvdjEvY29uc3VtZXItY29uc2VudHMvd2l0aGRyYXciLCJpYXQiOjE3ODkzMDA4MDAsImV4cCI6MTc4OTMwMDg2MCwianRpIjoiY29uc2VudF9maXh0dXJlX3dpdGhkcmF3IiwicHVycG9zZSI6ImNvbnNlbnQud2l0aGRyYXciLCJyZXF1ZXN0RGlnZXN0IjoiNDUzYzUzYzM1YzBmZGJmNDlkNjJmZTg5MjJjZWNiYmZkYWUxODNjNzEyMDZmY2E4ZjJjNjUzZDkwNDg1Y2I4NCJ9.uIpY9Xt8cawtorNetOlYaOJwvo15hWIzI1VtYhI1EG04QhCoxNANyMCzUp3el3v52Bcl0OFJ0-5VEbaJT01naA",
+      "expected": true
+    },
+    {
+      "name": "code-exchange-type-rejected",
+      "operation": "state",
+      "body": {
+        "version": 1,
+        "clientId": "academy-web",
+        "principal": {
+          "issuer": "https://issuer.example.test/auth/v1",
+          "subject": "00000000-0000-4000-8000-000000000001"
+        }
+      },
+      "jwt": "eyJhbGciOiJFUzI1NiIsImtpZCI6ImNvbnNlbnQtZml4dHVyZSIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJhY2FkZW15LXdlYiIsInN1YiI6ImFjYWRlbXktd2ViIiwiYXVkIjoiaHR0cHM6Ly9hY2NvdW50cy5leGFtcGxlLnRlc3QvdjEvY29uc3VtZXItY29uc2VudHMvc3RhdGUiLCJpYXQiOjE3ODkzMDA4MDAsImV4cCI6MTc4OTMwMDg2MCwianRpIjoiY29uc2VudF9maXh0dXJlX3N0YXRlIiwicHVycG9zZSI6ImNvbnNlbnQuc3RhdGUiLCJyZXF1ZXN0RGlnZXN0IjoiNWExMDBmNTMxNDYwODRkZmQ2N2FmYTc3Y2FjZjBjMDIzYjY5YjM0Yzg0NjhjMjliOWU1MDdjNmJiOGRkNTczYSJ9.e8n2kZ7NUCxcaN_ZMszmTSO24ukof01oOEVBntbvrRPsy6UDLVj406xAfSHp5b6w2yvtY9oAermH8kHLM1_s_Q",
+      "expected": false
+    },
+    {
+      "name": "wrong-purpose-rejected",
+      "operation": "state",
+      "body": {
+        "version": 1,
+        "clientId": "academy-web",
+        "principal": {
+          "issuer": "https://issuer.example.test/auth/v1",
+          "subject": "00000000-0000-4000-8000-000000000001"
+        }
+      },
+      "jwt": "eyJhbGciOiJFUzI1NiIsImtpZCI6ImNvbnNlbnQtZml4dHVyZSIsInR5cCI6ImlkZW50aXR5LWNvbnNlbnQtZGVsZWdhdGlvbi12MStqd3QifQ.eyJpc3MiOiJhY2FkZW15LXdlYiIsInN1YiI6ImFjYWRlbXktd2ViIiwiYXVkIjoiaHR0cHM6Ly9hY2NvdW50cy5leGFtcGxlLnRlc3QvdjEvY29uc3VtZXItY29uc2VudHMvc3RhdGUiLCJpYXQiOjE3ODkzMDA4MDAsImV4cCI6MTc4OTMwMDg2MCwianRpIjoiY29uc2VudF9maXh0dXJlX3N0YXRlIiwicHVycG9zZSI6ImNvbnNlbnQud2l0aGRyYXciLCJyZXF1ZXN0RGlnZXN0IjoiNWExMDBmNTMxNDYwODRkZmQ2N2FmYTc3Y2FjZjBjMDIzYjY5YjM0Yzg0NjhjMjliOWU1MDdjNmJiOGRkNTczYSJ9.gyH2BeXbzA3SJcaT9syp8bvryz2DSRFvZ8x1gEuhhlkY0ctuc3Ms0yaWyRjoa6x31nlwU1Ucl8aQaN3jOfq0Pg",
+      "expected": false
+    },
+    {
+      "name": "expired-rejected",
+      "operation": "state",
+      "body": {
+        "version": 1,
+        "clientId": "academy-web",
+        "principal": {
+          "issuer": "https://issuer.example.test/auth/v1",
+          "subject": "00000000-0000-4000-8000-000000000001"
+        }
+      },
+      "jwt": "eyJhbGciOiJFUzI1NiIsImtpZCI6ImNvbnNlbnQtZml4dHVyZSIsInR5cCI6ImlkZW50aXR5LWNvbnNlbnQtZGVsZWdhdGlvbi12MStqd3QifQ.eyJpc3MiOiJhY2FkZW15LXdlYiIsInN1YiI6ImFjYWRlbXktd2ViIiwiYXVkIjoiaHR0cHM6Ly9hY2NvdW50cy5leGFtcGxlLnRlc3QvdjEvY29uc3VtZXItY29uc2VudHMvc3RhdGUiLCJpYXQiOjE3ODkzMDA4MDAsImV4cCI6MTc4OTMwMDgwMCwianRpIjoiY29uc2VudF9maXh0dXJlX3N0YXRlIiwicHVycG9zZSI6ImNvbnNlbnQuc3RhdGUiLCJyZXF1ZXN0RGlnZXN0IjoiNWExMDBmNTMxNDYwODRkZmQ2N2FmYTc3Y2FjZjBjMDIzYjY5YjM0Yzg0NjhjMjliOWU1MDdjNmJiOGRkNTczYSJ9.yZLMaEtrQE6J72xIgERLvI1utR989G29TF-Ut8r2C9GDpME9XiSMuboVdH8LuAhp_XE6yh_qPvgT8X19tFl4Gw",
+      "expected": false
+    },
+    {
+      "name": "stale-body-revision-rejected",
+      "operation": "withdraw",
+      "body": {
+        "version": 1,
+        "clientId": "academy-web",
+        "principal": {
+          "issuer": "https://issuer.example.test/auth/v1",
+          "subject": "00000000-0000-4000-8000-000000000001"
+        },
+        "type": "marketing_email",
+        "operationId": "00000000-0000-4000-8000-000000000002",
+        "expectedRevision": "18"
+      },
+      "jwt": "eyJhbGciOiJFUzI1NiIsImtpZCI6ImNvbnNlbnQtZml4dHVyZSIsInR5cCI6ImlkZW50aXR5LWNvbnNlbnQtZGVsZWdhdGlvbi12MStqd3QifQ.eyJpc3MiOiJhY2FkZW15LXdlYiIsInN1YiI6ImFjYWRlbXktd2ViIiwiYXVkIjoiaHR0cHM6Ly9hY2NvdW50cy5leGFtcGxlLnRlc3QvdjEvY29uc3VtZXItY29uc2VudHMvd2l0aGRyYXciLCJpYXQiOjE3ODkzMDA4MDAsImV4cCI6MTc4OTMwMDg2MCwianRpIjoiY29uc2VudF9maXh0dXJlX3dpdGhkcmF3IiwicHVycG9zZSI6ImNvbnNlbnQud2l0aGRyYXciLCJyZXF1ZXN0RGlnZXN0IjoiNDUzYzUzYzM1YzBmZGJmNDlkNjJmZTg5MjJjZWNiYmZkYWUxODNjNzEyMDZmY2E4ZjJjNjUzZDkwNDg1Y2I4NCJ9.tQQiJfbwvWjSvQD88o29UOzxUwwptHaF24IErlU3xsj8qPpTkKR8Rr5_A2TkB54RaZkjRPxiMdULJX9Y84Qk-w",
+      "expected": false
+    }
+  ]
+}

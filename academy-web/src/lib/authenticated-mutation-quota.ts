@@ -6,7 +6,7 @@ import {
 
 export type AuthenticatedMutationOperation = Extract<
   EdgeRateLimitOperation,
-  'learner-progress' | 'learner-reset' | 'learner-simulation' | 'session-activity' | 'attempt-reauthentication'
+  'learner-progress' | 'learner-reset' | 'learner-simulation' | 'session-activity' | 'attempt-reauthentication' | 'account-consent'
 >
 
 export interface AuthenticatedMutationQuota {
@@ -16,6 +16,7 @@ export interface AuthenticatedMutationQuota {
 }
 
 export const AUTHENTICATED_MUTATION_QUOTAS: Record<AuthenticatedMutationOperation, AuthenticatedMutationQuota> = {
+  'account-consent': { accountLimit: 30, courseLimit: 30, windowMs: 60_000 },
   'session-activity': { accountLimit: 1, courseLimit: 1, windowMs: 60_000 },
   'attempt-reauthentication': { accountLimit: 30, courseLimit: 30, windowMs: 60_000 },
   'learner-progress': { accountLimit: 120, courseLimit: 60, windowMs: 60_000 },
