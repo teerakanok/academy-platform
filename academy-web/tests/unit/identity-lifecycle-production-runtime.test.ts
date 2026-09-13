@@ -26,7 +26,7 @@ const KEY_SET = await (async () => {
   const pair = await crypto.subtle.generateKey({ name: 'ECDSA', namedCurve: 'P-256' }, true, ['sign', 'verify'])
   const jwk = await crypto.subtle.exportKey('jwk', (pair as CryptoKeyPair).publicKey)
   return JSON.stringify({
-    issuer: 'https://supabase.cyberskills.co.th/auth/v1',
+    issuer: 'https://accounts.cyberskills.co.th/',
     revision: 1,
     keys: [{
       keyId: 'identity-lifecycle-production-test',
@@ -115,9 +115,38 @@ describe('Academy Identity lifecycle production pull runtime', () => {
     }
   })
 
-  it('pins the canonical producer issuer and rejects a mismatched verification set', () => {
+  it('reuses the pinned production client-assertion binding when lifecycle key names are absent', () => {
+    const config = projectAcademyIdentityLifecycleProductionConfig(environment({
+      IDENTITY_LIFECYCLE_CLIENT_ASSERTION_KEY_ID: undefined,
+      IDENTITY_LIFECYCLE_CLIENT_ASSERTION_PRIVATE_JWK: undefined,
+      IDENTITY_CLIENT_ASSERTION_KEY_ID: 'academy-prod-2026-08',
+      IDENTITY_CLIENT_ASSERTION_PRIVATE_JWK: PRIVATE_JWK,
+    }))
+    expect(config?.clientAssertionKeyId).toBe('academy-prod-2026-08')
+    expect(config?.clientAssertionPrivateJwk).toBe(PRIVATE_JWK)
+  })
+
+  it('still fails closed when no client-assertion key binding exists at all', () => {
+    expect(projectAcademyIdentityLifecycleProductionConfig(environment({
+      IDENTITY_LIFECYCLE_CLIENT_ASSERTION_KEY_ID: undefined,
+      IDENTITY_LIFECYCLE_CLIENT_ASSERTION_PRIVATE_JWK: undefined,
+    }))).toBeNull()
+    expect(projectAcademyIdentityLifecycleProductionConfig(environment({
+      IDENTITY_LIFECYCLE_CLIENT_ASSERTION_PRIVATE_JWK: undefined,
+    }))).toBeNull()
+  })
+
+  it('gives dedicated lifecycle key names precedence over the legacy binding', () => {
+    const config = projectAcademyIdentityLifecycleProductionConfig(environment({
+      IDENTITY_CLIENT_ASSERTION_KEY_ID: 'academy-prod-2026-08',
+      IDENTITY_CLIENT_ASSERTION_PRIVATE_JWK: PRIVATE_JWK,
+    }))
+    expect(config?.clientAssertionKeyId).toBe('academy-lifecycle-test')
+  })
+
+  it('pins the envelope signer issuer and rejects a mismatched verification set', () => {
     const config = projectAcademyIdentityLifecycleProductionConfig(environment())
-    expect(config?.envelopePolicy.expectedIssuer).toBe('https://supabase.cyberskills.co.th/auth/v1')
+    expect(config?.envelopePolicy.expectedIssuer).toBe('https://accounts.cyberskills.co.th/')
 
     const mismatched = JSON.parse(KEY_SET) as Record<string, unknown>
     mismatched.issuer = 'https://attacker.example/'

@@ -39,6 +39,21 @@
     // (ไม่มี NEXT_PUBLIC_SUPABASE_* = หน้า sign-in จะบอกตรงๆ ว่ายังไม่เปิด
     //  แทนที่จะโชว์ฟอร์มที่กดแล้ว error)
     "NEXT_PUBLIC_SEARCH_INDEXING": "on",
-    "ACADEMY_ADMISSION_MODE": "open"
+    "ACADEMY_ADMISSION_MODE": "open",
+    // F-2 lifecycle pull (2026-09-13): exact producer values provisioned with the
+    // identity publisher enablement — dedicated loopback tunnel ingress
+    // identity-events.cyberskills.co.th -> 127.0.0.1:18789 (cloudflared) and the
+    // pinned client-assertion audience. The private client JWK is NOT set here:
+    // the runtime falls back to the existing IDENTITY_CLIENT_ASSERTION_PRIVATE_JWK
+    // Worker secret (kid academy-prod-2026-08), which the publisher registry
+    // already pins for this consumer. Verification set = public producer key.
+    "IDENTITY_LIFECYCLE_ENABLED": "true",
+    "IDENTITY_LIFECYCLE_PUBLISHER_ENDPOINT": "https://identity-events.cyberskills.co.th/v1/lifecycle/events/pull",
+    "IDENTITY_LIFECYCLE_CLIENT_ASSERTION_AUDIENCE": "https://identity-events.cyberskills.co.th/v1/lifecycle/events/pull",
+    "IDENTITY_LIFECYCLE_EVENT_AUDIENCE": "https://academy.cyberskills.co.th/auth/events",
+    "IDENTITY_LIFECYCLE_CLIENT_ASSERTION_KEY_ID": "academy-prod-2026-08",
+    "IDENTITY_LIFECYCLE_WORKER_ID": "academy-lifecycle-prod-1",
+    "IDENTITY_LIFECYCLE_TIMEOUT_MS": "5000",
+    "IDENTITY_LIFECYCLE_VERIFICATION_KEY_SET_DOCUMENT": "{\"issuer\":\"https://accounts.cyberskills.co.th/\",\"revision\":1,\"keys\":[{\"keyId\":\"identity-events-prod-2026-09\",\"algorithm\":\"ES256\",\"publicJwk\":{\"kty\":\"EC\",\"crv\":\"P-256\",\"x\":\"XdCvKHWNQ_4r84wTqri7TbGXXA1AYig17JhuD-miql8\",\"y\":\"M5Bmd5FErX2BQWSrBUnmu0pQO7zjq9Z4A4AE3wsbKG8\"},\"state\":\"active\"}],\"retiredKeyFingerprints\":[],\"retiredKeyIds\":[]}"
   }
 }

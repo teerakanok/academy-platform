@@ -18,6 +18,8 @@ export * from './.open-next/worker.js'
 interface AcademyWorkerEnv extends MediaWorkerEnv, HostPolicyEnv, AdmissionEnv {
   EDGE_RATE_LIMITER?: DurableObjectNamespace<EdgeRateLimiter>
   RATE_LIMIT_KEY_SECRET?: string
+  IDENTITY_CLIENT_ASSERTION_KEY_ID?: string
+  IDENTITY_CLIENT_ASSERTION_PRIVATE_JWK?: string
   IDENTITY_LIFECYCLE_ENABLED?: string
   IDENTITY_LIFECYCLE_PUBLISHER_ENDPOINT?: string
   IDENTITY_LIFECYCLE_CLIENT_ASSERTION_AUDIENCE?: string
@@ -64,6 +66,33 @@ export default {
     )
   },
   async scheduled(_controller, env) {
-    await runAcademyIdentityLifecyclePull(env as unknown as Record<string, string | undefined>)
+    try {
+      const result = await runAcademyIdentityLifecyclePull(env as unknown as Record<string, string | undefined>)
+      // Bounded observability: the pull cycle returns silent no-op outcomes
+      // (disabled / retry_required / lease_busy) that previously vanished,
+      // leaving crons "Ok" while nothing converged. Log the outcome shape only
+      // (no secrets, no payloads).
+      console.log(JSON.stringify({
+        schema_version: 1,
+        event: 'identity_lifecycle_pull_scheduled',
+        outcome: typeof result === 'object' && result !== null ? (result as { outcome?: unknown }).outcome ?? 'unknown' : 'unknown',
+        sensitiveOperationsAllowed: typeof result === 'object' && result !== null
+          ? Boolean((result as { sensitiveOperationsAllowed?: unknown }).sensitiveOperationsAllowed)
+          : false,
+        cursor: typeof result === 'object' && result !== null
+          ? ((result as { cursor?: unknown }).cursor ?? null)
+          : null,
+        health: typeof result === 'object' && result !== null
+          ? ((result as { health?: unknown }).health ?? null)
+          : null,
+      }))
+    } catch (cause) {
+      console.log(JSON.stringify({
+        schema_version: 1,
+        event: 'identity_lifecycle_pull_scheduled',
+        outcome: 'threw',
+        error: cause instanceof Error ? cause.message.slice(0, 200) : 'non_error_thrown',
+      }))
+    }
   },
 } satisfies ExportedHandler<AcademyWorkerEnv>

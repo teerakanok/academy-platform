@@ -1,0 +1,650 @@
+{
+  "pages": [
+    {
+      "cell": "01-home",
+      "viewport": "desktop-1440",
+      "path": "/",
+      "status": 200,
+      "finalUrl": "https://academy.cyberskills.co.th/",
+      "title": "CYBERSKILLS Academy",
+      "htmlLang": "en",
+      "h1": [
+        "Stop relearning what you already know."
+      ],
+      "ready": "h1 visible",
+      "screenshot": "/Users/teerakanok/Dev/continuations/academy-security-recovery-20260912-523a1d40/reports/playtest-20260912/screenshots/01-home--desktop-1440.png",
+      "loadMs": 2787,
+      "issues": []
+    },
+    {
+      "cell": "02-courses",
+      "viewport": "desktop-1440",
+      "path": "/courses",
+      "status": 200,
+      "finalUrl": "https://academy.cyberskills.co.th/courses",
+      "title": "Course previews · CYBERSKILLS Academy",
+      "htmlLang": "en",
+      "h1": [
+        "Course previews"
+      ],
+      "ready": "h1 visible",
+      "screenshot": "/Users/teerakanok/Dev/continuations/academy-security-recovery-20260912-523a1d40/reports/playtest-20260912/screenshots/02-courses--desktop-1440.png",
+      "loadMs": 2420,
+      "issues": [
+        {
+          "kind": "requestfailed",
+          "url": "https://academy.cyberskills.co.th/courses/assembly/en?_rsc=5qAKrVs_O8_i41fZ",
+          "error": "net::ERR_ABORTED"
+        }
+      ]
+    },
+    {
+      "cell": "03-course-assembly-en",
+      "viewport": "desktop-1440",
+      "path": "/courses/assembly/en",
+      "status": 200,
+      "finalUrl": "https://academy.cyberskills.co.th/courses/assembly/en",
+      "title": "Assembly: Reading Machine Code · CYBERSKILLS Academy",
+      "htmlLang": "en",
+      "h1": [
+        "Assembly: Reading Machine Code"
+      ],
+      "ready": "syllabus visible",
+      "screenshot": "/Users/teerakanok/Dev/continuations/academy-security-recovery-20260912-523a1d40/reports/playtest-20260912/screenshots/03-course-assembly-en--desktop-1440.png",
+      "loadMs": 2817,
+      "issues": []
+    },
+    {
+      "cell": "04-course-assembly-th",
+      "viewport": "desktop-1440",
+      "path": "/courses/assembly/th",
+      "status": 200,
+      "finalUrl": "https://academy.cyberskills.co.th/courses/assembly/th",
+      "title": "ภาษาแอสเซมบลี: อ่านภาษาเครื่อง · CYBERSKILLS Academy",
+      "htmlLang": "th",
+      "h1": [
+        "ภาษาแอสเซมบลี: อ่านภาษาเครื่อง"
+      ],
+      "ready": "syllabus visible",
+      "screenshot": "/Users/teerakanok/Dev/continuations/academy-security-recovery-20260912-523a1d40/reports/playtest-20260912/screenshots/04-course-assembly-th--desktop-1440.png",
+      "loadMs": 3034,
+      "issues": []
+    },
+    {
+      "cell": "05-course-linux-en",
+      "viewport": "desktop-1440",
+      "path": "/courses/basic-os-linux/en",
+      "status": 200,
+      "finalUrl": "https://academy.cyberskills.co.th/courses/basic-os-linux/en",
+      "title": "Basic OS & Linux · CYBERSKILLS Academy",
+      "htmlLang": "en",
+      "h1": [
+        "Basic OS & Linux"
+      ],
+      "ready": "h1 visible",
+      "screenshot": "/Users/teerakanok/Dev/continuations/academy-security-recovery-20260912-523a1d40/reports/playtest-20260912/screenshots/05-course-linux-en--desktop-1440.png",
+      "loadMs": 2244,
+      "issues": []
+    },
+    {
+      "cell": "06-course-linux-th",
+      "viewport": "desktop-1440",
+      "path": "/courses/basic-os-linux/th",
+      "status": 200,
+      "finalUrl": "https://academy.cyberskills.co.th/courses/basic-os-linux/th",
+      "title": "พื้นฐานระบบปฏิบัติการและ Linux · CYBERSKILLS Academy",
+      "htmlLang": "th",
+      "h1": [
+        "พื้นฐานระบบปฏิบัติการและ Linux"
+      ],
+      "ready": "h1 visible",
+      "screenshot": "/Users/teerakanok/Dev/continuations/academy-security-recovery-20260912-523a1d40/reports/playtest-20260912/screenshots/06-course-linux-th--desktop-1440.png",
+      "loadMs": 2581,
+      "issues": []
+    },
+    {
+      "cell": "07-sign-in",
+      "viewport": "desktop-1440",
+      "path": "/sign-in",
+      "error": "TimeoutError: locator.waitFor: Timeout 15000ms exceeded.\nCall log:\n  - waiting for locator('input[type=\"email\"], input[name=\"email\"]').first() to be visible\n"
+    },
+    {
+      "cell": "08-sign-in-notice",
+      "viewport": "desktop-1440",
+      "path": "/sign-in?notice=identity-unavailable",
+      "status": 200,
+      "finalUrl": "https://academy.cyberskills.co.th/sign-in?notice=identity-unavailable",
+      "title": "Sign in · CYBERSKILLS Academy",
+      "htmlLang": "en",
+      "h1": [
+        "One CYBERSKILLS account"
+      ],
+      "ready": "Sign-in could not be completed. Please start again.",
+      "screenshot": "/Users/teerakanok/Dev/continuations/academy-security-recovery-20260912-523a1d40/reports/playtest-20260912/screenshots/08-sign-in-notice--desktop-1440.png",
+      "loadMs": 2202,
+      "issues": []
+    },
+    {
+      "cell": "09-privacy",
+      "viewport": "desktop-1440",
+      "path": "/privacy",
+      "status": 200,
+      "finalUrl": "https://academy.cyberskills.co.th/privacy",
+      "title": "Privacy notice · CYBERSKILLS Academy",
+      "htmlLang": "en",
+      "h1": [
+        "CYBERSKILLS Academy privacy notice"
+      ],
+      "ready": "h1 visible",
+      "screenshot": "/Users/teerakanok/Dev/continuations/academy-security-recovery-20260912-523a1d40/reports/playtest-20260912/screenshots/09-privacy--desktop-1440.png",
+      "loadMs": 2070,
+      "issues": [
+        {
+          "kind": "requestfailed",
+          "url": "https://academy.cyberskills.co.th/?_rsc=9HpeIuwfWrSbrFp8",
+          "error": "net::ERR_ABORTED"
+        }
+      ]
+    },
+    {
+      "cell": "10-unsubscribe",
+      "viewport": "desktop-1440",
+      "path": "/unsubscribe",
+      "status": 200,
+      "finalUrl": "https://academy.cyberskills.co.th/unsubscribe",
+      "title": "Email preferences · CYBERSKILLS Academy",
+      "htmlLang": "en",
+      "h1": [
+        "Stop Academy marketing emails"
+      ],
+      "ready": "h1 visible",
+      "screenshot": "/Users/teerakanok/Dev/continuations/academy-security-recovery-20260912-523a1d40/reports/playtest-20260912/screenshots/10-unsubscribe--desktop-1440.png",
+      "loadMs": 2082,
+      "issues": []
+    },
+    {
+      "cell": "11-app-404",
+      "viewport": "desktop-1440",
+      "path": "/courses/no-such-course",
+      "status": 404,
+      "finalUrl": "https://academy.cyberskills.co.th/courses/no-such-course",
+      "title": "404: This page could not be found.",
+      "htmlLang": "en",
+      "h1": [
+        "404"
+      ],
+      "ready": "body text: Skip to content\nCYBERSKILLS Academy\nCYBERSKILLS Academy\nMy learning\nEnglish\nไทย\nSign in\n☾\n404\nThis page could not be found.\n© 2026 CYBERSKILLS\nPrivacy notice",
+      "screenshot": "/Users/teerakanok/Dev/continuations/academy-security-recovery-20260912-523a1d40/reports/playtest-20260912/screenshots/11-app-404--desktop-1440.png",
+      "loadMs": 3714,
+      "issues": [
+        {
+          "kind": "console.error",
+          "text": "Failed to load resource: the server responded with a status of 404 ()"
+        },
+        {
+          "kind": "console.error",
+          "text": "Applying inline style violates the following Content Security Policy directive 'style-src 'self' 'nonce-owvPA7DMyPohhsLBMLSo4p+/A1ZobNbqpigWF8i22JE=''. Either the 'unsafe-inline' keyword, a hash ('sha256-Z5XTK23DFuEMs0PwnyZDO9SWxemQ5HxcpVaBNuUJyWY='), or a nonce ('nonce-...') is required to enable i"
+        },
+        {
+          "kind": "requestfailed",
+          "url": "https://academy.cyberskills.co.th/sign-in?next=%2Fdashboard",
+          "error": "net::ERR_ABORTED"
+        }
+      ]
+    },
+    {
+      "cell": "12-mw-404",
+      "viewport": "desktop-1440",
+      "path": "/courses/assembly/xx",
+      "status": 404,
+      "finalUrl": "https://academy.cyberskills.co.th/courses/assembly/xx",
+      "title": "",
+      "htmlLang": null,
+      "h1": [],
+      "ready": "body text: (EMPTY)",
+      "screenshot": "/Users/teerakanok/Dev/continuations/academy-security-recovery-20260912-523a1d40/reports/playtest-20260912/screenshots/12-mw-404--desktop-1440.png",
+      "loadMs": 660,
+      "issues": [
+        {
+          "kind": "console.error",
+          "text": "Failed to load resource: the server responded with a status of 404 ()"
+        }
+      ]
+    },
+    {
+      "cell": "01-home",
+      "viewport": "mobile-390",
+      "path": "/",
+      "status": 200,
+      "finalUrl": "https://academy.cyberskills.co.th/",
+      "title": "CYBERSKILLS Academy",
+      "htmlLang": "en",
+      "h1": [
+        "Stop relearning what you already know."
+      ],
+      "ready": "h1 visible",
+      "screenshot": "/Users/teerakanok/Dev/continuations/academy-security-recovery-20260912-523a1d40/reports/playtest-20260912/screenshots/01-home--mobile-390.png",
+      "loadMs": 2875,
+      "issues": []
+    },
+    {
+      "cell": "02-courses",
+      "viewport": "mobile-390",
+      "path": "/courses",
+      "status": 200,
+      "finalUrl": "https://academy.cyberskills.co.th/courses",
+      "title": "Course previews · CYBERSKILLS Academy",
+      "htmlLang": "en",
+      "h1": [
+        "Course previews"
+      ],
+      "ready": "h1 visible",
+      "screenshot": "/Users/teerakanok/Dev/continuations/academy-security-recovery-20260912-523a1d40/reports/playtest-20260912/screenshots/02-courses--mobile-390.png",
+      "loadMs": 4058,
+      "issues": [
+        {
+          "kind": "pageerror",
+          "text": "Error: Minified React error #418; visit https://react.dev/errors/418?args[]=HTML&args[]= for the full message or use the non-minified dev environment for full errors and additional helpful warnings."
+        }
+      ]
+    },
+    {
+      "cell": "03-course-assembly-en",
+      "viewport": "mobile-390",
+      "path": "/courses/assembly/en",
+      "status": 200,
+      "finalUrl": "https://academy.cyberskills.co.th/courses/assembly/en",
+      "title": "Assembly: Reading Machine Code · CYBERSKILLS Academy",
+      "htmlLang": "en",
+      "h1": [
+        "Assembly: Reading Machine Code"
+      ],
+      "ready": "syllabus visible",
+      "screenshot": "/Users/teerakanok/Dev/continuations/academy-security-recovery-20260912-523a1d40/reports/playtest-20260912/screenshots/03-course-assembly-en--mobile-390.png",
+      "loadMs": 2199,
+      "issues": []
+    },
+    {
+      "cell": "04-course-assembly-th",
+      "viewport": "mobile-390",
+      "path": "/courses/assembly/th",
+      "status": 200,
+      "finalUrl": "https://academy.cyberskills.co.th/courses/assembly/th",
+      "title": "ภาษาแอสเซมบลี: อ่านภาษาเครื่อง · CYBERSKILLS Academy",
+      "htmlLang": "th",
+      "h1": [
+        "ภาษาแอสเซมบลี: อ่านภาษาเครื่อง"
+      ],
+      "ready": "syllabus visible",
+      "screenshot": "/Users/teerakanok/Dev/continuations/academy-security-recovery-20260912-523a1d40/reports/playtest-20260912/screenshots/04-course-assembly-th--mobile-390.png",
+      "loadMs": 2243,
+      "issues": []
+    },
+    {
+      "cell": "05-course-linux-en",
+      "viewport": "mobile-390",
+      "path": "/courses/basic-os-linux/en",
+      "status": 200,
+      "finalUrl": "https://academy.cyberskills.co.th/courses/basic-os-linux/en",
+      "title": "Basic OS & Linux · CYBERSKILLS Academy",
+      "htmlLang": "en",
+      "h1": [
+        "Basic OS & Linux"
+      ],
+      "ready": "h1 visible",
+      "screenshot": "/Users/teerakanok/Dev/continuations/academy-security-recovery-20260912-523a1d40/reports/playtest-20260912/screenshots/05-course-linux-en--mobile-390.png",
+      "loadMs": 2852,
+      "issues": []
+    },
+    {
+      "cell": "06-course-linux-th",
+      "viewport": "mobile-390",
+      "path": "/courses/basic-os-linux/th",
+      "status": 200,
+      "finalUrl": "https://academy.cyberskills.co.th/courses/basic-os-linux/th",
+      "title": "พื้นฐานระบบปฏิบัติการและ Linux · CYBERSKILLS Academy",
+      "htmlLang": "th",
+      "h1": [
+        "พื้นฐานระบบปฏิบัติการและ Linux"
+      ],
+      "ready": "h1 visible",
+      "screenshot": "/Users/teerakanok/Dev/continuations/academy-security-recovery-20260912-523a1d40/reports/playtest-20260912/screenshots/06-course-linux-th--mobile-390.png",
+      "loadMs": 2714,
+      "issues": []
+    },
+    {
+      "cell": "07-sign-in",
+      "viewport": "mobile-390",
+      "path": "/sign-in",
+      "error": "TimeoutError: locator.waitFor: Timeout 15000ms exceeded.\nCall log:\n  - waiting for locator('input[type=\"email\"], input[name=\"email\"]').first() to be visible\n"
+    },
+    {
+      "cell": "08-sign-in-notice",
+      "viewport": "mobile-390",
+      "path": "/sign-in?notice=identity-unavailable",
+      "status": 200,
+      "finalUrl": "https://academy.cyberskills.co.th/sign-in?notice=identity-unavailable",
+      "title": "Sign in · CYBERSKILLS Academy",
+      "htmlLang": "en",
+      "h1": [
+        "One CYBERSKILLS account"
+      ],
+      "ready": "Sign-in could not be completed. Please start again.",
+      "screenshot": "/Users/teerakanok/Dev/continuations/academy-security-recovery-20260912-523a1d40/reports/playtest-20260912/screenshots/08-sign-in-notice--mobile-390.png",
+      "loadMs": 2014,
+      "issues": [
+        {
+          "kind": "pageerror",
+          "text": "Error: Minified React error #418; visit https://react.dev/errors/418?args[]=HTML&args[]= for the full message or use the non-minified dev environment for full errors and additional helpful warnings."
+        }
+      ]
+    },
+    {
+      "cell": "09-privacy",
+      "viewport": "mobile-390",
+      "path": "/privacy",
+      "status": 200,
+      "finalUrl": "https://academy.cyberskills.co.th/privacy",
+      "title": "Privacy notice · CYBERSKILLS Academy",
+      "htmlLang": "en",
+      "h1": [
+        "CYBERSKILLS Academy privacy notice"
+      ],
+      "ready": "h1 visible",
+      "screenshot": "/Users/teerakanok/Dev/continuations/academy-security-recovery-20260912-523a1d40/reports/playtest-20260912/screenshots/09-privacy--mobile-390.png",
+      "loadMs": 2227,
+      "issues": [
+        {
+          "kind": "pageerror",
+          "text": "Error: Minified React error #418; visit https://react.dev/errors/418?args[]=HTML&args[]= for the full message or use the non-minified dev environment for full errors and additional helpful warnings."
+        }
+      ]
+    },
+    {
+      "cell": "10-unsubscribe",
+      "viewport": "mobile-390",
+      "path": "/unsubscribe",
+      "status": 200,
+      "finalUrl": "https://academy.cyberskills.co.th/unsubscribe",
+      "title": "Email preferences · CYBERSKILLS Academy",
+      "htmlLang": "en",
+      "h1": [
+        "Stop Academy marketing emails"
+      ],
+      "ready": "h1 visible",
+      "screenshot": "/Users/teerakanok/Dev/continuations/academy-security-recovery-20260912-523a1d40/reports/playtest-20260912/screenshots/10-unsubscribe--mobile-390.png",
+      "loadMs": 2092,
+      "issues": []
+    },
+    {
+      "cell": "11-app-404",
+      "viewport": "mobile-390",
+      "path": "/courses/no-such-course",
+      "status": 404,
+      "finalUrl": "https://academy.cyberskills.co.th/courses/no-such-course",
+      "title": "404: This page could not be found.",
+      "htmlLang": "en",
+      "h1": [
+        "404"
+      ],
+      "ready": "body text: Skip to content\nCYBERSKILLS Academy\nAcademy\nMy learning\nSign in\n☾\n404\nThis page could not be found.\n© 2026 CYBERSKILLS\nEnglish\nไทย\nPrivacy notice",
+      "screenshot": "/Users/teerakanok/Dev/continuations/academy-security-recovery-20260912-523a1d40/reports/playtest-20260912/screenshots/11-app-404--mobile-390.png",
+      "loadMs": 2437,
+      "issues": [
+        {
+          "kind": "console.error",
+          "text": "Failed to load resource: the server responded with a status of 404 ()"
+        },
+        {
+          "kind": "console.error",
+          "text": "Applying inline style violates the following Content Security Policy directive 'style-src 'self' 'nonce-OOhGvESULQGrr3/+Qw6VkJvv4hzxEOLumSrfTYjjNhQ=''. Either the 'unsafe-inline' keyword, a hash ('sha256-Z5XTK23DFuEMs0PwnyZDO9SWxemQ5HxcpVaBNuUJyWY='), or a nonce ('nonce-...') is required to enable i"
+        },
+        {
+          "kind": "requestfailed",
+          "url": "https://academy.cyberskills.co.th/?_rsc=j-ZspalyCwSGviYW",
+          "error": "net::ERR_ABORTED"
+        }
+      ]
+    },
+    {
+      "cell": "12-mw-404",
+      "viewport": "mobile-390",
+      "path": "/courses/assembly/xx",
+      "status": 404,
+      "finalUrl": "https://academy.cyberskills.co.th/courses/assembly/xx",
+      "title": "",
+      "htmlLang": null,
+      "h1": [],
+      "ready": "body text: (EMPTY)",
+      "screenshot": "/Users/teerakanok/Dev/continuations/academy-security-recovery-20260912-523a1d40/reports/playtest-20260912/screenshots/12-mw-404--mobile-390.png",
+      "loadMs": 748,
+      "issues": [
+        {
+          "kind": "console.error",
+          "text": "Failed to load resource: the server responded with a status of 404 ()"
+        }
+      ]
+    }
+  ],
+  "interactions": [
+    {
+      "name": "nav-home-to-courses",
+      "viewport": {
+        "name": "desktop-1440",
+        "width": 1440,
+        "height": 900
+      },
+      "result": "landed=https://academy.cyberskills.co.th/courses courseLinksOnPage=8",
+      "issues": [
+        {
+          "kind": "requestfailed",
+          "url": "https://academy.cyberskills.co.th/courses?_rsc=MqUmqiA6rB_DejUk",
+          "error": "net::ERR_ABORTED"
+        }
+      ]
+    },
+    {
+      "name": "nav-home-to-courses",
+      "viewport": {
+        "name": "mobile-390",
+        "width": 390,
+        "height": 844
+      },
+      "result": "landed=https://academy.cyberskills.co.th/courses courseLinksOnPage=8",
+      "issues": [
+        {
+          "kind": "requestfailed",
+          "url": "https://academy.cyberskills.co.th/courses?_rsc=MqUmqiA6rB_DejUk",
+          "error": "net::ERR_ABORTED"
+        }
+      ]
+    },
+    {
+      "name": "course-lang-en-to-th",
+      "viewport": {
+        "name": "desktop-1440",
+        "width": 1440,
+        "height": 900
+      },
+      "result": "finalUrl=https://academy.cyberskills.co.th/courses/assembly/th htmlLang=th h1=\"ภาษาแอสเซมบลี: อ่านภาษาเครื่อง\"",
+      "issues": [
+        {
+          "kind": "requestfailed",
+          "url": "https://academy.cyberskills.co.th/courses/assembly/th?_rsc=GuOiHE1jPnIPjZ7n",
+          "error": "net::ERR_ABORTED"
+        }
+      ]
+    },
+    {
+      "name": "mobile-menu-toggle",
+      "viewport": {
+        "name": "mobile-390",
+        "width": 390,
+        "height": 844
+      },
+      "result": "no menu toggle button found (nav may be always visible)",
+      "issues": []
+    },
+    {
+      "name": "course-locale-default-redirect",
+      "viewport": {
+        "name": "desktop-1440",
+        "width": 1440,
+        "height": 900
+      },
+      "result": "finalUrl=https://academy.cyberskills.co.th/courses/assembly/en",
+      "issues": []
+    },
+    {
+      "name": "app-404-recovery-link",
+      "viewport": {
+        "name": "desktop-1440",
+        "width": 1440,
+        "height": 900
+      },
+      "result": "home link present=true visible=true",
+      "issues": [
+        {
+          "kind": "console.error",
+          "text": "Failed to load resource: the server responded with a status of 404 ()"
+        },
+        {
+          "kind": "console.error",
+          "text": "Applying inline style violates the following Content Security Policy directive 'style-src 'self' 'nonce-y9uUBvzIVpHH6Ywv2LMgMh93WiTmXMd09EsmKqcLI3I=''. Either the 'unsafe-inline' keyword, a hash ('sha256-Z5XTK23DFuEMs0PwnyZDO9SWxemQ5HxcpVaBNuUJyWY='), or a nonce ('nonce-...') is required to enable i"
+        }
+      ]
+    },
+    {
+      "name": "sign-in-form-shape",
+      "viewport": {
+        "name": "desktop-1440",
+        "width": 1440,
+        "height": 900
+      },
+      "result": "emailVisible=false forms=0 submitButtons=0 (no submission performed)",
+      "issues": []
+    },
+    {
+      "name": "private-route-redirect",
+      "viewport": {
+        "name": "desktop-1440",
+        "width": 1440,
+        "height": 900
+      },
+      "result": "finalUrl=https://academy.cyberskills.co.th/sign-in?next=%2Fdashboard",
+      "issues": []
+    }
+  ],
+  "consoleIssues": [
+    {
+      "cell": "02-courses",
+      "viewport": "desktop-1440",
+      "issues": [
+        {
+          "kind": "requestfailed",
+          "url": "https://academy.cyberskills.co.th/courses/assembly/en?_rsc=5qAKrVs_O8_i41fZ",
+          "error": "net::ERR_ABORTED"
+        }
+      ]
+    },
+    {
+      "cell": "09-privacy",
+      "viewport": "desktop-1440",
+      "issues": [
+        {
+          "kind": "requestfailed",
+          "url": "https://academy.cyberskills.co.th/?_rsc=9HpeIuwfWrSbrFp8",
+          "error": "net::ERR_ABORTED"
+        }
+      ]
+    },
+    {
+      "cell": "11-app-404",
+      "viewport": "desktop-1440",
+      "issues": [
+        {
+          "kind": "console.error",
+          "text": "Failed to load resource: the server responded with a status of 404 ()"
+        },
+        {
+          "kind": "console.error",
+          "text": "Applying inline style violates the following Content Security Policy directive 'style-src 'self' 'nonce-owvPA7DMyPohhsLBMLSo4p+/A1ZobNbqpigWF8i22JE=''. Either the 'unsafe-inline' keyword, a hash ('sha256-Z5XTK23DFuEMs0PwnyZDO9SWxemQ5HxcpVaBNuUJyWY='), or a nonce ('nonce-...') is required to enable i"
+        },
+        {
+          "kind": "requestfailed",
+          "url": "https://academy.cyberskills.co.th/sign-in?next=%2Fdashboard",
+          "error": "net::ERR_ABORTED"
+        }
+      ]
+    },
+    {
+      "cell": "12-mw-404",
+      "viewport": "desktop-1440",
+      "issues": [
+        {
+          "kind": "console.error",
+          "text": "Failed to load resource: the server responded with a status of 404 ()"
+        }
+      ]
+    },
+    {
+      "cell": "02-courses",
+      "viewport": "mobile-390",
+      "issues": [
+        {
+          "kind": "pageerror",
+          "text": "Error: Minified React error #418; visit https://react.dev/errors/418?args[]=HTML&args[]= for the full message or use the non-minified dev environment for full errors and additional helpful warnings."
+        }
+      ]
+    },
+    {
+      "cell": "08-sign-in-notice",
+      "viewport": "mobile-390",
+      "issues": [
+        {
+          "kind": "pageerror",
+          "text": "Error: Minified React error #418; visit https://react.dev/errors/418?args[]=HTML&args[]= for the full message or use the non-minified dev environment for full errors and additional helpful warnings."
+        }
+      ]
+    },
+    {
+      "cell": "09-privacy",
+      "viewport": "mobile-390",
+      "issues": [
+        {
+          "kind": "pageerror",
+          "text": "Error: Minified React error #418; visit https://react.dev/errors/418?args[]=HTML&args[]= for the full message or use the non-minified dev environment for full errors and additional helpful warnings."
+        }
+      ]
+    },
+    {
+      "cell": "11-app-404",
+      "viewport": "mobile-390",
+      "issues": [
+        {
+          "kind": "console.error",
+          "text": "Failed to load resource: the server responded with a status of 404 ()"
+        },
+        {
+          "kind": "console.error",
+          "text": "Applying inline style violates the following Content Security Policy directive 'style-src 'self' 'nonce-OOhGvESULQGrr3/+Qw6VkJvv4hzxEOLumSrfTYjjNhQ=''. Either the 'unsafe-inline' keyword, a hash ('sha256-Z5XTK23DFuEMs0PwnyZDO9SWxemQ5HxcpVaBNuUJyWY='), or a nonce ('nonce-...') is required to enable i"
+        },
+        {
+          "kind": "requestfailed",
+          "url": "https://academy.cyberskills.co.th/?_rsc=j-ZspalyCwSGviYW",
+          "error": "net::ERR_ABORTED"
+        }
+      ]
+    },
+    {
+      "cell": "12-mw-404",
+      "viewport": "mobile-390",
+      "issues": [
+        {
+          "kind": "console.error",
+          "text": "Failed to load resource: the server responded with a status of 404 ()"
+        }
+      ]
+    }
+  ]
+}

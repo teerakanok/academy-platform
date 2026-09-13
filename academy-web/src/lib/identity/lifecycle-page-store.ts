@@ -188,7 +188,14 @@ implements IdentityLifecycleLeasedPageStore {
         parameters,
       )
       if (error) throw error
-    } catch {
+    } catch (commitError) {
+      console.log(JSON.stringify({
+        schema_version: 1,
+        event: 'identity_lifecycle_commit_rpc_error',
+        message: (commitError instanceof Error ? commitError.message : String((commitError as { message?: unknown })?.message ?? 'non_error')).slice(0, 200),
+        code: (commitError as { code?: unknown } | null)?.code ?? null,
+        details: JSON.stringify((commitError as { details?: unknown } | null)?.details ?? null).slice(0, 120),
+      }))
       if (commitRequiresFailureFence(commit)) {
         let fenceFailureError: unknown
         try {

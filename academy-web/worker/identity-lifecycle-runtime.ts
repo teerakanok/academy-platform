@@ -6,6 +6,7 @@ import { APPROVED_ACADEMY_CONSUMER_REGISTRY_V1 } from '../src/lib/identity/consu
 import {
   createIdentityClientAssertionWebCryptoSigner,
 } from '../src/lib/identity/client-assertion-webcrypto-signer'
+import { verifyIdentityLifecycleEnvelope } from '../src/lib/identity/lifecycle-envelope-verifier'
 import { AcademyIdentityLifecyclePageStore } from '../src/lib/identity/lifecycle-page-store'
 import { createIdentityLifecyclePullResponseTransport } from '../src/lib/identity/lifecycle-pull-response-transport'
 import {
@@ -18,7 +19,10 @@ import {
   IDENTITY_LIFECYCLE_PULL_LEASE_MIN_DURATION_MS,
 } from '../src/lib/identity/lifecycle-pull-lease'
 
-const PRINCIPAL_ISSUER = 'https://supabase.cyberskills.co.th/auth/v1'
+// (removed duplicate import guard) `iss` with the identity-control
+// origin (see /opt production-lifecycle-publisher.json publisher.issuer),
+// distinct from the GoTrue principal issuer carried inside each event.
+const PRINCIPAL_ISSUER = 'https://accounts.cyberskills.co.th/'
 const CONSUMER_ID = 'academy-web'
 const KEY_ID = /^[A-Za-z0-9][A-Za-z0-9_-]{0,47}$/
 const WORKER_ID = /^[A-Za-z0-9][A-Za-z0-9._:/-]{0,159}$/
@@ -77,8 +81,18 @@ export function projectAcademyIdentityLifecycleProductionConfig(
     const endpoint = environmentValue.IDENTITY_LIFECYCLE_PUBLISHER_ENDPOINT
     const clientAssertionAudience = environmentValue.IDENTITY_LIFECYCLE_CLIENT_ASSERTION_AUDIENCE
     const eventAudience = environmentValue.IDENTITY_LIFECYCLE_EVENT_AUDIENCE
+    // The lifecycle pull asserts with the same production client key pair the
+    // publisher registry already pins for academy-web (kid academy-prod-2026-08,
+    // config://client-keys/academy-web/academy-prod-2026-08). That private JWK
+    // exists only as the IDENTITY_CLIENT_ASSERTION_PRIVATE_JWK Worker secret
+    // (custody record 2026-09-03: no off-host copy, export prohibited), so the
+    // dedicated lifecycle names fall back to the existing bindings instead of
+    // duplicating or exporting secret material. A future dedicated lifecycle key
+    // simply sets the IDENTITY_LIFECYCLE_* names, which take precedence.
     const clientAssertionKeyId = environmentValue.IDENTITY_LIFECYCLE_CLIENT_ASSERTION_KEY_ID
+      ?? environmentValue.IDENTITY_CLIENT_ASSERTION_KEY_ID
     const privateJwk = environmentValue.IDENTITY_LIFECYCLE_CLIENT_ASSERTION_PRIVATE_JWK
+      ?? environmentValue.IDENTITY_CLIENT_ASSERTION_PRIVATE_JWK
     const keySetDocument = environmentValue.IDENTITY_LIFECYCLE_VERIFICATION_KEY_SET_DOCUMENT
     const workerId = environmentValue.IDENTITY_LIFECYCLE_WORKER_ID
     if (typeof clientAssertionKeyId !== 'string' || typeof workerId !== 'string') return null
@@ -150,11 +164,40 @@ export async function createAcademyIdentityLifecyclePullCycleRuntime(
       keyId: config.clientAssertionKeyId,
       privateJwk: config.clientAssertionPrivateJwk,
     })
-    const responseTransport = createIdentityLifecyclePullResponseTransport({
+    const responseTransportBase = createIdentityLifecyclePullResponseTransport({
       endpoint: config.endpoint,
       timeoutMs: config.timeoutMs,
-      fetchPort: { fetch: dependencies.fetch },
+      // The pull response transport invokes the fetch method with an explicit
+      // receiver (fetchMethod.call(fetchPort, ...)); an unbound globalThis.fetch
+      // from a Modules worker then throws "Illegal invocation". Binding to the
+      // global keeps the reviewed call shape working.
+      fetchPort: { fetch: dependencies.fetch.bind(globalThis) },
     })
+    // Bounded production observability (temporary): surface why a pull turns
+    // into retry_required (non-200 or network error) without secrets/payloads.
+    const responseTransport = {
+      execute: async (request: Parameters<typeof responseTransportBase.execute>[0]) => {
+        try {
+          const response = await responseTransportBase.execute(request)
+          if (!response.ok) {
+            console.log(JSON.stringify({
+              schema_version: 1,
+              event: 'identity_lifecycle_pull_transport_error',
+              httpStatus: response.status,
+            }))
+          }
+          return response
+        } catch (cause) {
+          console.log(JSON.stringify({
+            schema_version: 1,
+            event: 'identity_lifecycle_pull_transport_error',
+            error: cause instanceof Error ? cause.message.slice(0, 200) : 'non_error_thrown',
+            errorName: cause instanceof Error ? cause.name : typeof cause,
+          }))
+          throw cause
+        }
+      },
+    }
     const transport = createIdentityLifecyclePullTransport({
       consumerId: CONSUMER_ID,
       clientAssertionAudience: config.clientAssertionAudience,
@@ -181,12 +224,53 @@ export async function createAcademyIdentityLifecyclePullCycleRuntime(
       },
       envelopePolicy: config.envelopePolicy,
     })
+    // Bounded production observability (temporary): wrap the outer verified-page
+    // transport so assertion/verification/network causes of retry_required are
+    // visible without exposing secrets or payloads.
+    const observedTransport = {
+      pullVerifiedPage: async (input: Parameters<typeof transport.pullVerifiedPage>[0]) => {
+        try {
+          return await transport.pullVerifiedPage(input)
+        } catch (cause) {
+          console.log(JSON.stringify({
+            schema_version: 1,
+            event: 'identity_lifecycle_pull_page_error',
+            error: cause instanceof Error ? cause.message.slice(0, 200) : 'non_error_thrown',
+            errorName: cause instanceof Error ? cause.name : typeof cause,
+            policyKeyId: config.envelopePolicy.key.keyId,
+            expectedIssuer: config.envelopePolicy.expectedIssuer,
+            expectedAudience: config.envelopePolicy.expectedAudience,
+          }))
+          throw cause
+        }
+      },
+    }
     const store = new AcademyIdentityLifecyclePageStore(dependencies.academyDb())
+    // Temporary bounded observability: surface which store RPC fails and the
+    // PostgREST error shape (codes/messages only — never payloads).
+    const observedStore = {
+      durable: store.durable,
+      read: async () => {
+        try { return await store.read() } catch (cause) {
+          console.log(JSON.stringify({ schema_version: 1, event: 'identity_lifecycle_store_error', method: 'read', error: cause instanceof Error ? cause.message.slice(0, 160) : 'non_error' }))
+          throw cause
+        }
+      },
+      reconcileApprovedConfigurationRevision: store.reconcileApprovedConfigurationRevision.bind(store),
+      claimPullLease: store.claimPullLease.bind(store),
+      releasePullLease: store.releasePullLease.bind(store),
+      commitPageUnderLease: async (...args: Parameters<typeof store.commitPageUnderLease>) => {
+        try { return await store.commitPageUnderLease(...args) } catch (cause) {
+          console.log(JSON.stringify({ schema_version: 1, event: 'identity_lifecycle_store_error', method: 'commitPageUnderLease', error: cause instanceof Error ? cause.message.slice(0, 160) : 'non_error' }))
+          throw cause
+        }
+      },
+    } as typeof store
     return async () => {
       await store.reconcileApprovedConfigurationRevision(config.approvedConfigRevision)
       return runIdentityLifecyclePullCycle({
-        store,
-        transport,
+        store: observedStore,
+        transport: observedTransport,
         clock: { now: dependencies.now },
         approvedConfigRevision: config.approvedConfigRevision,
         workerId: config.workerId,
