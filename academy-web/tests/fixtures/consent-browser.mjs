@@ -35,6 +35,8 @@ try {
     await page.goto(`${base}?lang=${lang}&theme=${theme}`)
     await expect(page.getByTestId('consent-status-research_statistics')).toHaveText(lang === 'th' ? 'ยินยอม' : 'Granted')
     await expect(page.getByTestId('consent-status-marketing_email')).toHaveText(lang === 'th' ? 'ยังไม่ได้ยินยอม' : 'Not granted')
+    await expect(page.getByRole('link', { name: lang === 'th' ? 'อ่านประกาศความเป็นส่วนตัว' : 'Read the privacy notice' }))
+      .toHaveAttribute('href', `https://accounts.cyberskills.co.th/legal/privacy-notice?lang=${lang}`)
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
     const axe = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21aa']).analyze()
     expect(axe.violations).toEqual([])

@@ -100,7 +100,7 @@ export function ConsentPreferences() {
     <div className="mt-5 flex flex-wrap items-center gap-4">
       {intent && notice === 'uncertain' && <button disabled={busy} onClick={() => void withdraw(intent.type)} className="rounded-lg border border-cs-accent px-3 py-2 text-sm text-cs-accent">{t.retry}</button>}
       <button disabled={busy} onClick={() => void load()} className="rounded-lg border border-cs-border px-3 py-2 text-sm text-cs-text disabled:opacity-50">{t.refresh}</button>
-      <a href={`https://accounts.cyberskills.co.th/legal/privacy?lang=${locale}`} className="text-sm text-cs-accent underline underline-offset-4">{t.notice}</a>
+      <a href={`https://accounts.cyberskills.co.th/legal/privacy-notice?lang=${locale}`} className="text-sm text-cs-accent underline underline-offset-4">{t.notice}</a>
     </div>
   </section>
 }
