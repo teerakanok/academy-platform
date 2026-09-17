@@ -1,8 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
   <!-- CYBERSKILLS Academy favicon: the official "Unbox the spark" mark (public/brand/logo-academy.svg)
-       in brand blue #38BDF8, on the same dark rounded tile the CYBERSKILLS site favicon uses.
+       in brand blue #38BDF8 on a white rounded tile, so it sits naturally in a light browser tab (founder 2026-09-17).
        Strokes are heavier than the logo so the box still reads at 16px. -->
-  <rect width="200" height="200" rx="44" fill="#0d1117"/>
+  <rect width="200" height="200" rx="44" fill="#FFFFFF"/>
   <g transform="translate(10 10) scale(0.9)">
     <g fill="none" stroke="#38BDF8" stroke-width="12" stroke-linejoin="round" stroke-linecap="round">
       <path d="M100 102 L144 122 L100 142 L56 122 Z" fill="rgba(56,189,248,0.10)"/>
