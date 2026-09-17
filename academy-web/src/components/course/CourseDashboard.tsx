@@ -80,7 +80,7 @@ function LessonProgress({
                   key={node.id}
                   className={`h-2.5 w-2.5 rounded-full transition-colors ${
                     isFinished
-                      ? 'bg-cs-accent-fill'
+                      ? 'bg-cs-accent'
                       : isSkipped
                         ? 'border border-dashed border-cs-border-2 bg-transparent'
                         : 'bg-cs-border-2/70'
@@ -92,7 +92,7 @@ function LessonProgress({
           {/* แถบเสริมใต้จุด — ตกแต่งให้เห็นภาพรวมเร็วขึ้น ค่าจริงอยู่ที่ ul ด้านบนแล้ว */}
           <div className="mt-2 h-1 overflow-hidden rounded-full bg-cs-surface-sunken" aria-hidden="true">
             <div
-              className="h-full rounded-full bg-cs-accent-fill transition-[width] duration-500"
+              className="h-full rounded-full bg-cs-accent transition-[width] duration-500"
               style={{ width: `${finishedPercent}%` }}
             />
           </div>
@@ -107,7 +107,7 @@ function LessonProgress({
           aria-label={`${label} progress`}
         >
           <div
-            className="h-full rounded-full bg-cs-accent-fill transition-[width] duration-500"
+            className="h-full rounded-full bg-cs-accent transition-[width] duration-500"
             style={{ width: `${finishedPercent}%` }}
           />
         </div>

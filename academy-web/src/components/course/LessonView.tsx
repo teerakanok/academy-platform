@@ -429,9 +429,9 @@ export function LessonView({
                   <span
                     className={`block h-1.5 rounded-full transition-all ${
                       isCurrent
-                        ? 'w-10 bg-cs-accent-fill'
+                        ? 'w-10 bg-cs-accent'
                         : isFinished
-                          ? 'w-5 bg-cs-accent-fill/70 group-hover:w-7'
+                          ? 'w-5 bg-cs-accent/70 group-hover:w-7'
                           : status === 'skipped'
                             ? 'w-5 bg-cs-border-2/60 group-hover:w-7'
                             : 'w-5 bg-cs-border-2/40 group-hover:w-7'
