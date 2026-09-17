@@ -83,12 +83,23 @@ export interface CourseSkill {
 }
 
 /** โครงคอร์สทั้งหมด (course.json) */
+/**
+ * ข้อเสนอของคอร์สเพื่อ **แสดงผล** เท่านั้น — ตัวตัดสินจริงว่าลงเรียนเองได้ไหมคือ
+ * `academy.course_offer` ในฐานข้อมูล (migration 0040) และมีเทสคุมว่าสองที่ตรงกัน
+ * (tests/unit/free-course-offer.test.ts) · วันนี้มีแค่คอร์สฟรี ไม่มีคอร์สเสียเงิน
+ */
+export interface CourseOffer {
+  model: 'free'
+}
+
 export interface CourseStructure {
   id: string
   slug: string
   version: string
   /** พื้นผิวสาธารณะต้อง opt-in รายคอร์ส; ค่าอื่นทั้งหมดถือเป็น internal */
   publicAvailability: 'internal' | 'syllabus-preview'
+  /** ไม่ระบุ = ลงเรียนเองไม่ได้ (ต้องได้สิทธิ์จาก owner ผ่าน operator path) */
+  offer?: CourseOffer
   defaultLocale: Locale
   availableLocales: Locale[]
   level: 'beginner' | 'intermediate' | 'advanced'
@@ -277,6 +288,7 @@ export interface PublicCourse {
   copy: PublicCourseCopy
   locale: Locale
   translatedNodeIds: string[]
+  offer: CourseOffer | null
 }
 
 /** ข้อมูลขั้นต่ำของ card ใน catalog สาธารณะ — ไม่มีเนื้อหาบทหรือ metadata ผู้เรียน */
