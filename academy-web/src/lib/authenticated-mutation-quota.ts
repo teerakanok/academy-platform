@@ -6,7 +6,7 @@ import {
 
 export type AuthenticatedMutationOperation = Extract<
   EdgeRateLimitOperation,
-  'learner-progress' | 'learner-reset' | 'learner-simulation'
+  'learner-progress' | 'learner-reset' | 'learner-simulation' | 'learner-enrol'
 >
 
 export interface AuthenticatedMutationQuota {
@@ -19,6 +19,8 @@ export const AUTHENTICATED_MUTATION_QUOTAS: Record<AuthenticatedMutationOperatio
   'learner-progress': { accountLimit: 120, courseLimit: 60, windowMs: 60_000 },
   'learner-reset': { accountLimit: 6, courseLimit: 3, windowMs: 3_600_000 },
   'learner-simulation': { accountLimit: 60, courseLimit: 30, windowMs: 60_000 },
+  // ลงเรียนฟรีเป็น idempotent — เผื่อกดซ้ำ/refresh ได้ แต่ไม่เปิดให้ยิงไม่จำกัด
+  'learner-enrol': { accountLimit: 30, courseLimit: 10, windowMs: 3_600_000 },
 }
 
 interface EdgeRateLimitDecision {

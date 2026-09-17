@@ -10,6 +10,7 @@ export type EdgeRateLimitOperation =
   | 'verify'
   | 'learner-progress'
   | 'learner-reset'
+  | 'learner-enrol'
   | 'learner-simulation'
   | 'identity-start-get'
   | 'identity-start-post'

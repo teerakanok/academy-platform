@@ -59,6 +59,26 @@ export async function resolveCourseAvailability(
   }
 }
 
+/**
+ * Fail-closed variant for mutations (free self-enrolment): a settings read
+ * error throws instead of falling back to the static value, so an unpublished
+ * or retired course can never be enrolled in because the settings store blinked.
+ */
+export async function requireEffectiveCourseVisibility(
+  staticAvailability: 'internal' | 'syllabus-preview',
+  courseSlug: string,
+): Promise<CourseVisibility> {
+  const db = academyDb()
+  const { data, error } = await db
+    .from('course_settings')
+    .select('visibility')
+    .eq('course_slug', courseSlug)
+    .maybeSingle()
+  if (error) throw new Error(`อ่านการตั้งค่าคอร์สไม่สำเร็จ: ${error.message}`)
+  const override = (data?.visibility as CourseVisibility | null | undefined) ?? null
+  return override ?? (staticAvailability === 'syllabus-preview' ? 'published' : 'unpublished')
+}
+
 /** Load all runtime overrides in one call (for the catalog page). */
 export async function loadAllCourseOverrides(): Promise<Map<string, EffectiveCourseAvailability>> {
   try {
