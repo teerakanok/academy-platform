@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { readFileSync } from 'node:fs'
+import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 
 /*
@@ -252,5 +252,31 @@ describe('WCAG AA — วัดจากค่าที่อยู่ในไ�
       expect(ratio(body, t.surface), `${name}: body บน surface`).toBeGreaterThanOrEqual(AA_TEXT)
       expect(ratio(text, t.bg), `${name}: text บน bg`).toBeGreaterThanOrEqual(AA_TEXT)
     }
+  })
+})
+
+// ---------- favicon (แท็บเบราว์เซอร์) ----------
+//
+// 2026-09-17 founder ทักว่าแท็บ Academy ยังเป็นกล่องสีเขียว — main ไม่มี favicon เลย
+// (`/favicon.ico` → 404) เบราว์เซอร์จึงโชว์ไอคอนเขียวที่ cache ไว้จาก deploy เก่า
+// (commit 6ccc024 ที่ไม่เคย merge) · ต้องมี icon ของ App Router และต้องเป็นโลโก้ Academy สีฟ้า
+describe('favicon ของแท็บเป็นโลโก้ Academy สีแบรนด์', () => {
+  const iconPath = join(webRoot, 'src', 'app', 'icon.svg')
+
+  it('มีไฟล์ icon ของ App Router จริง', () => {
+    expect(existsSync(iconPath), 'src/app/icon.svg ไม่มี — แท็บจะโชว์ไอคอนเก่าที่ cache ไว้').toBe(true)
+  })
+
+  it('ใช้สีฟ้า #38BDF8 และไม่มีเขียว/teal หลงเหลือ', () => {
+    const icon = existsSync(iconPath) ? readFileSync(iconPath, 'utf8') : ''
+    expect(icon.toUpperCase()).toContain(BRAND)
+    expect(icon).not.toMatch(/#00A280|#00E6B4|#34D399|#00A862|rgba\(0,\s*162,\s*128/i)
+  })
+
+  it('เป็นรูปทรงเดียวกับโลโก้ทางการ (ประกายดาวด้านบน)', () => {
+    const icon = existsSync(iconPath) ? readFileSync(iconPath, 'utf8') : ''
+    const spark = logoSvg.match(/<path d="(M100 22[^"]+)"/)?.[1]
+    expect(spark, 'หา path ประกายในโลโก้ทางการไม่เจอ').toBeTruthy()
+    expect(icon).toContain(spark!)
   })
 })
