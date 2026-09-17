@@ -1,3 +1,4 @@
+import * as React from 'react'
 import { notFound, redirect } from 'next/navigation'
 import { AccessRequiredView } from '@/components/course/AccessRequiredView'
 import { CourseLocaleChromeSync } from '@/components/course/CourseLocaleChromeSync'
@@ -5,6 +6,8 @@ import { currentUser } from '@/lib/auth/session'
 import { authorizeCourseResource } from '@/lib/account/course-access'
 import { getCourse } from '@/lib/content/course-source'
 import type { Locale } from '@/lib/content/course-types'
+import { freeCourseStartPath, isFreeOffer } from '@/lib/course/offer'
+import { resolveCourseAvailability } from '@/lib/course/settings'
 import { privatePage } from '@/lib/seo'
 
 export const metadata = privatePage('Course access')
@@ -42,6 +45,13 @@ export default async function AccessRequiredPage({
   const reason = access.reason === 'inactive'
     ? 'inactive'
     : access.reason === 'locked' ? 'locked' : 'not-enrolled'
+  // คอร์สฟรีที่เผยแพร่อยู่: ไม่ใช่ทางตัน ให้ปุ่มเริ่มเรียนฟรีแทน · คอร์สอื่นคงหน้าเดิม
+  // (ปุ่มนี้แค่พาไป /start — endpoint กับ DB ยังตรวจซ้ำก่อนลงเรียนจริง)
+  const freeStartHref = reason === 'not-enrolled'
+    && isFreeOffer(course.structure.offer)
+    && (await resolveCourseAvailability(course.structure.publicAvailability, slug)).visibility === 'published'
+    ? freeCourseStartPath(slug, course.locale)
+    : undefined
   return (
     <>
       <CourseLocaleChromeSync
@@ -55,6 +65,7 @@ export default async function AccessRequiredPage({
         locale={course.locale}
         reason={reason}
         slug={slug}
+        freeStartHref={freeStartHref}
       />
     </>
   )

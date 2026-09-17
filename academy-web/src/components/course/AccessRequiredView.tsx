@@ -20,6 +20,9 @@ const COPY = {
     roadmap: 'Return to the course roadmap',
     dashboard: 'Return to My learning',
     browse: 'Browse courses',
+    freeHeading: 'This course is free',
+    freeBody: (title: string) => `${title} is free with your CYBERSKILLS account. Start now and it will appear in My learning.`,
+    startFree: 'Start for free',
   },
   th: {
     eyebrow: 'สิทธิ์เข้าเรียน',
@@ -36,6 +39,9 @@ const COPY = {
     roadmap: 'กลับไปที่แผนการเรียน',
     dashboard: 'กลับไปที่คอร์สของฉัน',
     browse: 'ดูคอร์สทั้งหมด',
+    freeHeading: 'คอร์สนี้เรียนฟรี',
+    freeBody: (title: string) => `${title} เรียนฟรีด้วยบัญชี CYBERSKILLS เริ่มได้ทันที แล้วคอร์สจะอยู่ในคอร์สของฉัน`,
+    startFree: 'เริ่มเรียนฟรี',
   },
 } as const
 
@@ -44,15 +50,49 @@ export function AccessRequiredView({
   locale,
   reason,
   slug,
+  freeStartHref,
 }: {
   courseTitle: string
   locale: Locale
   reason: AccessReason
   slug: string
+  /** มีค่าเมื่อคอร์สเปิดให้ลงเรียนฟรีอยู่จริง — แทนทางตันด้วยปุ่ม "เริ่มเรียนฟรี" */
+  freeStartHref?: string
 }) {
   const copy = COPY[locale]
-  const body = copy.body[reason]
   const overview = `/courses/${slug}/learn?lang=${locale}`
+  if (reason === 'not-enrolled' && freeStartHref) {
+    return (
+      <main
+        className="mx-auto max-w-2xl px-6 py-16"
+        data-testid="course-access-required"
+        data-free-offer="true"
+        lang={locale}
+      >
+        <p className="font-mono text-xs uppercase tracking-[0.14em] text-cs-accent">{copy.eyebrow}</p>
+        <h1 className="mt-3 font-display text-3xl font-semibold leading-tight text-cs-text">
+          {copy.freeHeading}
+        </h1>
+        <p className="mt-4 max-w-xl leading-relaxed text-cs-body">{copy.freeBody(courseTitle)}</p>
+        <div className="mt-8 flex flex-wrap gap-3">
+          <Link
+            href={freeStartHref}
+            data-testid="course-primary-cta"
+            className="rounded-control bg-cs-accent-fill px-5 py-3 text-sm font-semibold text-cs-on-accent"
+          >
+            {copy.startFree}
+          </Link>
+          <Link
+            href={`/courses?lang=${locale}`}
+            className="rounded-control border border-cs-border bg-cs-surface px-5 py-3 text-sm text-cs-body hover:border-cs-accent"
+          >
+            {copy.browse}
+          </Link>
+        </div>
+      </main>
+    )
+  }
+  const body = copy.body[reason]
   return (
     <main
       className="mx-auto max-w-2xl px-6 py-16"

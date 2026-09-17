@@ -37,6 +37,8 @@ const COURSE_OVERVIEW = /^\/courses\/[^/]+$/
 const COURSE_LOCALIZED_OVERVIEW = /^\/courses\/[^/]+\/(?:en|th)$/
 const COURSE_THREE_SEGMENT = /^\/courses\/[^/]+\/[^/]+$/
 const COURSE_LEARNER_OVERVIEW = /^\/courses\/[^/]+\/learn$/
+// "เริ่มเรียนฟรี" — ต้องมีบัญชี (ไม่อยู่ใน isPublic) จึงถูกพาไป sign-in พร้อม next เดิม
+const COURSE_FREE_START = /^\/courses\/[^/]+\/start$/
 const COURSE_OG_IMAGE = /^\/courses\/[^/]+\/opengraph-image$/
 // ปล่อยให้ static route ตอบ 404 กับ locale ที่ไม่ได้ enumerate; ถ้าปิดตรงนี้ก่อน
 // middleware จะพาคนดูภาพแชร์ที่พิมพ์ locale ผิดไปหน้า sign-in แทน.
@@ -108,7 +110,8 @@ export async function middleware(request: NextRequest) {
     COURSE_THREE_SEGMENT.test(requestPath) &&
     !COURSE_LOCALIZED_OVERVIEW.test(requestPath) &&
     !COURSE_OG_IMAGE.test(requestPath) &&
-    !COURSE_LEARNER_OVERVIEW.test(requestPath)
+    !COURSE_LEARNER_OVERVIEW.test(requestPath) &&
+    !COURSE_FREE_START.test(requestPath)
   ) {
     return withEdgeSecurityHeaders(new NextResponse(null, { status: 404 }))
   }
