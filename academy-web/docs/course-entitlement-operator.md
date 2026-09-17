@@ -2,11 +2,42 @@
 
 ## Scope
 
-This is the initial manual B2B/university enrollment path. No payment provider is
-selected, no public entitlement UI exists, and the Academy Worker cannot grant or
-revoke a course. Runtime remains behind Cloudflare Access and receives only reads,
-progress functions, Identity callback/session RPCs, and the monotonic service
-activation RPC.
+This is the manual B2B/university enrollment path for every course that is not
+offered free. No payment provider is selected. For those courses the Academy Worker
+cannot grant or revoke access. Runtime remains behind Cloudflare Access and receives
+only reads, progress functions, Identity callback/session RPCs, the monotonic service
+activation RPC, and the free self-enrolment RPC below.
+
+### Free courses: learner self-enrolment (migration `0040`, founder decision 2026-09-17)
+
+The one exception is a course that `academy.course_offer` records with
+`model = 'free'`. For such a course a signed-in learner may enrol themselves
+(`POST /api/courses/<slug>/enrol`), which calls
+`academy.enrol_free_course(user_id, course_slug)` as `academy_runtime`. That
+security-definer RPC:
+
+- refuses unless the offer row says `free` (`42501`) — naming a slug grants nothing;
+- refuses unless the learner's service activation is `active` (`55000`);
+- never overrides an owner revocation: a revoked scope stays revoked (`42501`);
+- is idempotent: an active scope from any source is returned unchanged, with no audit;
+- otherwise writes `source = 'free'` with no expiry and one audit row whose actor is
+  the learner and whose reference is `self-enrol:free-offer`.
+
+It can grant only `free`. It cannot grant `grant`, `invitation`, or `purchase`, and it
+cannot revoke. `academy.course_offer` has no privilege for the runtime, `service_role`,
+browser roles, `academy_staff_admin`, or `academy_entitlement_operator`; which courses
+are free changes only through a reviewed migration applied by the database owner.
+`content/courses/<slug>/course.json` repeats `offer.model = "free"` for display, and
+`tests/unit/free-course-offer.test.ts` fails if content and the migration seed disagree.
+Seeded in `0040`: assembly, basic-os-linux, c-low-level, computer-architecture,
+computer-networking, git-essentials, operating-systems, setup-and-environment.
+
+To stop self-enrolment for a course without touching existing learners, remove its
+offer row in a reviewed migration (and its `offer` in `course.json`). To remove one
+learner's free access, revoke through this operator path; the learner cannot re-enrol
+over that revocation. Rollback SQL:
+`supabase/rollbacks/0040_free_course_self_enrolment.rollback.sql` (retains
+entitlements and audit evidence).
 
 The entitlement database role is `academy_entitlement_operator`. It is a direct
 PostgreSQL login with these bounded executable functions:
@@ -20,7 +51,8 @@ It has no table privilege and cannot call staff-role mutation. The application
 runtime, shared `service_role`, browser roles, and `academy_staff_admin` cannot
 execute the entitlement RPC. An active Academy `owner` staff actor is required
 inside the mutating function; a learner or runtime principal cannot self-issue
-access.
+access through it. The only learner-initiated access is the free-offer RPC above,
+limited to courses the database records as free.
 
 ## Migration review
 
