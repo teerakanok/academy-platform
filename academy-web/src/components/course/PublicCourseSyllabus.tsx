@@ -2,7 +2,8 @@ import * as React from 'react'
 import Link from 'next/link'
 import { CourseCover } from './CourseCover'
 import { PublicCourseLocaleLink } from './PublicCourseLocaleLink'
-import type { Locale, PublicCourseCopy, PublicCourseStructure } from '@/lib/content/course-types'
+import type { CourseOffer, Locale, PublicCourseCopy, PublicCourseStructure } from '@/lib/content/course-types'
+import { freeCourseStartPath, isFreeOffer } from '@/lib/course/offer'
 
 type SyllabusLabels = {
   level: Record<PublicCourseStructure['level'], string>
@@ -21,6 +22,9 @@ type SyllabusLabels = {
   accountHeading: string
   accountBody: string
   browse: string
+  startFree: string
+  freeAccountHeading: string
+  freeAccountBody: string
   learningSteps: (steps: number, checkpoints: number) => string
   availability: (translatedSteps: number, totalSteps: number) => string
 }
@@ -43,6 +47,9 @@ const SYLLABUS_LABELS: Record<Locale, SyllabusLabels> = {
     accountHeading: 'Learn with an account when access opens',
     accountBody: 'Your CYBERSKILLS account will keep progress and checkpoint results together. Until then, this syllabus is here to help you choose the route that fits your goal.',
     browse: 'Browse course previews',
+    startFree: 'Start for free',
+    freeAccountHeading: 'Free with your CYBERSKILLS account',
+    freeAccountBody: 'Sign in and start right away. Your account keeps your progress and checkpoint results together on every device.',
     learningSteps: (steps, checkpoints) => `${steps} learning steps · ${checkpoints} required checkpoint${checkpoints === 1 ? '' : 's'}`,
     availability: (translatedSteps, totalSteps) =>
       translatedSteps === totalSteps
@@ -66,6 +73,9 @@ const SYLLABUS_LABELS: Record<Locale, SyllabusLabels> = {
     accountHeading: 'เริ่มเรียนด้วยบัญชี CYBERSKILLS เมื่อเปิดให้ใช้งาน',
     accountBody: 'บัญชี CYBERSKILLS จะเก็บความก้าวหน้าและผลจากด่านบังคับไว้ด้วยกัน ระหว่างนี้ คุณใช้แผนการเรียนนี้เลือกเส้นทางที่ตรงกับเป้าหมายได้.',
     browse: 'ดูตัวอย่างคอร์สทั้งหมด',
+    startFree: 'เริ่มเรียนฟรี',
+    freeAccountHeading: 'เรียนฟรีด้วยบัญชี CYBERSKILLS',
+    freeAccountBody: 'เข้าสู่ระบบแล้วเริ่มเรียนได้ทันที บัญชีของคุณจะเก็บความก้าวหน้าและผลจากด่านบังคับไว้ด้วยกันในทุกอุปกรณ์',
     learningSteps: (steps, checkpoints) => `${steps} ขั้นการเรียน · ${checkpoints} ด่านบังคับ`,
     availability: (translatedSteps, totalSteps) =>
       translatedSteps === totalSteps
@@ -92,14 +102,19 @@ export function PublicCourseSyllabus({
   copy,
   locale,
   translatedNodeIds,
+  offer = null,
 }: {
   structure: PublicCourseStructure
   copy: PublicCourseCopy
   locale: Locale
   translatedNodeIds: string[]
+  /** ข้อเสนอเพื่อแสดงผล — คอร์สที่ไม่ฟรีคงหน้าเดิมทุกอย่าง ไม่มีปุ่มลงเรียน */
+  offer?: CourseOffer | null
 }) {
   const translated = new Set(translatedNodeIds)
   const labels = SYLLABUS_LABELS[locale]
+  const free = isFreeOffer(offer)
+  const startHref = freeCourseStartPath(structure.slug, locale)
   const checkpointCount = structure.nodes.filter((node) => node.kind === 'capstone').length
 
   return (
@@ -135,6 +150,15 @@ export function PublicCourseSyllabus({
               </PublicCourseLocaleLink>
             ))}
           </nav>
+          {free && (
+            <Link
+              href={startHref}
+              data-testid="course-primary-cta"
+              className="mt-6 inline-flex rounded-control bg-cs-accent-fill px-6 py-3 text-sm font-semibold text-cs-on-accent shadow-card transition-transform duration-200 hover:-translate-y-0.5"
+            >
+              {labels.startFree}
+            </Link>
+          )}
         </div>
         <CourseCover structure={structure} className="aspect-[4/3] w-full border border-cs-border md:aspect-square" />
       </header>
@@ -193,17 +217,34 @@ export function PublicCourseSyllabus({
 
       <section className="border-l-2 border-cs-accent px-5 py-1" aria-labelledby="access-heading">
         <h2 id="access-heading" className="font-display text-xl font-semibold text-cs-text">
-          {labels.accountHeading}
+          {free ? labels.freeAccountHeading : labels.accountHeading}
         </h2>
         <p className="mt-2 max-w-2xl text-sm leading-relaxed text-cs-body">
-          {labels.accountBody}
+          {free ? labels.freeAccountBody : labels.accountBody}
         </p>
-        <Link
-          href={`/courses?lang=${locale}`}
-          className="mt-5 inline-flex rounded-control bg-cs-accent-fill px-5 py-3 text-sm font-semibold text-cs-on-accent transition-transform hover:-translate-y-0.5"
-        >
-          {labels.browse}
-        </Link>
+        {free ? (
+          <div className="mt-5 flex flex-wrap gap-3">
+            <Link
+              href={startHref}
+              className="inline-flex rounded-control bg-cs-accent-fill px-5 py-3 text-sm font-semibold text-cs-on-accent transition-transform hover:-translate-y-0.5"
+            >
+              {labels.startFree}
+            </Link>
+            <Link
+              href={`/courses?lang=${locale}`}
+              className="inline-flex rounded-control border border-cs-border bg-cs-surface px-5 py-3 text-sm text-cs-body hover:border-cs-accent"
+            >
+              {labels.browse}
+            </Link>
+          </div>
+        ) : (
+          <Link
+            href={`/courses?lang=${locale}`}
+            className="mt-5 inline-flex rounded-control bg-cs-accent-fill px-5 py-3 text-sm font-semibold text-cs-on-accent transition-transform hover:-translate-y-0.5"
+          >
+            {labels.browse}
+          </Link>
+        )}
       </section>
     </div>
   )

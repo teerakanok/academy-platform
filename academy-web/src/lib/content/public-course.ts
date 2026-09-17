@@ -41,6 +41,7 @@ export function toPublicCourse(course: Course): PublicCourse {
     },
     locale: course.locale,
     translatedNodeIds: [...course.translatedNodeIds],
+    offer: course.structure.offer ? { model: course.structure.offer.model } : null,
   }
 }
 

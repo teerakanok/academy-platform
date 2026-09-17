@@ -3,6 +3,9 @@
   "slug": "basic-os-linux",
   "version": "1.0.0",
   "publicAvailability": "syllabus-preview",
+  "offer": {
+    "model": "free"
+  },
   "defaultLocale": "en",
   "availableLocales": [
     "en",

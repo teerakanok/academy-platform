@@ -110,7 +110,8 @@ export function CourseOverview({
   const summary = summarise(structure, state)
   const recordSummary = courseRecordSummary(structure, state)
   const skippedBlockers = recordSummary.blocking.filter((b) => b.reason === 'skipped').length
-  const next = nextNode(structure, state)
+  // เรียนต่อจากบทที่เปิดค้างไว้ล่าสุด (เหมือน dashboard) — ไม่มีความคืบหน้าก็เริ่มบทแรก
+  const next = nextNode(structure, state, record?.lastNodeId ?? null)
   const untranslated = structure.nodes.length - translatedNodeIds.length
   const { lessonCount, checkpointCount } = courseStepCounts(structure)
   const skillMapView = skillMapPresentation({
@@ -178,7 +179,7 @@ export function CourseOverview({
               data-testid="start-or-continue"
               className="rounded-control bg-cs-accent-fill px-6 py-3 text-sm font-semibold text-cs-on-accent shadow-card transition-transform duration-200 hover:-translate-y-0.5"
             >
-              {summary.completed + summary.testedOut + summary.skipped > 0 ? text.continue : text.start}
+              {!isEmptyCourseProgress(record) ? text.continue : text.start}
             </Link>
           )}
           {loaded && record && !accessIssue && (
