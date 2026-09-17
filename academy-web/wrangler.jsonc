@@ -37,6 +37,18 @@
     // preview: ยังไม่เปิดให้ค้นเจอ และยังไม่เปิดระบบบัญชี
     // (ไม่มี NEXT_PUBLIC_SUPABASE_* = หน้า sign-in จะบอกตรงๆ ว่ายังไม่เปิด
     //  แทนที่จะโชว์ฟอร์มที่กดแล้ว error)
-    "NEXT_PUBLIC_SEARCH_INDEXING": "on"
+    "NEXT_PUBLIC_SEARCH_INDEXING": "on",
+
+    // เปิดหมู่ route ภายใน (/admin, /player) ให้มีอยู่จริง — ไม่ได้ให้สิทธิ์ใคร
+    // `hasStaffRole` ยังตรวจทุกคำขอเหมือนเดิม: /admin ต้องเป็น owner, /player
+    // ต้อง content-ops หรือ owner ค่านี้แค่ทำให้ route family มีตัวตน
+    //
+    // ก่อนหน้านี้ไม่ได้ตั้งไว้ที่ไหนเลย founder จึงมี owner role ครบ, RPC คืน
+    // true, route deploy แล้ว แต่ dashboard ไม่โชว์ทางเข้า และ course_settings
+    // ว่างเปล่ามาตลอด — publish คอร์สไม่ได้เลยสักครั้ง
+    //
+    // อยู่ใน repo ไม่ใช่ dashboard: `deploy:cf` ใช้ `--keep-vars` ค่าที่ตั้งบน
+    // dashboard จึงมองไม่เห็นจากที่นี่ และรอบถัดไปไม่มีใครรู้ว่ามันเปิดอยู่
+    "INTERNAL_SURFACES": "on"
   }
 }
