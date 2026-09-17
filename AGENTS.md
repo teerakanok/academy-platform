@@ -132,8 +132,23 @@ commit) — เวอร์ชัน/รายละเอียดตรึง�
 
 ## Brand & design
 
-- Inherit the CYBERSKILLS aesthetic: dark, terminal/CLI motif, teal accent, "rigorous / precision / threat-intelligence" tone.
+- **Academy's accent is blue `#38BDF8` — not the CYBERSKILLS teal.** Every product in
+  the ecosystem carries its own accent from its own logo; teal `#00E6B4` belongs to the
+  parent brand mark, not to Academy. Authoritative sources, both on the website repo:
+  `cyberskills-web/public/redesign/logos/logo-academy.svg` (`stroke="#38BDF8"`) and
+  `cyberskills-web/src/lib/content-v2.js` → `productBrand.academy`
+  (`color #38BDF8` · `hover #7DD3FC` · `textLight #0A6C9E` · `ink #06121C`).
+  Do not change this accent without a **new logo** as the reference — it has been
+  wrongly overwritten twice (`0beb89a`, `fdb2028`); founder corrected it again
+  2026-09-17. Enforced by `academy-web/tests/unit/brand-accent.test.ts`.
+- Inherit the rest of the CYBERSKILLS aesthetic: terminal/CLI motif and the
+  "rigorous / precision / threat-intelligence" tone. Academy renders light by default
+  (it is a classroom, not a SOC); dark is a toggle.
 - Use the `@cyberskills/tokens` design system (`cs-` tokens) when building any UI (`bg-cs-bg`, `text-cs-accent`, etc.). See `ecosystem/DESIGN_SYSTEM.md`.
+- Accent model: `--cs-accent-fill` is the bright brand blue and is a **surface only** —
+  it carries contrast through the dark ink placed on it. Text, borders, graph lines and
+  bare state indicators use `--cs-accent`; the brand blue alone reaches only 2.14:1 on
+  white and fails WCAG 1.4.11 as a thin mark.
 - Tagline energy reserved: "Learn. Grow. Go." (optional).
 
 ---
