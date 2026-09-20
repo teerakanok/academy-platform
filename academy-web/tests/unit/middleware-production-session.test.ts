@@ -44,6 +44,18 @@ describe('production middleware opaque-session prefilter', () => {
     })
   })
 
+  it.each(['/admin', '/admin/courses', '/player', '/player/module/assessment'])
+    ('returns 404 for disabled internal surface %s before checking a session', async (pathname) => {
+      vi.stubEnv('INTERNAL_SURFACES', 'off')
+
+      const response = await middleware(
+        new NextRequest(`https://academy.cyberskills.co.th${pathname}`),
+      )
+
+      expect(response.status).toBe(404)
+      expect(response.headers.get('location')).toBeNull()
+    })
+
   it('rejects caller CSP controls and mints unique nonce policies', async () => {
     const makeRequest = () => new NextRequest('https://academy.cyberskills.co.th/', {
       headers: {

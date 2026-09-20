@@ -47,11 +47,11 @@ describe('internalSurfacesEnabled', () => {
 })
 
 describe('isInternalSurface', () => {
-  it.each(['/player', '/player/', '/player/module/x', '/player/exam/y'])('%s = ภายใน', (path) => {
+  it.each(['/player', '/player/', '/player/module/x', '/player/exam/y', '/admin', '/admin/', '/admin/courses'])('%s = ภายใน', (path) => {
     expect(isInternalSurface(path)).toBe(true)
   })
 
-  it.each(['/', '/dashboard', '/courses/basic-os-linux', '/playerx', '/api/progress'])(
+  it.each(['/', '/dashboard', '/courses/basic-os-linux', '/playerx', '/adminx', '/api/progress'])(
     '%s = ไม่ใช่ภายใน (ห้ามกันเส้นทางปกติโดยไม่ตั้งใจ)',
     (path) => {
       expect(isInternalSurface(path)).toBe(false)

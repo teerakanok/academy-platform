@@ -18,5 +18,8 @@ export function internalSurfacesEnabled(): boolean {
 
 /** เส้นทางที่ถือเป็นพื้นผิวภายใน — ใช้ร่วมกันระหว่าง middleware และหน้าเว็บ */
 export function isInternalSurface(pathname: string): boolean {
-  return pathname === '/player' || pathname.startsWith('/player/')
+  return pathname === '/player'
+    || pathname.startsWith('/player/')
+    || pathname === '/admin'
+    || pathname.startsWith('/admin/')
 }
