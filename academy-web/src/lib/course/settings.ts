@@ -81,24 +81,20 @@ export async function requireEffectiveCourseVisibility(
 
 /** Load all runtime overrides in one call (for the catalog page). */
 export async function loadAllCourseOverrides(): Promise<Map<string, EffectiveCourseAvailability>> {
-  try {
-    const db = academyDb()
-    const { data, error } = await db
-      .from('course_settings')
-      .select('course_slug, title_override, subtitle_override, visibility')
-    if (error) throw new Error(`อ่านการตั้งค่าคอร์สไม่สำเร็จ: ${error.message}`)
-    const map = new Map<string, EffectiveCourseAvailability>()
-    for (const row of data ?? []) {
-      map.set(row.course_slug as string, {
-        visibility: (row.visibility as CourseVisibility | null) ?? 'published',
-        overridden: row.visibility !== null,
-        titleOverride: (row.title_override as string | null) ?? null,
-        subtitleOverride: (row.subtitle_override as string | null) ?? null,
-      })
-    }
-    return map
-  } catch (error) {
-    console.error('[course-settings] อ่านการตั้งค่าทั้งหมดไม่สำเร็จ:', safeErrorMessage(error))
-    return new Map()
+  const db = academyDb()
+  const { data, error } = await db
+    .from('course_settings')
+    .select('course_slug, title_override, subtitle_override, visibility')
+  if (error) throw new Error(`อ่านการตั้งค่าคอร์สไม่สำเร็จ: ${error.message}`)
+
+  const map = new Map<string, EffectiveCourseAvailability>()
+  for (const row of data ?? []) {
+    map.set(row.course_slug as string, {
+      visibility: (row.visibility as CourseVisibility | null) ?? 'published',
+      overridden: row.visibility !== null,
+      titleOverride: (row.title_override as string | null) ?? null,
+      subtitleOverride: (row.subtitle_override as string | null) ?? null,
+    })
   }
+  return map
 }
