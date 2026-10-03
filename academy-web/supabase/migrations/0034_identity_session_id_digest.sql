@@ -40,46 +40,6 @@ begin
 end
 $$;
 
-lock table academy.identity_session,
-            academy.identity_authorization_transaction
-  in access exclusive mode;
-
-do $$
-declare
-  v_digest_collisions bigint;
-begin
-  select count(*) into v_digest_collisions
-  from (
-    select academy.identity_session_id_digest(id) as digest
-      from academy.identity_session
-     group by academy.identity_session_id_digest(id)
-    having count(*) > 1
-  ) as collisions;
-
-  if v_digest_collisions > 0 then
-    raise exception 'identity session digest transition would collide'
-      using errcode = '23514';
-  end if;
-end
-$$;
-
-update academy.identity_session
-   set id = academy.identity_session_id_digest(id);
-
--- Legacy completed receipts held random raw bearers that cannot be converted
--- into the deterministic retry bearer. Clear only linkage/lease state so the
--- retained verified result can issue a fresh digest-bound receipt on retry.
-update academy.identity_authorization_transaction
-   set claim_digest = null,
-       claim_expires_at = null,
-       session_id = null,
-       completed_account_id = null,
-       completed_at = null,
-       attempt_count = 0
- where session_id is not null
-    or completed_at is not null
-    or claim_digest is not null;
-
 create or replace function academy.create_identity_session_digest(
   p_session_id text,
   p_issuer text,
@@ -535,5 +495,58 @@ grant execute on function academy.claim_identity_authorization_transaction_diges
 grant execute on function academy.finalize_identity_authorization_transaction_digest(text, text, uuid, text, text)
   to academy_runtime;
 
-insert into academy.identity_session_id_digest_transition (migration_name)
-values ('0034_identity_session_id_digest');
+-- Supabase CLI executes a migration as individual SQL statements. Keep the
+-- guarded lock, both data conversions, and the completion marker in this one
+-- statement so a local reset gets the same atomic transition without relying
+-- on a caller-owned explicit transaction.
+do $transition$
+declare
+  v_digest_collisions bigint;
+begin
+  if exists (
+    select 1
+      from academy.identity_session_id_digest_transition
+     where migration_name = '0034_identity_session_id_digest'
+  ) then
+    raise exception 'identity session digest transition was already applied'
+      using errcode = '23514';
+  end if;
+
+  lock table academy.identity_session,
+              academy.identity_authorization_transaction
+    in access exclusive mode;
+
+  select count(*) into v_digest_collisions
+  from (
+    select academy.identity_session_id_digest(id) as digest
+      from academy.identity_session
+     group by academy.identity_session_id_digest(id)
+     having count(*) > 1
+  ) as collisions;
+
+  if v_digest_collisions > 0 then
+    raise exception 'identity session digest transition would collide'
+      using errcode = '23514';
+  end if;
+
+  update academy.identity_session
+     set id = academy.identity_session_id_digest(id);
+
+  -- Legacy completed receipts held random raw bearers that cannot be converted
+  -- into the deterministic retry bearer. Clear only linkage/lease state so the
+  -- retained verified result can issue a fresh digest-bound receipt on retry.
+  update academy.identity_authorization_transaction
+     set claim_digest = null,
+         claim_expires_at = null,
+         session_id = null,
+         completed_account_id = null,
+         completed_at = null,
+         attempt_count = 0
+   where session_id is not null
+      or completed_at is not null
+      or claim_digest is not null;
+
+  insert into academy.identity_session_id_digest_transition (migration_name)
+  values ('0034_identity_session_id_digest');
+end
+$transition$;
