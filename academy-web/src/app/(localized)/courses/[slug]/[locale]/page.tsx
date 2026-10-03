@@ -7,6 +7,7 @@ import { toPublicCourse } from '@/lib/content/public-course'
 import { publicCourseShareImagePath } from '@/lib/course-share-image'
 import { isUiLocale } from '@/lib/i18n/ui'
 import { absoluteUrl, publicPage } from '@/lib/seo'
+import { getVisiblePublicCourse } from '@/lib/course/visibility'
 
 export const dynamic = 'force-dynamic'
 export const dynamicParams = false
@@ -18,9 +19,9 @@ export function generateStaticParams() {
   })
 }
 
-function publicCourseForPath(slug: string, locale: string) {
+async function publicCourseForPath(slug: string, locale: string) {
   if (!isUiLocale(locale)) return null
-  const course = getPublicCourse(slug, locale)
+  const course = await getVisiblePublicCourse(slug, locale)
   return course?.locale === locale ? course : null
 }
 
@@ -34,8 +35,8 @@ export async function generateMetadata({
   params: Promise<{ slug: string; locale: string }>
 }): Promise<Metadata> {
   const { slug, locale } = await params
-  const course = publicCourseForPath(slug, locale)
-  if (!course) return { robots: { index: false, follow: false } }
+  const course = await publicCourseForPath(slug, locale)
+  if (!course) notFound()
 
   const languagePaths = Object.fromEntries(course.structure.availableLocales.map((code) => [code, coursePath(slug, code)]))
   languagePaths['x-default'] = coursePath(slug, course.structure.defaultLocale)
@@ -59,7 +60,7 @@ export default async function LocalizedCoursePage({
 }) {
   const { slug, locale } = await params
   const nonce = (await headers()).get('x-nonce') ?? undefined
-  const course = publicCourseForPath(slug, locale)
+  const course = await publicCourseForPath(slug, locale)
   if (!course) notFound()
 
   const path = coursePath(slug, course.locale)

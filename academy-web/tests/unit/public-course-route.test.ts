@@ -1,8 +1,14 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { generateMetadata, generateStaticParams } from '@/app/(localized)/courses/[slug]/[locale]/page'
 import { legacyCourseRedirectPath } from '@/lib/content/legacy-public-course-route'
 import { getCourseStructure, listPublicCourseSlugs } from '@/lib/content/course-source'
 import { getCourse } from '@/lib/content/course-source'
+
+const requireEffectiveCourseVisibility = vi.hoisted(() => vi.fn(async () => 'published'))
+
+vi.mock('@/lib/course/settings', () => ({
+  requireEffectiveCourseVisibility,
+}))
 
 describe('public course route', () => {
   it('pre-renders each available locale of public courses only', () => {

@@ -3,7 +3,7 @@ import 'server-only'
 import { getPublicCourse, listPublicCourseSlugs } from '@/lib/content/course-source'
 import type { Course } from '@/lib/content/course-types'
 import type { Locale } from '@/lib/content/course-types'
-import { loadAllCourseOverrides } from '@/lib/course/settings'
+import { loadAllCourseOverrides, requireEffectiveCourseVisibility } from '@/lib/course/settings'
 
 /**
  * Runtime-aware catalog: combines the static course registry with the
@@ -36,4 +36,20 @@ export async function getVisiblePublicCourses(locale?: Locale): Promise<Course[]
       }
     })
     .filter((course): course is Course => course !== null)
+}
+
+/**
+ * Resolve one public course only when its runtime visibility is published.
+ * A settings-read failure propagates, and hidden courses return null so every
+ * route can turn them into the same notFound boundary.
+ */
+export async function getVisiblePublicCourse(slug: string, locale?: Locale): Promise<Course | null> {
+  const course = getPublicCourse(slug, locale)
+  if (!course) return null
+
+  const visibility = await requireEffectiveCourseVisibility(
+    course.structure.publicAvailability,
+    slug,
+  )
+  return visibility === 'published' ? course : null
 }
