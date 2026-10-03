@@ -1,0 +1,2 @@
+WARN content/courses/git-essentials/locales/th/lessons/init-and-commit.json .blocks[12].expected: ASCII tokens dropped ['staging']
+checked 40 files, 0 with failures
