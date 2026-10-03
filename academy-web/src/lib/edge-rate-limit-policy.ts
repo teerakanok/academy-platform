@@ -12,6 +12,8 @@ export type EdgeRateLimitOperation =
   | 'learner-reset'
   | 'learner-enrol'
   | 'learner-simulation'
+  | 'certificate-verify'
+  | 'session-read'
   | 'identity-start-get'
   | 'identity-start-post'
   | 'identity-callback-get'
@@ -27,10 +29,26 @@ export interface EdgeRateLimitRule {
 
 const WINDOW_MS = 60_000
 const LIMIT = 10
+const SESSION_READ_LIMIT = 120
+const SESSION_READ_GLOBAL_LIMIT = 3_000
 const MARKER_MAX_AGE_MS = 120_000
 const MARKER_FUTURE_SKEW_MS = 30_000
 
-const rules = new Map([
+const certificateVerifyRule = {
+  operation: 'certificate-verify' as const,
+  globalLimit: 300,
+  limit: LIMIT,
+  windowMs: WINDOW_MS,
+}
+
+const sessionReadRule = {
+  operation: 'session-read' as const,
+  globalLimit: SESSION_READ_GLOBAL_LIMIT,
+  limit: SESSION_READ_LIMIT,
+  windowMs: WINDOW_MS,
+}
+
+const rules = new Map<string, EdgeRateLimitRule>([
   ['POST:/api/leads', {
     operation: 'leads' as const,
     globalLimit: 300,
@@ -80,12 +98,58 @@ const rules = new Map([
     limit: LIMIT,
     windowMs: WINDOW_MS,
   }],
+  ['GET:/api/certificate/verify', certificateVerifyRule],
+  ['GET:/api/admin/courses', sessionReadRule],
+  ['GET:/api/auth/me', sessionReadRule],
+  ['GET:/api/explanations', sessionReadRule],
+  ['GET:/api/progress', sessionReadRule],
+  ['GET:/api/progress/reset', sessionReadRule],
 ])
 
 export type EdgeRateLimitAdmission =
   | { kind: 'public' }
   | { kind: 'protected'; rule: EdgeRateLimitRule }
   | { kind: 'invalid' }
+
+const dynamicRules = [
+  {
+    method: 'GET',
+    segments: ['api', 'courses', '*', 'enrol'],
+    rule: sessionReadRule,
+  },
+  {
+    method: 'GET',
+    segments: ['api', 'courses', '*', 'skill-map'],
+    rule: sessionReadRule,
+  },
+  {
+    method: 'GET',
+    segments: ['api', 'courses', '*', 'certificate'],
+    rule: sessionReadRule,
+  },
+  {
+    method: 'GET',
+    segments: ['api', 'courses', '*', 'certificate', 'pdf'],
+    rule: sessionReadRule,
+  },
+]
+
+function ruleForCanonicalPath(method: string, canonicalPath: string): EdgeRateLimitRule | null {
+  const exactRule = rules.get(`${method}:${canonicalPath}`)
+  if (exactRule) return exactRule
+
+  const pathSegments = canonicalPath.split('/')
+  const segments = pathSegments[0] === '' ? pathSegments.slice(1) : pathSegments
+  return dynamicRules.find(({ method: ruleMethod, segments: patternSegments }) => (
+    ruleMethod === method
+    && segments.length === patternSegments.length
+    && patternSegments.every((pattern, index) => (
+      pattern === '*'
+        ? segments[index] !== undefined && segments[index] !== ''
+        : pattern === segments[index]
+    ))
+  ))?.rule ?? null
+}
 
 function canonicalAdmission(request: Request): EdgeRateLimitAdmission {
   let pathname: string
@@ -104,9 +168,6 @@ function canonicalAdmission(request: Request): EdgeRateLimitAdmission {
   if (segments.some((segment) => segment === '.' || segment === '..')) return { kind: 'invalid' }
 
   const canonicalPath = canonicalTrailingSlash(pathname)
-  const rule = rules.get(`${request.method}:${canonicalPath}`)
-  if (rule) return { kind: 'protected', rule }
-
   if (pathname.includes('%')) {
     let decodedPath: string
     try {
@@ -121,9 +182,12 @@ function canonicalAdmission(request: Request): EdgeRateLimitAdmission {
       || decodedPath.includes('\\')
       || /[\u0000-\u001f\u007f]/.test(decodedPath)
       || decodedSegments.some((segment) => segment === '.' || segment === '..')
-      || rules.has(`${request.method}:${canonicalDecodedPath}`)
+      || ruleForCanonicalPath(request.method, canonicalDecodedPath) !== null
     ) return { kind: 'invalid' }
   }
+
+  const rule = ruleForCanonicalPath(request.method, canonicalPath)
+  if (rule) return { kind: 'protected', rule }
 
   return { kind: 'public' }
 }
