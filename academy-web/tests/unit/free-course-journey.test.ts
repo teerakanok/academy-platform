@@ -7,6 +7,7 @@ const mocks = vi.hoisted(() => ({
   getCourseAccess: vi.fn(),
   authorizeCourseResource: vi.fn(),
   resolveCourseAvailability: vi.fn(),
+  requireEffectiveCourseVisibility: vi.fn(),
   redirect: vi.fn((target: string) => {
     throw Object.assign(new Error('NEXT_REDIRECT'), { target })
   }),
@@ -21,7 +22,10 @@ vi.mock('@/lib/account/course-access', () => ({
   getCourseAccess: mocks.getCourseAccess,
   authorizeCourseResource: mocks.authorizeCourseResource,
 }))
-vi.mock('@/lib/course/settings', () => ({ resolveCourseAvailability: mocks.resolveCourseAvailability }))
+vi.mock('@/lib/course/settings', () => ({
+  resolveCourseAvailability: mocks.resolveCourseAvailability,
+  requireEffectiveCourseVisibility: mocks.requireEffectiveCourseVisibility,
+}))
 
 import { AccessRequiredView } from '@/components/course/AccessRequiredView'
 import { readFreeEnrolmentState } from '@/components/course/CourseExperience'
@@ -82,6 +86,7 @@ describe('/courses/[slug]/start', () => {
     vi.clearAllMocks()
     mocks.currentUser.mockResolvedValue({ account: { id: 'user-1' } })
     mocks.getCourseAccess.mockResolvedValue({ allowed: false, reason: 'not-entitled' })
+    mocks.requireEffectiveCourseVisibility.mockResolvedValue('published')
   })
 
   it('sends a signed-out visitor to sign-in and brings them back to the same start path', async () => {
@@ -111,6 +116,16 @@ describe('/courses/[slug]/start', () => {
     await expect(run('cissp')()).rejects.toThrow('NEXT_NOT_FOUND')
     expect(mocks.currentUser).not.toHaveBeenCalled()
   })
+
+  it.each(['unpublished', 'retired'] as const)(
+    'returns 404 before rendering the start shell when visibility is %s',
+    async (visibility) => {
+      mocks.requireEffectiveCourseVisibility.mockResolvedValueOnce(visibility)
+
+      await expect(run('basic-os-linux', 'th')()).rejects.toThrow('NEXT_NOT_FOUND')
+      expect(mocks.currentUser).not.toHaveBeenCalled()
+    },
+  )
 })
 
 describe('/access-required for a not-enrolled learner', () => {

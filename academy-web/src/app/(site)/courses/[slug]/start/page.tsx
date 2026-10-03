@@ -7,6 +7,7 @@ import { currentUser } from '@/lib/auth/session'
 import { getCourse } from '@/lib/content/course-source'
 import type { Locale } from '@/lib/content/course-types'
 import { courseLearnPath, freeCourseStartPath, isFreeOffer } from '@/lib/course/offer'
+import { requireEffectiveCourseVisibility } from '@/lib/course/settings'
 import { privatePage } from '@/lib/seo'
 
 export const metadata = privatePage('Start course')
@@ -28,6 +29,8 @@ export default async function FreeCourseStartPage({
   const requested: Locale | undefined = lang === 'en' || lang === 'th' ? lang : undefined
   const course = getCourse(slug, requested)
   if (!course || !isFreeOffer(course.structure.offer)) notFound()
+  const visibility = await requireEffectiveCourseVisibility(course.structure.publicAvailability, slug)
+  if (visibility !== 'published') notFound()
 
   const user = await currentUser()
   if (!user) redirect(`/sign-in?next=${encodeURIComponent(freeCourseStartPath(slug, course.locale))}`)
