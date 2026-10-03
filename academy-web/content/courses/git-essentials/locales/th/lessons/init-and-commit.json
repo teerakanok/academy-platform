@@ -121,7 +121,7 @@
     },
     {
       "kind": "try",
-      "title": "สร้าง repository ที่มีสาม commit",
+      "title": "สร้าง repository ที่มี 2 commit",
       "steps": [
         "รัน: mkdir -p ~/git-lab && cd ~/git-lab && git init",
         "รัน: echo 'line one' > notes.txt && git status",
