@@ -169,9 +169,21 @@ describe('ด่านที่ผูกกับ attempt — หน้า lesso
       expect(item.id).toBeTruthy()
     }
     const serialized = JSON.stringify(pub)
+    const serializedCheckpoint = JSON.stringify(pub.checkpoint)
+    // โจทย์ที่สร้างจากบทเรียนใช้ข้อความในเนื้อหาเป็นตัวเลือก (เช่นแถวในตาราง)
+    // ข้อความนั้นอยู่ในหน้าได้ในฐานะเนื้อหา — สิ่งที่ห้ามคือมันติดมากับด่าน
+    // หรือโผล่ในหน้าจากที่อื่นนอกเหนือเนื้อหาบทเรียน
+    const teachingText = JSON.stringify({
+      ...withCheckpoint.lesson,
+      checkpoint: [],
+      videoCueQuestions: [],
+    })
     for (const item of withCheckpoint.lesson.checkpoint) {
       if ('kind' in item && item.kind === 'simulation') continue
+      expect(serialized, `โจทย์ของ ${item.id} ยังติดมากับหน้า`).not.toContain(item.prompt)
       for (const text of Object.values(item.choices)) {
+        expect(serializedCheckpoint, `ข้อความตัวเลือกของ ${item.id} ยังติดมากับด่าน`).not.toContain(text)
+        if (teachingText.includes(JSON.stringify(text).slice(1, -1))) continue
         expect(serialized, `ข้อความตัวเลือกของ ${item.id} ยังติดมากับหน้า`).not.toContain(text)
       }
     }

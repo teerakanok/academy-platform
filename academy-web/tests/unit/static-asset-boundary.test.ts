@@ -73,6 +73,7 @@ describe('deployed static-asset boundary', () => {
     } finally {
       rmSync(root, { recursive: true, force: true })
     }
+    // รัน build script จริงใน bash — ใต้โหลดของทั้งชุดเกิน 5 วินาทีที่เป็นค่าเริ่มต้นได้
   }, 30_000)
 })
 

@@ -1,7 +1,5 @@
 import { createHash } from 'node:crypto'
-import { existsSync } from 'node:fs'
-import { join } from 'node:path'
-import { pathToFileURL } from 'node:url'
+import { importIdentityControlContracts } from '../fixtures/identity-control-producer/load'
 import { describe, expect, it } from 'vitest'
 
 import {
@@ -12,8 +10,6 @@ import {
   type AcademyClientAssertionRehearsalRegistry,
 } from '@/lib/identity/client-assertion-registration-rehearsal'
 
-const SIBLING_IDENTITY_CONTROL = join(__dirname, '../../../../identity-control')
-const CANONICAL_IDENTITY_CONTROL = '/private/tmp/identity-security-correction-cde63a58'
 
 describe('Academy client-assertion public-key registration rehearsal', () => {
   it('accepts active/overlap and refuses retired, unknown, tampered, or mismatched assertions', async () => {
@@ -299,20 +295,7 @@ async function loadIdentityControlContracts(): Promise<{
   Authenticator: IdentityControlAuthenticatorConstructor
   ClientControlRegistry: IdentityControlRegistryConstructor
 }> {
-  const sourceRoot = existsSync(SIBLING_IDENTITY_CONTROL)
-    ? SIBLING_IDENTITY_CONTROL
-    : CANONICAL_IDENTITY_CONTROL
-  const authenticatorPath = pathToFileURL(join(
-    sourceRoot,
-    'packages/core/src/client-assertion',
-  )).href
-  const controlPath = pathToFileURL(join(
-    sourceRoot,
-    'packages/core/src/client-control',
-  )).href
-  const [authenticator, control]: unknown[] = await Promise.all([
-    import(authenticatorPath), import(controlPath),
-  ])
+  const { authenticator, control } = await importIdentityControlContracts()
   if (!authenticator || typeof authenticator !== 'object'
     || !('Es256ClientAssertionAuthenticator' in authenticator)
     || typeof authenticator.Es256ClientAssertionAuthenticator !== 'function'

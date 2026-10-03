@@ -31,6 +31,8 @@
     ".open-next",
     "ops/academy-retention-worker",
     "tests/workerd/signer-worker.ts",
-    "tests/workerd/authenticated-mutation-quota-worker.ts"
+    "tests/workerd/authenticated-mutation-quota-worker.ts",
+    "tests/fixtures/identity-control-producer/client-assertion.ts",
+    "tests/fixtures/identity-control-producer/client-control.ts"
   ]
 }
