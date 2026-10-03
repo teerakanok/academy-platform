@@ -109,6 +109,25 @@ describe('Basic OS & Linux — ครบถ้วนพร้อมสอน', (
 })
 
 describe('ระบบสองภาษา', () => {
+  it('Git init-and-commit บอกจำนวน commit ตรงกับขั้นตอนจริงทั้งสองภาษา', () => {
+    for (const locale of ['en', 'th'] as const) {
+      const resolved = getLesson('git-essentials', 'init-and-commit', locale)!
+      const blocks = resolved.lesson.blocks
+      const block = blocks.find(
+        (item): item is Extract<(typeof blocks)[number], { kind: 'try' }> => item.kind === 'try',
+      )
+      expect(block, `${locale}: ต้องมี try block`).toBeDefined()
+      expect(
+        block!.steps.filter((step) => step.includes('git commit -m')),
+        `${locale}: จำนวน commit command`,
+      ).toHaveLength(2)
+      expect(block!.title).toBe(
+        locale === 'en' ? 'Make a repository with two commits' : 'สร้าง repository ที่มี 2 commit',
+      )
+      expect(block!.expected).toContain(locale === 'en' ? 'Two commits' : 'commit สองตัว')
+    }
+  })
+
   it('ขอภาษาไทยแล้วได้ไทยเมื่อมีคำแปล', () => {
     const resolved = getLesson('basic-os-linux', 'os-what-it-does', 'th')!
     expect(resolved.servedLocale).toBe('th')

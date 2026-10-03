@@ -121,7 +121,7 @@
     },
     {
       "kind": "try",
-      "title": "Make a repository with three commits",
+      "title": "Make a repository with two commits",
       "steps": [
         "Run: mkdir -p ~/git-lab && cd ~/git-lab && git init",
         "Run: echo 'line one' > notes.txt && git status",
