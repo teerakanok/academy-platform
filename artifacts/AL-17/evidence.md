@@ -20,3 +20,15 @@ Notes for reviewer/host backlog:
 - pipes-and-logs image alt says "คำสั่งสี่ตัว" but lists five commands (fact issue, EN to compare; left unchanged).
 - processes-and-packages nodeTitle vs lesson title differ only by a space (pre-existing).
 - Fairness ceiling failures for both launch courses (en+th) are a separate assessment card candidate.
+
+## Revision 2 evidence (2026-10-03)
+
+สถานะ: แก้เฉพาะ two must-fix findings จาก `REV-AL-17-ca5b4679-r1` แล้ว
+
+- `status-diff-log`: objective และ heading เปลี่ยนจาก "ก่อนคุณมาเกิดอะไรขึ้นบ้าง" เป็นภาษาไทยธรรมชาติตามที่ reviewer แนะนำ
+- `gitignore`: ตัด connector "เสียอีก" ออกโดยคงความหมายเดิม
+- Diff จาก `ca5b4679` เปลี่ยนเฉพาะ 3 editable prose strings ใน 2 ไฟล์นี้; ไม่แตะ optional polish เพื่อไม่ขยายสโคป
+- Guard rerun: `artifacts/AL-17/check-th-edit.py 20bf386 <40 Thai files>` — Source PASS, checked 40 files / 0 failures; 1 documented WARN สำหรับ `staging:` (`init-and-commit.blocks[12].expected`)
+- Registry rerun: `node scripts/generate-content-registry.mjs` — Source PASS, no diff in `src/lib/content-registry.generated.ts`
+- Unit rerun: `npm run test:unit` on Node 25.5.0 — Native PASS, 169 files passed, 3222 passed / 2 skipped / 0 failed (`unit-r2.txt`)
+- Updated second-provider Thai readability review: NOT_RUN — awaiting the next independent review after this revision
