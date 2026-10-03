@@ -5,6 +5,7 @@ import {
   type ActivationRecord,
 } from './access'
 import { getCourseStructure } from '@/lib/content/course-source'
+import { requireEffectiveCourseVisibility } from '@/lib/course/settings'
 import { loadProgress } from '@/lib/course/progress-db'
 import { toLearnerState } from '@/lib/course/progress'
 import { nodeStatus } from '@/lib/course/roadmap'
@@ -12,7 +13,7 @@ import { safeErrorMessage } from '@/lib/safe-log'
 
 export type CourseAccess =
   | { allowed: true }
-  | { allowed: false; reason: 'inactive' | 'not-entitled' | 'locked' | 'unavailable' }
+  | { allowed: false; reason: 'inactive' | 'not-entitled' | 'hidden' | 'locked' | 'unavailable' }
 
 export function decideCourseAccess(
   activation: ActivationRecord | null,
@@ -34,19 +35,28 @@ export async function getServiceAccess(userId: string): Promise<CourseAccess> {
   }
 }
 
-/** ประตูเดียวของ content path: ต้องเปิดใช้ Academy และมี entitlement ของคอร์สพร้อมกัน */
+/** ประตูเดียวของ content path: ต้อง active, มี entitlement และคอร์สยัง published */
 export async function getCourseAccess(userId: string, courseSlug: string): Promise<CourseAccess> {
   try {
     const activation = await getActivation(userId)
     if (!isServiceUsable(activation)) return { allowed: false, reason: 'inactive' }
-    return decideCourseAccess(activation, await hasCourseEntitlement(userId, courseSlug))
+    const entitlement = decideCourseAccess(activation, await hasCourseEntitlement(userId, courseSlug))
+    if (!entitlement.allowed) return entitlement
+
+    const structure = getCourseStructure(courseSlug)
+    if (structure) {
+      const visibility = await requireEffectiveCourseVisibility(structure.publicAvailability, courseSlug)
+      if (visibility !== 'published') return { allowed: false, reason: 'hidden' }
+    }
+
+    return { allowed: true }
   } catch (error) {
-    console.error('[course-access] ตรวจ course entitlement ไม่สำเร็จ:', safeErrorMessage(error))
+    console.error('[course-access] ตรวจ course visibility/entitlement ไม่สำเร็จ:', safeErrorMessage(error))
     return { allowed: false, reason: 'unavailable' }
   }
 }
 
-/** ตรวจครบถึง resource authorization เพื่อให้ direct URL/API ข้าม prerequisite ไม่ได้ */
+/** ตรวจ visibility และ resource authorization เพื่อให้ direct URL/API ข้าม prerequisite ไม่ได้ */
 export async function authorizeCourseResource(
   userId: string,
   courseSlug: string,
