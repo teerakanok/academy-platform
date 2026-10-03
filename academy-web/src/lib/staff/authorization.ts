@@ -22,3 +22,12 @@ export async function requireInternalContentStaff(): Promise<SessionUser> {
   if (!user || !(await hasStaffRole(user.account.id, 'content-ops'))) notFound()
   return user
 }
+
+// หน้า `/admin/**` เป็นของ owner เท่านั้น — ตรงกับ requireOwner() ของ /api/admin
+// ผู้เรียนที่ล็อกอินแล้วต้องได้ 404 ไม่ใช่โครงหน้าแอดมิน (AC-SEC-06)
+export async function requireInternalOwner(): Promise<SessionUser> {
+  if (!internalSurfacesEnabled()) notFound()
+  const user = await currentUser()
+  if (!user || !(await hasStaffRole(user.account.id, 'owner'))) notFound()
+  return user
+}

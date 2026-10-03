@@ -11,12 +11,18 @@
 //
 // Environment toggle เป็น prerequisite เท่านั้น; ทุก page ใต้ /player ยังต้องตรวจ
 // content-ops/owner จากฐานข้อมูลอีกชั้นก่อนส่ง fixture ไป browser
+//
+// `/admin` อยู่ใต้สวิตช์เดียวกัน (AW-SEC-02): wrangler.jsonc ประกาศว่าสวิตช์คุม
+// ทั้ง `/admin` และ `/player` · `/api/admin/**` ไม่อยู่ในนี้ — ทุก handler ตรวจ
+// owner เองต่อ request และต้องตอบ JSON 401/403 ไม่ใช่ 404 เปล่า
 
 export function internalSurfacesEnabled(): boolean {
   return process.env.INTERNAL_SURFACES?.trim() === 'on'
 }
 
+const INTERNAL_ROOTS = ['/admin', '/player'] as const
+
 /** เส้นทางที่ถือเป็นพื้นผิวภายใน — ใช้ร่วมกันระหว่าง middleware และหน้าเว็บ */
 export function isInternalSurface(pathname: string): boolean {
-  return pathname === '/player' || pathname.startsWith('/player/')
+  return INTERNAL_ROOTS.some((root) => pathname === root || pathname.startsWith(`${root}/`))
 }
