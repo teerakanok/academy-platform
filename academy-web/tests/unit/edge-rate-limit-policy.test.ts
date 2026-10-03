@@ -27,6 +27,48 @@ describe('edge rate-limit policy', () => {
     expect(edgeRateLimitRule(new Request('https://academy.cyberskills.co.th/api/progress', { method: 'POST' }))).toBeNull()
   })
 
+  it('protects the public certificate verification read', () => {
+    const rule = edgeRateLimitRule(new Request('https://academy.cyberskills.co.th/api/certificate/verify'))
+
+    expect(rule).toMatchObject({
+      operation: 'certificate-verify',
+      limit: 10,
+      globalLimit: 300,
+      windowMs: 60_000,
+    })
+  })
+
+  it.each([
+    '/api/admin/courses',
+    '/api/auth/me',
+    '/api/courses/git-essentials/enrol',
+    '/api/courses/git-essentials/skill-map',
+    '/api/courses/git-essentials/certificate',
+    '/api/courses/git-essentials/certificate/pdf',
+    '/api/explanations',
+    '/api/progress',
+    '/api/progress/reset',
+  ])('protects session-gated API read %s with one actor budget', (path) => {
+    const rule = edgeRateLimitRule(new Request(`https://academy.cyberskills.co.th${path}`))
+
+    expect(rule).toMatchObject({
+      operation: 'session-read',
+      limit: 120,
+      globalLimit: 3_000,
+      windowMs: 60_000,
+    })
+  })
+
+  it('matches dynamic course reads without allowing encoded route disguises', () => {
+    const origin = 'https://academy.cyberskills.co.th'
+    expect(edgeRateLimitRule(new Request(`${origin}/api/courses/risk-fundamentals/enrol/`)))
+      .toMatchObject({ operation: 'session-read' })
+    expect(edgeRateLimitRule(new Request(`${origin}/api/courses/risk-fundamentals/not-a-read`))).toBeNull()
+    expect(edgeRateLimitAdmission(new Request(`${origin}/api/courses/%72isk-fundamentals/enrol`)))
+      .toEqual({ kind: 'invalid' })
+    expect(edgeRateLimitAdmission(new Request(`${origin}/api/auth/%6de`))).toEqual({ kind: 'invalid' })
+  })
+
   it('preserves valid encoded public paths while rejecting protected-route disguises', () => {
     const origin = 'https://academy.cyberskills.co.th'
     expect(edgeRateLimitAdmission(new Request(`${origin}/courses/%E0%B9%84%E0%B8%97%E0%B8%A2`)))

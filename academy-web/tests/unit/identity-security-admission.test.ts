@@ -229,6 +229,56 @@ describe('Identity unauthenticated admission', () => {
     expect(rpcCalls).toEqual([])
   })
 
+  it('throttles public certificate verification while normal traffic from another actor passes', async () => {
+    const environment = {
+      EDGE_RATE_LIMITER: budgetNamespace({ counters: new Map() }),
+      RATE_LIMIT_KEY_SECRET: RATE_LIMIT_SECRET,
+    }
+    const request = () => new Request(`${ORIGIN}/api/certificate/verify?number=${'a'.repeat(32)}`, {
+      headers: { 'cf-connecting-ip': '198.51.100.10' },
+    })
+
+    for (let attempt = 0; attempt < 10; attempt += 1) {
+      expect(await enforceEdgeRateLimit(request(), environment)).not.toBeInstanceOf(Response)
+    }
+    const limited = await enforceEdgeRateLimit(request(), environment)
+    const normal = await enforceEdgeRateLimit(new Request(`${ORIGIN}/api/certificate/verify?number=${'b'.repeat(32)}`, {
+      headers: { 'cf-connecting-ip': '198.51.100.11' },
+    }), environment)
+
+    expect(isResponse(limited) && limited.status).toBe(429)
+    expect(isResponse(limited) && limited.headers.get('retry-after')).toBe('60')
+    expect(normal).not.toBeInstanceOf(Response)
+  }, 30_000)
+
+  it('throttles session-gated API reads before OpenNext while another actor passes', async () => {
+    const environment = {
+      EDGE_RATE_LIMITER: budgetNamespace({ counters: new Map() }),
+      RATE_LIMIT_KEY_SECRET: RATE_LIMIT_SECRET,
+    }
+    const request = () => new Request(`${ORIGIN}/api/courses/git-essentials/enrol`, {
+      headers: {
+        'cf-connecting-ip': '198.51.100.10',
+        cookie: '__Host-academy_session=AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+      },
+    })
+
+    for (let attempt = 0; attempt < 120; attempt += 1) {
+      expect(await enforceEdgeRateLimit(request(), environment)).not.toBeInstanceOf(Response)
+    }
+    const limited = await enforceEdgeRateLimit(request(), environment)
+    const normal = await enforceEdgeRateLimit(new Request(`${ORIGIN}/api/courses/git-essentials/enrol`, {
+      headers: {
+        'cf-connecting-ip': '198.51.100.11',
+        cookie: '__Host-academy_session=BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB',
+      },
+    }), environment)
+
+    expect(isResponse(limited) && limited.status).toBe(429)
+    expect(isResponse(limited) && limited.headers.get('retry-after')).toBe('60')
+    expect(normal).not.toBeInstanceOf(Response)
+  }, 30_000)
+
   it('aggregates IPv6 actors and durable route targets across source addresses', async () => {
     const counters = new Map<string, number>()
     const environment = {
@@ -285,7 +335,7 @@ describe('Identity unauthenticated admission', () => {
     expect(overflow).toBeInstanceOf(Response)
     expect(isResponse(overflow) && overflow.status).toBe(429)
     expect(counters.size).toBe(333)
-  })
+  }, 30_000)
 
   it('fails closed when a later durable budget scope is unavailable', async () => {
     const decision = await enforceEdgeRateLimit(new Request(`${ORIGIN}/api/auth/otp`, {
