@@ -11,6 +11,7 @@ describe('service activation runtime definer correction', () => {
   it('uses a collision-checked non-login owner with only activation row access', () => {
     expect(migration).toMatch(/activation writer role already exists/)
     expect(migration).toMatch(/create role academy_activation_writer\s+nologin noinherit nosuperuser nocreatedb nocreaterole noreplication nobypassrls/i)
+    expect(migration).not.toMatch(/^\s*alter role academy_activation_writer\b/im)
     expect(migration).toMatch(/grant usage on schema academy to academy_activation_writer/i)
     expect(migration).toMatch(/grant select, insert, update on academy\.service_activation\s+to academy_activation_writer/i)
     expect(migration).toMatch(/create policy academy_service_activation_sync_writer/i)

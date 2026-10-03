@@ -12,8 +12,10 @@ begin
 end
 $$;
 
-alter role academy_activation_writer
-  nologin noinherit nosuperuser nocreatedb nocreaterole noreplication nobypassrls;
+-- CREATE ROLE above already establishes these least-privilege attributes.
+-- Do not restate them with ALTER ROLE: Supabase's local migration role can
+-- create this constrained role but cannot alter SUPERUSER, even to say
+-- NOSUPERUSER. Removing the redundant ALTER keeps local db reset working.
 
 grant usage on schema academy to academy_activation_writer;
 grant select, insert, update on academy.service_activation
