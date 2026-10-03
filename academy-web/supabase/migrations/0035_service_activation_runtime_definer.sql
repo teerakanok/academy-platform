@@ -1,14 +1,28 @@
 -- Restore profile activation after the least-privilege table-write removal.
--- The dedicated owner is not a login role and is never granted to another role.
+-- Outside local reset bootstrap, the dedicated owner is not a login role and is
+-- not granted to a runtime, service, or operator role. roles.sql creates an
+-- exact local copy and grants it only to the local postgres migration role so
+-- OWNER TO can execute without superuser privileges.
 do $$
 begin
-  if exists (select 1 from pg_roles where rolname = 'academy_activation_writer') then
-    raise exception 'activation writer role already exists; inspect collision before migration'
+  if not exists (select 1 from pg_roles where rolname = 'academy_activation_writer') then
+    create role academy_activation_writer
+      nologin noinherit nosuperuser nocreatedb nocreaterole noreplication nobypassrls
+      password null;
+  elsif not exists (
+    select 1 from pg_roles
+     where rolname = 'academy_activation_writer'
+       and rolcanlogin = false
+       and rolinherit = false
+       and rolsuper = false
+       and rolcreatedb = false
+       and rolcreaterole = false
+       and rolreplication = false
+       and rolbypassrls = false
+  ) then
+    raise exception 'activation writer role already exists with unexpected attributes; inspect collision before migration'
       using errcode = '55000';
   end if;
-  create role academy_activation_writer
-    nologin noinherit nosuperuser nocreatedb nocreaterole noreplication nobypassrls
-    password null;
 end
 $$;
 
@@ -33,8 +47,14 @@ create policy academy_service_activation_sync_writer
 alter function academy.sync_service_activation(uuid, text, integer)
   security definer
   set search_path = pg_catalog, academy;
+
+-- PostgreSQL requires the incoming function owner to have CREATE on its schema
+-- for the transfer. Grant it only around the statement and leave the reviewed
+-- final ACL without schema-create authority.
+grant create on schema academy to academy_activation_writer;
 alter function academy.sync_service_activation(uuid, text, integer)
   owner to academy_activation_writer;
+revoke create on schema academy from academy_activation_writer;
 
 revoke all on function academy.sync_service_activation(uuid, text, integer)
   from public, anon, authenticated, service_role,

@@ -52,3 +52,22 @@ was consumed by the immutable reviewed cutover packet at source SHA-256
 migration must not be re-applied. Future Pool A changes continue through the
 canonical owner and reviewed migration workflow. Never reconcile this checksum
 divergence by linking this checkout or replaying 0034.
+
+## Migration 0035 local ownership and production history
+
+The local Supabase migration role is not a superuser. PostgreSQL therefore
+requires it to be a member of `academy_activation_writer` before migration 0035
+can transfer `academy.sync_service_activation` to that owner, and the incoming
+owner needs `CREATE` on schema `academy` at the instant of the function-owner
+transfer. `supabase/roles.sql` now creates the same constrained owner for a
+disposable local stack and grants it only to the local `postgres` migration
+role. Migration 0035 accepts that exact pre-created role and grants
+`CREATE` on the schema only around `OWNER TO`, revoking it immediately
+afterward. The reviewed final role attributes, table/function grants, and
+runtime boundary are unchanged.
+
+Production does not execute `roles.sql`. Its recorded migration 0035 was
+consumed at source SHA-256
+`2dffae6647191714f3e3456432584c96ff40bd7cca6ea19cea7fe822b090acc4`;
+this local compatibility edit changes only the source checksum for a new
+disposable ledger and must not be replayed or reconciled against Pool A.
