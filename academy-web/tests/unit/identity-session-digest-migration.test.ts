@@ -28,6 +28,32 @@ describe('Academy identity session digest migration', () => {
     expect(migration).toMatch(/lock table academy\.identity_session/i)
     expect(migration).toMatch(/identity session digest transition was already applied/i)
   })
+
+  it('keeps the lock, data transition, and marker in one CLI-runnable statement', () => {
+    const transition = migration.match(
+      /do\s+\$transition\$([\s\S]*?)\$transition\$/i,
+    )
+
+    expect(transition).not.toBeNull()
+    const body = transition?.[1] ?? ''
+    expect(body).toMatch(/identity session digest transition was already applied/i)
+    expect(body).toMatch(/lock table academy\.identity_session,[\s\S]*in access exclusive mode/i)
+    expect(body).toMatch(/identity session digest transition would collide/i)
+    expect(body).toMatch(
+      /update academy\.identity_session\s+set id = academy\.identity_session_id_digest\(id\)/i,
+    )
+    expect(body).toMatch(/set claim_digest = null,[\s\S]*attempt_count = 0/i)
+    expect(body).toMatch(
+      /insert into academy\.identity_session_id_digest_transition[\s\S]*0034_identity_session_id_digest/i,
+    )
+    expect(migration).not.toMatch(/^lock table/im)
+    expect(migration.match(/identity session digest transition was already applied/gi))
+      .toHaveLength(2)
+    expect(migration.indexOf('identity session digest transition was already applied'))
+      .toBeLessThan(
+        migration.indexOf('create or replace function academy.create_identity_session_digest'),
+      )
+  })
 })
 
 describe.skipIf(!databaseUrl)('Academy identity session digest real PostgreSQL transition', () => {
