@@ -10,6 +10,7 @@ prove-it labs และระบบแต้ม lab
 2. `plans/active_plan.md` — สถานะปัจจุบัน, นิยาม product + โมเดลราคา, Phase 0 lanes
 3. `plans/completed_log.md` — decision ที่ปิดแล้ว + เหตุผล + evidence
 4. `docs/maintenance/README.md` — maintenance, secret inventory, backup/restore, rollback
+5. `academy-web/docs/local-database-reset.md` — สร้าง/ตรวจ local Supabase DB
 
 ## สถานะ (2026-07-31)
 
