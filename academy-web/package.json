@@ -21,6 +21,7 @@
     "verify:public-share-images": "node scripts/verify-public-share-images.mjs",
     "verify:public-share-image-composition": "node scripts/verify-public-share-image-composition.mjs",
     "verify:public-course-pages": "node scripts/verify-public-course-pages.mjs",
+    "verify:launch-exposure": "node scripts/verify-launch-exposure.mjs",
     "verify:cf-public-share-images": "node scripts/verify-cf-public-share-images.mjs",
     "verify:cf-public-course-pages": "node scripts/verify-cf-public-course-pages.mjs",
     "verify:workerd": "node scripts/workerd-signer-check.mjs",
