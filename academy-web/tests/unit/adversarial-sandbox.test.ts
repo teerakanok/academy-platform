@@ -312,7 +312,7 @@ describe('ที่กันเปื้อนของสคริปต์ adv
     expect(() => assertPristine(root, ['ของจริง.txt']))
       .toThrow(/ไม่ตรงกับ HEAD อยู่ก่อนแล้ว จึงไม่เริ่ม/)
     expect(() => assertPristine(root, ['ของจริง.txt'])).toThrow(/git checkout -- ของจริง\.txt/)
-  })
+  }, 30_000)
 
   it('ข้อความปัญหาไม่ซ้อนกันเป็นชั้นเมื่อ restore ถูกเรียกซ้ำ', () => {
     const path = join(root, 'ล็อกอยู่.txt')

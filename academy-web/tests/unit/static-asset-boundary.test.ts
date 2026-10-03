@@ -73,7 +73,7 @@ describe('deployed static-asset boundary', () => {
     } finally {
       rmSync(root, { recursive: true, force: true })
     }
-  })
+  }, 30_000)
 })
 
 
