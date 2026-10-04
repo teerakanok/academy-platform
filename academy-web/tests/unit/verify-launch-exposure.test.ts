@@ -269,6 +269,44 @@ describe('launch exposure verification', () => {
     }
   })
 
+  it('accepts a bounded Next redirect echo but rejects hidden lesson HTML or oversized bodies', async () => {
+    const realisticNextBody =
+      `Redirecting to ${BASE}/sign-in?next=%2Fcourses%2Fassembly%2Fstart (307)\n`
+    const lessonHtmlBody =
+      '<!doctype html><html><body><article><h1>Why read assembly?</h1></article></body></html>'
+    const cases = [
+      { body: realisticNextBody, pass: true, outcome: 'anon-gated', failed: 0 },
+      { body: lessonHtmlBody, pass: false, outcome: 'unexpected', failed: 1 },
+      { body: 'x'.repeat(2049), pass: false, outcome: 'unexpected', failed: 1 },
+    ]
+
+    for (const { body, pass, outcome, failed } of cases) {
+      const defaultFetch = fetchFor('public').fetch
+      const fetch = async (url: string, init: RequestInit) => {
+        if (url === `${BASE}/courses/assembly/lessons/why-read-assembly`) {
+          return response(307, body, `${BASE}/sign-in?next=%2Fcourses%2Fassembly%2Fstart`)
+        }
+        return defaultFetch(url, init)
+      }
+      const receipt = await verifyLaunchExposure({
+        base: BASE,
+        expect: 'public',
+        timeoutMs: 1500,
+        fetch,
+      })
+      const hiddenCheck = receipt.checks.find((check) => check.id === 'hidden:assembly')
+
+      expect(hiddenCheck?.pass).toBe(pass)
+      expect(receipt.overall).toBe(pass)
+      expect(receipt.summary.failed).toBe(failed)
+      expect(hiddenCheck?.observed['/courses/assembly/lessons/why-read-assembly']).toEqual({
+        status: 307,
+        outcome,
+      })
+      expect(JSON.stringify(receipt)).not.toContain(body)
+    }
+  })
+
   it('passes gated mode when every Academy path is redirected by Cloudflare Access', async () => {
     const { fetch } = fetchFor('gated')
     const receipt = await verifyLaunchExposure({

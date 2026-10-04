@@ -24,6 +24,7 @@ const HIDDEN_COURSE_LESSON_IDS = new Map([
 const INTERNAL_PATHS = ['/admin', '/admin/courses', '/api/admin/courses', '/player']
 const REDIRECT_STATUSES = new Set([301, 302, 303, 307, 308])
 const MAX_BODY_BYTES = 2 * 1024 * 1024
+const MAX_ANON_REDIRECT_BODY_BYTES = 2048
 export const HIDDEN_COURSE_ANON_SCOPE_NOTE =
   'Anonymous hidden lesson/start probes prove only 404 or a same-origin sign-in redirect without course content; authenticated refusal is proven by AL-03 tests/canary, not this probe.'
 export const HELP_TEXT = `Usage: verify-launch-exposure.mjs --base <origin> --expect gated|public [options]
@@ -33,6 +34,9 @@ Read-only launch exposure checks. --expect gated requires Cloudflare Access redi
 absence, and internal routes not served anonymously.
 
 ${HIDDEN_COURSE_ANON_SCOPE_NOTE}
+
+Local Next receipts should use --base http://localhost:<port>: Next rewrites loopback
+redirects to localhost, and the anonymous-gate checks compare the received target origin.
 
 Options:
   --base <origin>             Academy origin (http:// or https://, no path/query)
@@ -337,7 +341,7 @@ async function hiddenRouteResponse(load, base, slug) {
     const response = await load(`${base}${route.path}`)
     responses.push(response)
     const anonymousGateAccepted = route.anonymousGateAllowed &&
-      isAnonymousSignInRedirect(response, base, slug)
+      isAnonymousSignInRedirect(response, base)
     const accepted = response.status === 404 || anonymousGateAccepted
     routeResults[route.path] = {
       status: response.status,
@@ -457,7 +461,7 @@ function canonicalPublicCourseLocation(response, base, path) {
   return url.pathname === `/courses/${slug}/en` || url.pathname === `/courses/${slug}/th` ? url : null
 }
 
-function isAnonymousSignInRedirect(response, base, slug) {
+function isAnonymousSignInRedirect(response, base) {
   if (!response || !REDIRECT_STATUSES.has(response.status) || !response.location) return false
   let url
   try {
@@ -465,9 +469,15 @@ function isAnonymousSignInRedirect(response, base, slug) {
   } catch {
     return false
   }
+  const body = response.body ?? ''
+  const normalizedBody = body.toLowerCase()
   return url.origin === base &&
     url.pathname === '/sign-in' &&
-    !(response.body ?? '').includes(slug)
+    Buffer.byteLength(body, 'utf8') <= MAX_ANON_REDIRECT_BODY_BYTES &&
+    !normalizedBody.includes('<html') &&
+    !normalizedBody.includes('<article') &&
+    !normalizedBody.includes('<h1') &&
+    !normalizedBody.includes('lesson-title')
 }
 
 function isPublicCoursePath(path) {
