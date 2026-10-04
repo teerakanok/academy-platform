@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  HELP_TEXT,
+  HIDDEN_COURSE_ANON_SCOPE_NOTE,
   HIDDEN_COURSE_SLUGS,
   parseLaunchExposureArgs,
   verifyLaunchExposure,
@@ -36,6 +38,14 @@ function accessRedirect() {
     302,
     '',
     'https://team.cloudflareaccess.com/cdn-cgi/access/login/issuer?opaque=value',
+  )
+}
+
+function signInRedirect(slug: string, base: string) {
+  return response(
+    307,
+    '',
+    `${base}/sign-in?next=%2Fcourses%2F${slug}%2Fstart`,
   )
 }
 
@@ -78,8 +88,22 @@ function fetchFor(expect: 'gated' | 'public', failure?: Failure) {
         ? response(200, 'hidden lesson leaked')
         : response(404)
     }
-    if (slug && HIDDEN_COURSE_SLUGS.includes(slug)) return response(404)
-    if (path === '/courses/basic-os-linux' || path === '/courses/git-essentials') return response(200)
+    const hiddenStart = /^\/courses\/([^/]+)\/start$/.exec(path)
+    const startSlug = hiddenStart?.[1]
+    const origin = new URL(url).origin
+    if (startSlug && HIDDEN_COURSE_SLUGS.includes(startSlug)) return signInRedirect(startSlug, origin)
+    if (path === '/courses/basic-os-linux') {
+      const canonicalLocale = failure?.kind === 'public-route' && failure.path === '/courses/basic-os-linux/en'
+        ? 'th'
+        : 'en'
+      return response(308, '', `${origin}/courses/basic-os-linux/${canonicalLocale}`)
+    }
+    if (path === '/courses/git-essentials') {
+      const canonicalLocale = failure?.kind === 'public-route' && failure.path === '/courses/git-essentials/en'
+        ? 'th'
+        : 'en'
+      return response(308, '', `${origin}/courses/git-essentials/${canonicalLocale}`)
+    }
     if (path === '/courses/basic-os-linux/en' || path === '/courses/basic-os-linux/th') return response(200)
     if (path === '/courses/git-essentials/en' || path === '/courses/git-essentials/th') return response(200)
 
@@ -150,6 +174,99 @@ describe('launch exposure verification', () => {
     expect(serialized).not.toContain('opaque=value')
     expect(serialized).not.toContain('/cdn-cgi/access/login')
     expect(serialized).not.toContain('cookie')
+
+    const canonicalRedirect = receipt.checks.find((check) => check.id === 'public:/courses/basic-os-linux')
+    expect(canonicalRedirect?.status).toBe(308)
+    expect(canonicalRedirect?.observed).toEqual({
+      directStatus: 308,
+      canonicalLocaleRedirect: true,
+      redirectTargetStatus: 200,
+    })
+
+    const hiddenCheck = receipt.checks.find((check) => check.id === 'hidden:assembly')
+    expect(hiddenCheck?.pass).toBe(true)
+    expect(hiddenCheck?.observed['/courses/assembly/start']).toEqual({
+      status: 307,
+      outcome: 'anon-gated',
+    })
+    expect(receipt.scopeNotes).toContain(HIDDEN_COURSE_ANON_SCOPE_NOTE)
+    expect(HELP_TEXT).toContain(HIDDEN_COURSE_ANON_SCOPE_NOTE)
+  })
+
+  it('accepts only a same-origin locale target for canonical public course redirects', async () => {
+    const cases = [
+      { location: 'https://evil.test/courses/basic-os-linux/en', targetStatus: 200 },
+      { location: `${BASE}/courses/basic-os-linux/not-a-locale`, targetStatus: 200 },
+      { location: `${BASE}/courses/basic-os-linux/en`, targetStatus: 404 },
+    ]
+    for (const { location, targetStatus } of cases) {
+      const seen: string[] = []
+      const defaultFetch = fetchFor('public').fetch
+      const fetch = async (url: string, init: RequestInit) => {
+        seen.push(url)
+        if (url === `${BASE}/courses/basic-os-linux`) {
+          return response(308, '', location)
+        }
+        if (url === `${BASE}/courses/basic-os-linux/en` && targetStatus !== 200) return response(targetStatus)
+        return defaultFetch(url, init)
+      }
+      const receipt = await verifyLaunchExposure({
+        base: BASE,
+        expect: 'public',
+        timeoutMs: 1500,
+        fetch,
+      })
+      const targetCheck = receipt.checks.find((check) => check.id === 'public:/courses/basic-os-linux')
+
+      expect(targetCheck?.pass).toBe(false)
+      expect(receipt.overall).toBe(false)
+      expect(seen).not.toContain('https://evil.test/courses/basic-os-linux/en')
+      expect(targetCheck?.observed).toEqual(location === `${BASE}/courses/basic-os-linux/en`
+        ? {
+            directStatus: 308,
+            canonicalLocaleRedirect: true,
+            redirectTargetStatus: targetStatus,
+          }
+        : { directStatus: 308 })
+      if (location.startsWith('https://evil.test')) {
+        expect(JSON.stringify(receipt)).not.toContain(location)
+      }
+    }
+  })
+
+  it('accepts hidden lesson/start anonymous redirects only to the same-origin sign-in path', async () => {
+    const cases = [
+      'https://evil.test/sign-in',
+      `${BASE}/dashboard`,
+      `${BASE}/sign-in/lessons/assembly`,
+    ]
+    for (const location of cases) {
+      const seen: string[] = []
+      const defaultFetch = fetchFor('public').fetch
+      const fetch = async (url: string, init: RequestInit) => {
+        seen.push(url)
+        if (url === `${BASE}/courses/assembly/lessons/why-read-assembly`) {
+          return response(307, '', location)
+        }
+        return defaultFetch(url, init)
+      }
+      const receipt = await verifyLaunchExposure({
+        base: BASE,
+        expect: 'public',
+        timeoutMs: 1500,
+        fetch,
+      })
+      const hiddenCheck = receipt.checks.find((check) => check.id === 'hidden:assembly')
+
+      expect(hiddenCheck?.pass).toBe(false)
+      expect(receipt.overall).toBe(false)
+      expect(hiddenCheck?.observed['/courses/assembly/lessons/why-read-assembly']).toEqual({
+        status: 307,
+        outcome: 'unexpected',
+      })
+      expect(seen).not.toContain('https://evil.test/sign-in')
+      expect(JSON.stringify(receipt)).not.toContain(location)
+    }
   })
 
   it('passes gated mode when every Academy path is redirected by Cloudflare Access', async () => {

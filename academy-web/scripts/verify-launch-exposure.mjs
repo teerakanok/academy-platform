@@ -24,6 +24,24 @@ const HIDDEN_COURSE_LESSON_IDS = new Map([
 const INTERNAL_PATHS = ['/admin', '/admin/courses', '/api/admin/courses', '/player']
 const REDIRECT_STATUSES = new Set([301, 302, 303, 307, 308])
 const MAX_BODY_BYTES = 2 * 1024 * 1024
+export const HIDDEN_COURSE_ANON_SCOPE_NOTE =
+  'Anonymous hidden lesson/start probes prove only 404 or a same-origin sign-in redirect without course content; authenticated refusal is proven by AL-03 tests/canary, not this probe.'
+export const HELP_TEXT = `Usage: verify-launch-exposure.mjs --base <origin> --expect gated|public [options]
+
+Read-only launch exposure checks. --expect gated requires Cloudflare Access redirects;
+--expect public requires the two launch courses, exact catalog visibility, hidden-course
+absence, and internal routes not served anonymously.
+
+${HIDDEN_COURSE_ANON_SCOPE_NOTE}
+
+Options:
+  --base <origin>             Academy origin (http:// or https://, no path/query)
+  --expect <mode>             gated or public
+  --raw-host <workers-origin> Require 404 on the raw *.workers.dev origin
+  --timeout-ms <250-30000>    Bounded per-request timeout
+  --skip-access-boundary      Local public-mode only: skip Cloudflare-owned checks
+  -h, --help                  Show this help
+`
 
 export function parseLaunchExposureArgs(argv) {
   const options = {
@@ -129,10 +147,11 @@ export async function verifyLaunchExposure(options) {
 
   const responseCache = new Map()
   const load = async (url) => {
-    if (!responseCache.has(url)) {
-      responseCache.set(url, requestUrl(fetch, url, timeoutMs))
+    const cacheKey = String(url)
+    if (!responseCache.has(cacheKey)) {
+      responseCache.set(cacheKey, requestUrl(fetch, cacheKey, timeoutMs))
     }
-    return responseCache.get(url)
+    return responseCache.get(cacheKey)
   }
 
   const checks = []
@@ -156,13 +175,20 @@ export async function verifyLaunchExposure(options) {
 
     if ((path === '/' || isPublicCoursePath(path)) && path !== '/courses') {
       const response = await load(url)
+      const publicRoute = await publicRouteResult({
+        load,
+        base,
+        path,
+        response,
+      })
       addCheck({
         id: `public:${path}`,
         kind: 'public-route',
         url,
-        response,
-        pass: response.status === 200 && !isCloudflareAccessRedirect(response),
-        expected: '200 without Cloudflare Access redirect',
+        response: publicRoute.response,
+        pass: publicRoute.pass,
+        expected: publicRoute.expected,
+        observed: publicRoute.observed,
       })
     }
   }
@@ -190,8 +216,9 @@ export async function verifyLaunchExposure(options) {
         kind: 'hidden-course',
         url: response.url,
         response,
-        pass: response.status === 404,
-        expected: 'every hidden course route returns 404',
+        pass: response.allAccepted,
+        expected:
+          'overview/en/th return 404; anonymous lesson/start return 404 or same-origin sign-in without course content',
       })
     }
 
@@ -270,6 +297,7 @@ export async function verifyLaunchExposure(options) {
     base,
     rawHost: rawHost ?? null,
     timeoutMs,
+    scopeNotes: expect === 'public' ? [HIDDEN_COURSE_ANON_SCOPE_NOTE] : [],
     overall: failed === 0,
     summary: { passed, failed, skipped, total: checks.length },
     checks,
@@ -294,22 +322,41 @@ function buildProbePaths() {
 
 async function hiddenRouteResponse(load, base, slug) {
   const lessonId = HIDDEN_COURSE_LESSON_IDS.get(slug)
-  const paths = [
-    `/courses/${slug}`,
-    `/courses/${slug}/en`,
-    `/courses/${slug}/th`,
-    `/courses/${slug}/lessons/${lessonId}`,
-    `/courses/${slug}/start`,
+  const routes = [
+    { path: `/courses/${slug}`, anonymousGateAllowed: false },
+    { path: `/courses/${slug}/en`, anonymousGateAllowed: false },
+    { path: `/courses/${slug}/th`, anonymousGateAllowed: false },
+    { path: `/courses/${slug}/lessons/${lessonId}`, anonymousGateAllowed: true },
+    { path: `/courses/${slug}/start`, anonymousGateAllowed: true },
   ]
   const responses = []
-  for (const path of paths) responses.push(await load(`${base}${path}`))
-  const firstFailure = responses.find((response) => response.status !== 404)
+  const routeResults = {}
+  const anonGatedPaths = []
+  const evaluatedResponses = []
+  for (const route of routes) {
+    const response = await load(`${base}${route.path}`)
+    responses.push(response)
+    const anonymousGateAccepted = route.anonymousGateAllowed &&
+      isAnonymousSignInRedirect(response, base, slug)
+    const accepted = response.status === 404 || anonymousGateAccepted
+    routeResults[route.path] = {
+      status: response.status,
+      outcome: accepted ? (response.status === 404 ? 'not-found' : 'anon-gated') : 'unexpected',
+    }
+    if (anonymousGateAccepted) anonGatedPaths.push(route.path)
+    evaluatedResponses.push({ response, accepted })
+  }
+  const firstFailure = evaluatedResponses.find(({ accepted }) => !accepted)?.response
+  const representative = firstFailure ?? responses.find((response) => response.status !== 404) ?? responses[0]
   return {
     url: `${base}/courses/${slug}`,
-    status: firstFailure?.status ?? 404,
-    locationHost: responses.find((response) => response.locationHost)?.locationHost ?? null,
+    status: representative?.status ?? 404,
+    locationHost: representative?.locationHost ?? null,
     error: responses.find((response) => response.error)?.error ?? null,
-    aggregatedStatuses: Object.fromEntries(paths.map((path, index) => [path, responses[index].status])),
+    allAccepted: evaluatedResponses.length === routes.length &&
+      evaluatedResponses.every(({ accepted }) => accepted),
+    routeResults,
+    anonGatedPaths,
   }
 }
 
@@ -326,7 +373,8 @@ async function requestUrl(fetch, url, timeoutMs) {
     const location = response.headers?.get?.('location')
     return {
       status: response.status,
-      locationHost: locationHost(location),
+      locationHost: locationHost(location, url),
+      location,
       body: await readBoundedBody(response),
       error: null,
     }
@@ -346,10 +394,10 @@ async function readBoundedBody(response) {
   return body
 }
 
-function locationHost(location) {
+function locationHost(location, requestUrl) {
   if (!location) return null
   try {
-    return new URL(location).host
+    return new URL(location, requestUrl).host
   } catch {
     return null
   }
@@ -359,6 +407,67 @@ function isCloudflareAccessRedirect(response) {
   if (!response || !REDIRECT_STATUSES.has(response.status)) return false
   const host = response.locationHost?.toLowerCase()
   return host === 'cloudflareaccess.com' || host?.endsWith('.cloudflareaccess.com') === true
+}
+
+async function publicRouteResult({ load, base, path, response }) {
+  if (response.status === 200 && !isCloudflareAccessRedirect(response)) {
+    return {
+      response,
+      pass: true,
+      expected: '200 without Cloudflare Access redirect',
+      observed: { directStatus: 200 },
+    }
+  }
+
+  const canonicalUrl = canonicalPublicCourseLocation(response, base, path)
+  if (!canonicalUrl) {
+    return {
+      response,
+      pass: false,
+      expected: '200 without Cloudflare Access redirect',
+      observed: { directStatus: response.status },
+    }
+  }
+
+  const target = await load(canonicalUrl)
+  return {
+    response,
+    pass: target.status === 200 && !isCloudflareAccessRedirect(target),
+    expected:
+      '200 without Cloudflare Access redirect, or 301/308 to a same-origin course locale whose target returns 200',
+    observed: {
+      directStatus: response.status,
+      canonicalLocaleRedirect: true,
+      redirectTargetStatus: target.status,
+    },
+  }
+}
+
+function canonicalPublicCourseLocation(response, base, path) {
+  if (!response || (response.status !== 301 && response.status !== 308) || !response.location) return null
+  const slug = PUBLIC_COURSE_SLUGS.find((candidate) => path === `/courses/${candidate}`)
+  if (!slug) return null
+  let url
+  try {
+    url = new URL(response.location, base)
+  } catch {
+    return null
+  }
+  if (url.origin !== base || url.search || url.hash) return null
+  return url.pathname === `/courses/${slug}/en` || url.pathname === `/courses/${slug}/th` ? url : null
+}
+
+function isAnonymousSignInRedirect(response, base, slug) {
+  if (!response || !REDIRECT_STATUSES.has(response.status) || !response.location) return false
+  let url
+  try {
+    url = new URL(response.location, base)
+  } catch {
+    return false
+  }
+  return url.origin === base &&
+    url.pathname === '/sign-in' &&
+    !(response.body ?? '').includes(slug)
 }
 
 function isPublicCoursePath(path) {
@@ -392,7 +501,7 @@ function normalizeCheck(check) {
   }
   if (response?.error) result.error = response.error
   if ('observed' in check) result.observed = check.observed
-  if (response && 'aggregatedStatuses' in response) result.observed = response.aggregatedStatuses
+  if (response && 'routeResults' in response) result.observed = response.routeResults
   return result
 }
 
@@ -401,7 +510,12 @@ function errorName(error) {
 }
 
 async function main() {
-  const options = parseLaunchExposureArgs(process.argv.slice(2))
+  const argv = process.argv.slice(2)
+  if (argv.includes('-h') || argv.includes('--help')) {
+    console.log(HELP_TEXT)
+    return
+  }
+  const options = parseLaunchExposureArgs(argv)
   const receipt = await verifyLaunchExposure(options)
   console.log(JSON.stringify(receipt))
   process.exitCode = receipt.overall ? 0 : 1
