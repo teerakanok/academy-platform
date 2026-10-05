@@ -4,7 +4,7 @@
 
 > Canonical context for this product. All AI providers read this file.
 > Provider-specific extensions, if ever needed, are pointer files only and must reference this file. Keep this file provider-neutral.
-> Director-level context lives in the repo-root `../../../AGENTS.md` (CYBERSKILLS ecosystem). Read it before cross-product work.
+> The director contract normally arrives through your user adapter; if it is not in your context, read `/Users/teerakanok/Dev/cyberskills-director-governance/AGENTS.md`.
 
 ---
 
@@ -12,12 +12,12 @@
 
 For every Academy session:
 
-1. Read director context: `../../../AGENTS.md`.
+1. The director contract normally arrives through your user adapter; if it is not in your context, read `/Users/teerakanok/Dev/cyberskills-director-governance/AGENTS.md`.
 2. Read this file.
-3. Read `plans/active_plan.md` for the current open slice. Read `plans/completed_log.md` only when tracing a prior decision, evidence, or residual risk.
+3. Read `plans/NOW.md` (3 KB at most: the current slice, open gates, and pointers). Open `plans/active_plan.md` only at the section NOW.md points to, or when you change the plan. Whoever changes the current slice or a gate in `active_plan.md` updates `NOW.md` in the same commit. Read `plans/completed_log.md` only when tracing a prior decision, evidence, or residual risk.
 4. Read local `principles/` and `skills/` only when the task matches a project-specific addition.
 5. For operations, incident response, backup, restore, rollback, or secret inventory work, read `docs/maintenance/README.md`.
-6. For cross-product work, read `../../../ecosystem/ECOSYSTEM.md`.
+6. For cross-product work, read `/Users/teerakanok/Dev/cyberskills-director-governance/ecosystem/ECOSYSTEM.md`.
 
 In long status and active-plan files, read current work and task-relevant sections. Before editing, scan headings and open, deferred, or blocked items for applicable constraints; follow any linked risk gates. Read completed history when tracing decisions, evidence, or residual risk.
 
@@ -116,8 +116,8 @@ DIY บน CYBERSKILLS defaults: Next.js App Router (TypeScript) · Tailwind +
 `@cyberskills/tokens` (cs-) · Supabase self-host **Pool A** schema `academy` ·
 
 > ⚠️ Pool A เป็น shared infra (Crux/STAR/Forge/Academy) — ก่อนแตะ auth, migration,
-> หรือ SQL ตรง ให้อ่าน `ecosystem/SHARED_INFRA_ACCESS.md` และ `reports/state/supabase.md`
-> ของ director repo ก่อนเสมอ
+> หรือ SQL ตรง ให้อ่าน `/Users/teerakanok/Dev/cyberskills-director-governance/ecosystem/SHARED_INFRA_ACCESS.md` และ
+> `/Users/teerakanok/Dev/cyberskills-director-governance/reports/state/supabase.md` ก่อนเสมอ
 deploy ปัจจุบัน = **Cloudflare Workers** ผ่าน `npm run deploy:cf`
 (`cyberskills-academy.songpon-te.workers.dev` — D6 2026-08-01 "hosting เอียง
 Cloudflare"; การยืนยันขั้นสุดท้ายรอวัด latency หลัง M3 — ดู `plans/active_plan.md`
@@ -144,7 +144,7 @@ commit) — เวอร์ชัน/รายละเอียดตรึง�
 - Inherit the rest of the CYBERSKILLS aesthetic: terminal/CLI motif and the
   "rigorous / precision / threat-intelligence" tone. Academy renders light by default
   (it is a classroom, not a SOC); dark is a toggle.
-- Use the `@cyberskills/tokens` design system (`cs-` tokens) when building any UI (`bg-cs-bg`, `text-cs-accent`, etc.). See `ecosystem/DESIGN_SYSTEM.md`.
+- Use the `@cyberskills/tokens` design system (`cs-` tokens) when building any UI (`bg-cs-bg`, `text-cs-accent`, etc.). See `/Users/teerakanok/Dev/cyberskills-director-governance/ecosystem/DESIGN_SYSTEM.md`.
 - Accent model: `--cs-accent-fill` is the bright brand blue and is a **surface only** —
   it carries contrast through the dark ink placed on it. Text, borders, graph lines and
   bare state indicators use `--cs-accent`; the brand blue alone reaches only 2.14:1 on
@@ -179,7 +179,7 @@ commit) — เวอร์ชัน/รายละเอียดตรึง�
 
 ## Security baseline (inherit ecosystem standard)
 
-Follow the CYBERSKILLS cross-product security baseline (repo-root `AGENTS.md` → "Security Baseline"): input validation; secrets in `.env` only (never hardcode); error sanitization; explicit CORS (no `*` in prod); dependency pinning + SBOM; admin/route protection with required auth tokens; docs endpoints disabled in production; internal services bound to localhost. Any feature handling learner PII must honor **PDPA** (consent + privacy notice) since the audience includes Thailand.
+Follow the CYBERSKILLS cross-product security baseline (the installed governance root's `principles/security-and-authorization.md`): input validation; secrets in `.env` only (never hardcode); error sanitization; explicit CORS (no `*` in prod); dependency pinning + SBOM; admin/route protection with required auth tokens; docs endpoints disabled in production; internal services bound to localhost. Any feature handling learner PII must honor **PDPA** (consent + privacy notice) since the audience includes Thailand.
 
 ---
 
@@ -205,4 +205,4 @@ When delegating work on this product, describe roles by **neutral capability tie
 - `plans/completed_log.md` — closed items with outcome + evidence + residual risk.
 - Strategy context: `plans/active_plan.md`, `plans/completed_log.md`,
   `context/`, and relevant ecosystem docs.
-- Read repo-root `AGENTS.md` + `ecosystem/ECOSYSTEM.md` before cross-product work.
+- Read `/Users/teerakanok/Dev/cyberskills-director-governance/ecosystem/ECOSYSTEM.md` before cross-product work; the director contract arrives as in the read order above.
