@@ -1,0 +1,264 @@
+{
+  "schema": "gathering-ops/v1",
+  "operation": "deploy",
+  "summary": "Publish Academy on the canonical host with only basic-os-linux and git-essentials visible, while /admin, /api/admin, and /player remain Cloudflare Access internal.",
+  "change": "Capture protected pre-change Access and course-settings snapshots, apply the founder-approved eight-course visibility shape through the audited owner-attributed RPC (never direct course_settings SQL), narrow the existing Access app to /admin and create cloned-policy /api/admin and /player apps, then verify public exposure and raw-worker denial. The RPC trade-off is a dedicated academy_staff_admin execution path that derives the sole active owner and records the exact founder reference plus before/after rows; it requires migration 0043 in the deployed AL-09 release.",
+  "verification": "Each step has a read-only applied/not-applied check. Final gate is npm run verify:launch-exposure --expect public with the raw workers.dev 404; protected snapshots and sanitized summaries remain outside Git.",
+  "recovery_limit": "Recovery is the tested reverse order: restore the exact protected Access snapshot (remove launch-created apps, then restore the whole-host app), restore the exact audited course-settings before-state through the rollback RPC, and rerun gated exposure plus raw-worker 404 checks. No DNS, Worker, entitlement, or course_offer change is authorized.",
+  "targets": [
+    {
+      "provider": "cloudflare-access",
+      "resource_id": "app/72f37caa-6573-4898-8bd1-b4aaaba741cc",
+      "display": "Academy canonical Access application"
+    },
+    {
+      "provider": "cloudflare-access",
+      "resource_id": "host/academy.cyberskills.co.th",
+      "display": "Academy host Access topology"
+    },
+    {
+      "provider": "postgres",
+      "resource_id": "academy/course_settings",
+      "display": "Academy runtime course settings"
+    }
+  ],
+  "execution_inputs": [
+    "academy-web/ops/runbooks/AL-10.json",
+    "academy-web/ops/launch/cloudflare-access.mjs",
+    "academy-web/ops/launch/course-visibility.mjs",
+    "academy-web/ops/launch/postcheck.mjs",
+    "academy-web/scripts/verify-launch-exposure.mjs",
+    "academy-web/supabase/migrations/0043_launch_course_visibility_rpc.sql",
+    "academy-web/package.json",
+    "reports/releases/2026-10-22-first-launch-runbook.md"
+  ],
+  "writable_outputs": [
+    "academy-web/ops/launch/run-output/access",
+    "academy-web/ops/launch/run-output/course-visibility",
+    "academy-web/ops/launch/run-output/postcheck"
+  ],
+  "dependencies": [
+    "AL-09 production release must deploy the reviewed source containing migration 0043 before this plan is approved",
+    "Cloudflare API token must be limited to Zero Trust Access administration for the named account",
+    "Academy launch database credential must connect through a member of academy_staff_admin without table rights"
+  ],
+  "runtime_env": [
+    "CLOUDFLARE_API_TOKEN",
+    "CLOUDFLARE_ACCOUNT_KEY",
+    "ACADEMY_LAUNCH_DATABASE_CREDENTIAL"
+  ],
+  "target_identity": {
+    "argv": [
+      "node",
+      "ops/launch/cloudflare-access.mjs",
+      "--mode",
+      "identity"
+    ],
+    "cwd": "academy-web",
+    "timeout_seconds": 10
+  },
+  "steps": [
+    {
+      "id": "access-snapshot",
+      "label": "Capture protected Access application/policy definitions and gated baseline probes",
+      "argv": [
+        "node",
+        "ops/launch/cloudflare-access.mjs",
+        "--mode",
+        "snapshot",
+        "--output-dir",
+        "ops/launch/run-output/access",
+        "--timeout-ms",
+        "15000"
+      ],
+      "cwd": "academy-web",
+      "timeout_seconds": 120,
+      "mutating": true,
+      "irreversible": false,
+      "expected_outcome": {
+        "phase": "snapshot",
+        "snapshotValid": true,
+        "liveMatchesSnapshot": true
+      },
+      "check": {
+        "argv": [
+          "node",
+          "ops/launch/cloudflare-access.mjs",
+          "--mode",
+          "check",
+          "--phase",
+          "snapshot",
+          "--output-dir",
+          "ops/launch/run-output/access",
+          "--timeout-ms",
+          "15000"
+        ],
+        "cwd": "academy-web",
+        "timeout_seconds": 120
+      }
+    },
+    {
+      "id": "course-visibility-snapshot",
+      "label": "Capture protected exact eight-row course settings baseline",
+      "argv": [
+        "node",
+        "ops/launch/course-visibility.mjs",
+        "--mode",
+        "snapshot",
+        "--output-dir",
+        "ops/launch/run-output/course-visibility"
+      ],
+      "cwd": "academy-web",
+      "timeout_seconds": 60,
+      "mutating": true,
+      "irreversible": false,
+      "expected_outcome": {
+        "phase": "snapshot",
+        "snapshotValid": true,
+        "stateMatchesSnapshot": true
+      },
+      "check": {
+        "argv": [
+          "node",
+          "ops/launch/course-visibility.mjs",
+          "--mode",
+          "check",
+          "--phase",
+          "snapshot",
+          "--output-dir",
+          "ops/launch/run-output/course-visibility"
+        ],
+        "cwd": "academy-web",
+        "timeout_seconds": 60
+      }
+    },
+    {
+      "id": "course-visibility-launch",
+      "label": "Apply founder-approved visibility through the audited owner-attributed RPC",
+      "argv": [
+        "node",
+        "ops/launch/course-visibility.mjs",
+        "--mode",
+        "apply",
+        "--approval-reference",
+        "AL-10-FOUNDER-OPS-APPROVAL",
+        "--output-dir",
+        "ops/launch/run-output/course-visibility"
+      ],
+      "cwd": "academy-web",
+      "timeout_seconds": 90,
+      "mutating": true,
+      "irreversible": false,
+      "expected_outcome": {
+        "phase": "launch",
+        "founderLaunchShape": true,
+        "auditAction": "launch"
+      },
+      "check": {
+        "argv": [
+          "node",
+          "ops/launch/course-visibility.mjs",
+          "--mode",
+          "check",
+          "--phase",
+          "launch",
+          "--approval-reference",
+          "AL-10-FOUNDER-OPS-APPROVAL",
+          "--output-dir",
+          "ops/launch/run-output/course-visibility"
+        ],
+        "cwd": "academy-web",
+        "timeout_seconds": 60
+      }
+    },
+    {
+      "id": "access-expose-public",
+      "label": "Keep only admin API and player families internal in Cloudflare Access",
+      "argv": [
+        "node",
+        "ops/launch/cloudflare-access.mjs",
+        "--mode",
+        "apply",
+        "--output-dir",
+        "ops/launch/run-output/access",
+        "--timeout-ms",
+        "15000"
+      ],
+      "cwd": "academy-web",
+      "timeout_seconds": 240,
+      "mutating": true,
+      "irreversible": false,
+      "expected_outcome": {
+        "phase": "launch",
+        "adminInternalOnly": true,
+        "internalFamilies": [
+          "/admin",
+          "/api/admin",
+          "/player"
+        ]
+      },
+      "check": {
+        "argv": [
+          "node",
+          "ops/launch/cloudflare-access.mjs",
+          "--mode",
+          "check",
+          "--phase",
+          "launch",
+          "--output-dir",
+          "ops/launch/run-output/access",
+          "--timeout-ms",
+          "15000"
+        ],
+        "cwd": "academy-web",
+        "timeout_seconds": 120
+      }
+    },
+    {
+      "id": "public-launch-postcheck",
+      "label": "Run the public launch exposure and raw workers.dev verification",
+      "argv": [
+        "npm",
+        "run",
+        "verify:launch-exposure",
+        "--",
+        "--base",
+        "https://academy.cyberskills.co.th",
+        "--expect",
+        "public",
+        "--raw-host",
+        "https://cyberskills-academy.songpon-te.workers.dev",
+        "--timeout-ms",
+        "8000"
+      ],
+      "cwd": "academy-web",
+      "timeout_seconds": 180,
+      "mutating": true,
+      "irreversible": false,
+      "expected_outcome": {
+        "phase": "postcheck",
+        "overall": true,
+        "failed": 0,
+        "rawHost404": true
+      },
+      "check": {
+        "argv": [
+          "node",
+          "ops/launch/postcheck.mjs",
+          "--mode",
+          "check",
+          "--base",
+          "https://academy.cyberskills.co.th",
+          "--raw-host",
+          "https://cyberskills-academy.songpon-te.workers.dev",
+          "--output-dir",
+          "ops/launch/run-output/postcheck",
+          "--timeout-ms",
+          "8000"
+        ],
+        "cwd": "academy-web",
+        "timeout_seconds": 180
+      }
+    }
+  ]
+}

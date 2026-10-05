@@ -175,29 +175,11 @@ The five-object remote R2 activation report proves object integrity and preview 
 
 ## 4. Exact course visibility change
 
-**Precondition:** AL-03 is deployed and independently reviewed, AL-09 is complete, and the §2.2 baseline export exists. If AL-03 is absent, do not change Access: the six hidden courses could remain reachable by direct public overview, lesson, or API path.
+**Precondition:** AL-03 is deployed and independently reviewed, AL-09 is complete (including reviewed migration `0043_launch_course_visibility_rpc.sql`), and the §2.2 baseline export exists. If AL-03 or the audited launch RPC is absent, do not change Access: the six hidden courses could remain reachable, or the runner would have no safe non-session visibility path.
 
 The AL-03 scope named in the gathering covers sitemap, `authorizeCourseResource`, the free-start page, and the enrol RPC. The public overview files still call `getPublicCourse()` without `course_settings` in the inspected source candidate. Therefore this runbook treats direct overview enforcement as an explicit additional AL-03/AL-09 launch requirement; AL-10's page-404 acceptance cannot be waived.
 
-Use the owner-signed Academy session at `/admin/courses`. Do not write `course_settings` directly with SQL. The equivalent audited owner API is:
-
-```http
-PATCH /api/admin/courses/{slug}
-Content-Type: application/json
-
-{"visibility":"published"}
-```
-
-or:
-
-```http
-PATCH /api/admin/courses/{slug}
-Content-Type: application/json
-
-{"visibility":"unpublished"}
-```
-
-The API accepts only `published | unpublished | retired | inherit`, requires the owner role, validates Origin, and records the owner in the settings row ([API](../../academy-web/src/app/%28site%29/api/admin/courses/%5Bslug%5D/route.ts), [schema](../../academy-web/supabase/migrations/0039_course_settings.sql)).
+Do not write `course_settings` directly with SQL and do not reuse a human owner browser session in the one-click runner. Migration `0043` adds the narrowly scoped `academy.set_launch_course_visibility` / `academy.inspect_launch_course_visibility` RPCs. A member of `academy_staff_admin` may execute only those functions; it receives no `course_settings` table rights. Inside one transaction the RPC requires the protected pre-launch state hash, derives the sole active owner, applies only the founder-approved eight-course shape, and appends `before_state`, `after_state`, owner account, founder approval reference, row count, and time to `course_settings_launch_audit`. Rollback accepts only the exact audited pre-launch state and records the reverse transition. The trade-off is a new reviewed schema migration and a scoped launch database credential; this is preferred over direct SQL or a borrowed owner session because attribution and exact-state recovery remain durable.
 
 ### 4.1 Launch target
 
@@ -214,7 +196,7 @@ The API accepts only `published | unpublished | retired | inherit`, requires the
 
 Use `unpublished`, not `retired`, for the six launch-hidden courses. `retired` is a stronger soft-delete and is not needed to shape the first launch.
 
-After the eight operations, reload `/admin/courses` and require:
+After the RPC commits, its read-only inspection must require:
 
 - `basic-os-linux` and `git-essentials`: effective visibility `published`, overridden `true`;
 - all six other courses: effective visibility `unpublished`, overridden `true`;
@@ -483,6 +465,7 @@ Evidence classification for launch operators must remain explicit:
 - Access IDs and 302 probes: [`reports/reviews/academy-canonical-domain-deployment-receipt-20260823.json`](../reviews/academy-canonical-domain-deployment-receipt-20260823.json)
 - Security findings driving AL-01..AL-05: [`academy-web/reports/security-review-2026-09-19.md`](../../academy-web/reports/security-review-2026-09-19.md)
 - Course settings schema/owner API: [`academy-web/supabase/migrations/0039_course_settings.sql`](../../academy-web/supabase/migrations/0039_course_settings.sql), [`academy-web/src/app/(site)/api/admin/courses/[slug]/route.ts`](../../academy-web/src/app/%28site%29/api/admin/courses/%5Bslug%5D/route.ts)
+- Audited launch RPC and typed runbook: [`academy-web/supabase/migrations/0043_launch_course_visibility_rpc.sql`](../../academy-web/supabase/migrations/0043_launch_course_visibility_rpc.sql), [`academy-web/ops/runbooks/AL-10.json`](../../academy-web/ops/runbooks/AL-10.json), [`academy-web/ops/launch/course-visibility.mjs`](../../academy-web/ops/launch/course-visibility.mjs)
 - Public route policy: [`academy-web/src/middleware.ts`](../../academy-web/src/middleware.ts)
 - Internal surface configuration: [`academy-web/wrangler.jsonc`](../../academy-web/wrangler.jsonc)
 - Retention contract: [`academy-web/docs/academy-retention-scheduler.md`](../../academy-web/docs/academy-retention-scheduler.md), [`academy-web/ops/academy-retention-worker/retention.ts`](../../academy-web/ops/academy-retention-worker/retention.ts)
