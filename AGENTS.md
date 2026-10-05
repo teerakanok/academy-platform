@@ -12,9 +12,9 @@
 
 For every Academy session:
 
-1. Read director context: `../../../AGENTS.md`.
+1. The director contract normally arrives through your user adapter; if it is not in your context, read `/Users/teerakanok/Dev/cyberskills-director-governance/AGENTS.md`.
 2. Read this file.
-3. Read `plans/active_plan.md` for the current open slice. Read `plans/completed_log.md` only when tracing a prior decision, evidence, or residual risk.
+3. Read `plans/NOW.md` (3 KB at most: the current slice, open gates, and pointers). Open `plans/active_plan.md` only at the section NOW.md points to, or when you change the plan. Whoever changes the current slice or a gate in `active_plan.md` updates `NOW.md` in the same commit. Read `plans/completed_log.md` only when tracing a prior decision, evidence, or residual risk.
 4. Read local `principles/` and `skills/` only when the task matches a project-specific addition.
 5. For operations, incident response, backup, restore, rollback, or secret inventory work, read `docs/maintenance/README.md`.
 6. For cross-product work, read `../../../ecosystem/ECOSYSTEM.md`.
@@ -179,7 +179,7 @@ commit) — เวอร์ชัน/รายละเอียดตรึง�
 
 ## Security baseline (inherit ecosystem standard)
 
-Follow the CYBERSKILLS cross-product security baseline (repo-root `AGENTS.md` → "Security Baseline"): input validation; secrets in `.env` only (never hardcode); error sanitization; explicit CORS (no `*` in prod); dependency pinning + SBOM; admin/route protection with required auth tokens; docs endpoints disabled in production; internal services bound to localhost. Any feature handling learner PII must honor **PDPA** (consent + privacy notice) since the audience includes Thailand.
+Follow the CYBERSKILLS cross-product security baseline (the installed governance root's `principles/security-and-authorization.md`): input validation; secrets in `.env` only (never hardcode); error sanitization; explicit CORS (no `*` in prod); dependency pinning + SBOM; admin/route protection with required auth tokens; docs endpoints disabled in production; internal services bound to localhost. Any feature handling learner PII must honor **PDPA** (consent + privacy notice) since the audience includes Thailand.
 
 ---
 
