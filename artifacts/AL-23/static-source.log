@@ -1,0 +1,11 @@
+# AL-23 static/source gates
+2026-10-05T16:52:36Z
+## node syntax
+node syntax PASS
+## governance manifests
+AL-09 PASS steps=9 targets=2
+AL-21 PASS steps=6 targets=1
+## scoped eslint
+scoped eslint PASS
+## app TypeScript
+app TypeScript PASS

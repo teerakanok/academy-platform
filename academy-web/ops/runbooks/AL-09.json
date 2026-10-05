@@ -1,0 +1,113 @@
+{
+  "schema": "gathering-ops/v1",
+  "operation": "deploy",
+  "summary": "Typed AL-09 security release: prepare exact cfa59b4 source, back up Academy schema/data, rehearse and apply 0041/0042, then build, upload, activate, and verify the Cloudflare Worker.",
+  "change": "Extracts the pinned cfa59b4 tree into approved state, creates a root-owned 0600 Academy backup on ssh-db, applies only 0041 and 0042 under SET LOCAL ROLE postgres with ROLLBACK rehearsal then COMMIT, and deploys that exact source at 100%.",
+  "verification": "Source archive and every pinned file hash are checked. Backup mode/bytes/SHA-256/archive-list count and migration catalogs are read back. Wrangler inventory proves the tagged candidate; deployment and gated exposure postchecks prove the active version. Migrations 0034/0035 are never invoked.",
+  "recovery_limit": "Worker only: run the repo-pinned wrangler command versions deploy <recorded previous_version_id>@100 --name cyberskills-academy, then repeat deployment/exposure checks. Database changes are retained; restore from the recorded dump only by a separate founder-authorized incident decision.",
+  "targets": [
+    {"provider":"cloudflare","resource_id":"worker:cyberskills-academy","display":"Cloudflare Worker cyberskills-academy"},
+    {"provider":"ssh","resource_id":"host:ssh-db.cyberskills.co.th:supabase-db:postgres:academy","display":"Pool A Academy PostgreSQL schema on ssh-db"}
+  ],
+  "execution_inputs": [
+    "academy-web/ops/runbooks/AL-09.json",
+    "academy-web/ops/release/common.mjs",
+    "academy-web/ops/release/source-prepare.mjs",
+    "academy-web/ops/release/target-identity.mjs",
+    "academy-web/ops/release/db-backup.mjs",
+    "academy-web/ops/release/db-migration.mjs",
+    "academy-web/ops/release/npm-ci.mjs",
+    "academy-web/ops/release/build-cf.mjs",
+    "academy-web/ops/release/versions-upload.mjs",
+    "academy-web/ops/release/deploy-100.mjs",
+    "academy-web/ops/release/postcheck.mjs",
+    "academy-web/scripts/build-cloudflare.sh",
+    "academy-web/scripts/workerd-signer-check.mjs",
+    "academy-web/scripts/sync-open-next-cache.mjs",
+    "academy-web/scripts/check-open-next-assets.mjs",
+    "academy-web/scripts/check-final-worker-startup.mjs",
+    "academy-web/open-next.config.ts",
+    "academy-web/scripts/verify-launch-exposure.mjs",
+    "academy-web/package.json",
+    "academy-web/package-lock.json"
+  ],
+  "writable_outputs": ["academy-web/ops/runbooks/state/AL-09"],
+  "dependencies": [
+    "Cloudflare authentication is supplied only as CLOUDFLARE_API_TOKEN by the host.",
+    "SSH agent authentication is supplied only as SSH_AUTH_SOCK for root@ssh-db.cyberskills.co.th.",
+    "The supabase-db container and Pool A postgres/academy schema are reachable.",
+    "The host Git object database contains cfa59b4df7db480a7254f35dcea7fb98bbfdc58d.",
+    "AL-07 native Postgres evidence remains PASS; production 0041/0042 are initially pending and 0034/0035 are never re-applied."
+  ],
+  "runtime_env": ["CLOUDFLARE_API_TOKEN", "SSH_AUTH_SOCK"],
+  "target_identity": {
+    "argv": ["node","academy-web/ops/release/target-identity.mjs","run","--card","AL-09"],
+    "cwd": ".",
+    "timeout_seconds": 60
+  },
+  "steps": [
+    {
+      "id":"source-prepare","label":"Extract and hash-verify the exact cfa59b4 application tree",
+      "argv":["node","academy-web/ops/release/source-prepare.mjs","run","--card","AL-09"],
+      "cwd":".","timeout_seconds":180,"mutating":true,"irreversible":false,
+      "expected_outcome":{"archive_verified":true,"commit":"cfa59b4df7db480a7254f35dcea7fb98bbfdc58d"},
+      "check":{"argv":["node","academy-web/ops/release/source-prepare.mjs","check","--card","AL-09"],"cwd":".","timeout_seconds":120}
+    },
+    {
+      "id":"db-backup","label":"Create and verify a new Academy schema-plus-data backup on ssh-db",
+      "argv":["node","academy-web/ops/release/db-backup.mjs","run","--card","AL-09"],
+      "cwd":".","timeout_seconds":280,"mutating":true,"irreversible":false,
+      "expected_outcome":{"backup_verified":true,"mode":"0600"},
+      "check":{"argv":["node","academy-web/ops/release/db-backup.mjs","check","--card","AL-09"],"cwd":".","timeout_seconds":90}
+    },
+    {
+      "id":"apply-0041","label":"Rehearse ROLLBACK then COMMIT migration 0041 only",
+      "argv":["node","academy-web/ops/release/db-migration.mjs","run","--migration","0041","--card","AL-09"],
+      "cwd":".","timeout_seconds":180,"mutating":true,"irreversible":false,
+      "expected_outcome":{"migration":"0041","service_role_grants_absent":true},
+      "check":{"argv":["node","academy-web/ops/release/db-migration.mjs","check","--migration","0041","--card","AL-09"],"cwd":".","timeout_seconds":90}
+    },
+    {
+      "id":"apply-0042","label":"Rehearse ROLLBACK then COMMIT migration 0042 only",
+      "argv":["node","academy-web/ops/release/db-migration.mjs","run","--migration","0042","--card","AL-09"],
+      "cwd":".","timeout_seconds":180,"mutating":true,"irreversible":false,
+      "expected_outcome":{"migration":"0042","course_visibility_enforced":true},
+      "check":{"argv":["node","academy-web/ops/release/db-migration.mjs","check","--migration","0042","--card","AL-09"],"cwd":".","timeout_seconds":90}
+    },
+    {
+      "id":"npm-ci","label":"Install the exact lockfile dependencies in the pinned source",
+      "argv":["node","academy-web/ops/release/npm-ci.mjs","run","--card","AL-09"],
+      "cwd":".","timeout_seconds":300,"mutating":true,"irreversible":false,
+      "expected_outcome":{"dependencies_installed":true},
+      "check":{"argv":["node","academy-web/ops/release/npm-ci.mjs","check","--card","AL-09"],"cwd":".","timeout_seconds":90}
+    },
+    {
+      "id":"build-cf","label":"Build the Cloudflare Worker from the pinned source",
+      "argv":["node","academy-web/ops/release/build-cf.mjs","run","--card","AL-09"],
+      "cwd":".","timeout_seconds":300,"mutating":true,"irreversible":false,
+      "expected_outcome":{"build_completed":true,"source_commit":"cfa59b4df7db480a7254f35dcea7fb98bbfdc58d"},
+      "check":{"argv":["node","academy-web/ops/release/build-cf.mjs","check","--card","AL-09"],"cwd":".","timeout_seconds":90}
+    },
+    {
+      "id":"versions-upload","label":"Upload a tagged Worker candidate using the repo-pinned wrangler",
+      "argv":["node","academy-web/ops/release/versions-upload.mjs","run","--card","AL-09"],
+      "cwd":".","timeout_seconds":240,"mutating":true,"irreversible":false,
+      "expected_outcome":{"uploaded":true,"source_commit":"cfa59b4df7db480a7254f35dcea7fb98bbfdc58d"},
+      "check":{"argv":["node","academy-web/ops/release/versions-upload.mjs","check","--card","AL-09"],"cwd":".","timeout_seconds":90}
+    },
+    {
+      "id":"deploy-100","label":"Record the predecessor and activate the candidate at 100%",
+      "argv":["node","academy-web/ops/release/deploy-100.mjs","run","--card","AL-09"],
+      "cwd":".","timeout_seconds":180,"mutating":true,"irreversible":false,
+      "expected_outcome":{"traffic_percentage":100},
+      "check":{"argv":["node","academy-web/ops/release/deploy-100.mjs","check","--card","AL-09"],"cwd":".","timeout_seconds":90}
+    },
+    {
+      "id":"postcheck","label":"Verify gated exposure, raw-host denial, and deployment readback",
+      "argv":["node","academy-web/ops/release/postcheck.mjs","run","--card","AL-09"],
+      "cwd":".","timeout_seconds":150,"mutating":true,"irreversible":false,
+      "expected_outcome":{"postcheck_passed":true},
+      "check":{"argv":["node","academy-web/ops/release/postcheck.mjs","check","--card","AL-09"],"cwd":".","timeout_seconds":60}
+    }
+  ]
+}

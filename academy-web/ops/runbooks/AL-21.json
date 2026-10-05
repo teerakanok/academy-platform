@@ -1,0 +1,88 @@
+{
+  "schema": "gathering-ops/v1",
+  "operation": "deploy",
+  "summary": "Typed AL-21 content release: prepare exact 00f07ed source, install dependencies, build, upload, activate at 100%, and verify the still-gated Academy Worker.",
+  "change": "Extracts and hash-verifies the 00f07ed tree, runs the lockfile install and Cloudflare build in that exact source, uploads a tagged candidate, records its predecessor, and activates only that candidate at 100%. No database step runs.",
+  "verification": "The source archive and pinned file hashes are checked before every mutation. The repo-pinned wrangler inventory proves the exact tagged candidate; deployment readback must show it at 100%. Canonical host and raw workers.dev exposure checks remain gated.",
+  "recovery_limit": "Worker only: run the repo-pinned wrangler command versions deploy <recorded previous_version_id>@100 --name cyberskills-academy, then repeat deployment and gated exposure checks. No database or course-visibility change is made or reversed by this runbook.",
+  "targets": [
+    {"provider":"cloudflare","resource_id":"worker:cyberskills-academy","display":"Cloudflare Worker cyberskills-academy"}
+  ],
+  "execution_inputs": [
+    "academy-web/ops/runbooks/AL-21.json",
+    "academy-web/ops/release/common.mjs",
+    "academy-web/ops/release/source-prepare.mjs",
+    "academy-web/ops/release/target-identity.mjs",
+    "academy-web/ops/release/npm-ci.mjs",
+    "academy-web/ops/release/build-cf.mjs",
+    "academy-web/ops/release/versions-upload.mjs",
+    "academy-web/ops/release/deploy-100.mjs",
+    "academy-web/ops/release/postcheck.mjs",
+    "academy-web/scripts/build-cloudflare.sh",
+    "academy-web/scripts/workerd-signer-check.mjs",
+    "academy-web/scripts/sync-open-next-cache.mjs",
+    "academy-web/scripts/check-open-next-assets.mjs",
+    "academy-web/scripts/check-final-worker-startup.mjs",
+    "academy-web/open-next.config.ts",
+    "academy-web/scripts/verify-launch-exposure.mjs",
+    "academy-web/package.json",
+    "academy-web/package-lock.json"
+  ],
+  "writable_outputs": ["academy-web/ops/runbooks/state/AL-21"],
+  "dependencies": [
+    "Cloudflare authentication is supplied only as CLOUDFLARE_API_TOKEN by the host.",
+    "AL-09 is already applied and its database changes are retained.",
+    "The host Git object database contains 00f07ed1528b04b755b8da5e0703aa4c3143df36.",
+    "The AL-20 source gate remains PASS for this exact content release."
+  ],
+  "runtime_env": ["CLOUDFLARE_API_TOKEN"],
+  "target_identity": {
+    "argv": ["node","academy-web/ops/release/target-identity.mjs","run","--card","AL-21"],
+    "cwd": ".",
+    "timeout_seconds":60
+  },
+  "steps": [
+    {
+      "id":"source-prepare","label":"Extract and hash-verify the exact 00f07ed application tree",
+      "argv":["node","academy-web/ops/release/source-prepare.mjs","run","--card","AL-21"],
+      "cwd":".","timeout_seconds":180,"mutating":true,"irreversible":false,
+      "expected_outcome":{"archive_verified":true,"commit":"00f07ed1528b04b755b8da5e0703aa4c3143df36"},
+      "check":{"argv":["node","academy-web/ops/release/source-prepare.mjs","check","--card","AL-21"],"cwd":".","timeout_seconds":120}
+    },
+    {
+      "id":"npm-ci","label":"Install the exact lockfile dependencies in the pinned source",
+      "argv":["node","academy-web/ops/release/npm-ci.mjs","run","--card","AL-21"],
+      "cwd":".","timeout_seconds":300,"mutating":true,"irreversible":false,
+      "expected_outcome":{"dependencies_installed":true},
+      "check":{"argv":["node","academy-web/ops/release/npm-ci.mjs","check","--card","AL-21"],"cwd":".","timeout_seconds":90}
+    },
+    {
+      "id":"build-cf","label":"Build the Cloudflare Worker from the pinned content source",
+      "argv":["node","academy-web/ops/release/build-cf.mjs","run","--card","AL-21"],
+      "cwd":".","timeout_seconds":300,"mutating":true,"irreversible":false,
+      "expected_outcome":{"build_completed":true,"source_commit":"00f07ed1528b04b755b8da5e0703aa4c3143df36"},
+      "check":{"argv":["node","academy-web/ops/release/build-cf.mjs","check","--card","AL-21"],"cwd":".","timeout_seconds":90}
+    },
+    {
+      "id":"versions-upload","label":"Upload a tagged Worker candidate using the repo-pinned wrangler",
+      "argv":["node","academy-web/ops/release/versions-upload.mjs","run","--card","AL-21"],
+      "cwd":".","timeout_seconds":240,"mutating":true,"irreversible":false,
+      "expected_outcome":{"uploaded":true,"source_commit":"00f07ed1528b04b755b8da5e0703aa4c3143df36"},
+      "check":{"argv":["node","academy-web/ops/release/versions-upload.mjs","check","--card","AL-21"],"cwd":".","timeout_seconds":90}
+    },
+    {
+      "id":"deploy-100","label":"Record the AL-09 predecessor and activate the content candidate at 100%",
+      "argv":["node","academy-web/ops/release/deploy-100.mjs","run","--card","AL-21"],
+      "cwd":".","timeout_seconds":180,"mutating":true,"irreversible":false,
+      "expected_outcome":{"traffic_percentage":100},
+      "check":{"argv":["node","academy-web/ops/release/deploy-100.mjs","check","--card","AL-21"],"cwd":".","timeout_seconds":90}
+    },
+    {
+      "id":"postcheck","label":"Verify gated exposure, raw-host denial, and deployment readback",
+      "argv":["node","academy-web/ops/release/postcheck.mjs","run","--card","AL-21"],
+      "cwd":".","timeout_seconds":150,"mutating":true,"irreversible":false,
+      "expected_outcome":{"postcheck_passed":true},
+      "check":{"argv":["node","academy-web/ops/release/postcheck.mjs","check","--card","AL-21"],"cwd":".","timeout_seconds":60}
+    }
+  ]
+}
