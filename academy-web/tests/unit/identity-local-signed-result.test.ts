@@ -72,7 +72,7 @@ describe('Academy local signed Identity Control results', () => {
       NODE_ENV: 'test',
       ACADEMY_IDENTITY_CONTROL_LOCAL_FIXTURE: '1',
       ACADEMY_IDENTITY_CONTROL_LOCAL_APP_ORIGIN: 'http://localhost:3000',
-      ACADEMY_IDENTITY_CONTROL_LOCAL_ACCOUNT_CENTER_ORIGIN: 'http://localhost:5173',
+      ACADEMY_IDENTITY_CONTROL_LOCAL_ACCOUNT_CENTER_ORIGIN: 'http://localhost:21200',
       ACADEMY_IDENTITY_CONTROL_LOCAL_API_ORIGIN: 'http://localhost:8788',
       ACADEMY_IDENTITY_CONTROL_LOCAL_STATE_DIRECTORY: stateDirectory,
     }

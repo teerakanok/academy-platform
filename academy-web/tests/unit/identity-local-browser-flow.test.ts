@@ -124,7 +124,7 @@ describe('Academy local Identity Control browser flow', () => {
       NODE_ENV: 'test',
       ACADEMY_IDENTITY_CONTROL_LOCAL_FIXTURE: '1',
       ACADEMY_IDENTITY_CONTROL_LOCAL_APP_ORIGIN: 'http://localhost:3000',
-      ACADEMY_IDENTITY_CONTROL_LOCAL_ACCOUNT_CENTER_ORIGIN: 'http://localhost:5173',
+      ACADEMY_IDENTITY_CONTROL_LOCAL_ACCOUNT_CENTER_ORIGIN: 'http://localhost:21200',
       ACADEMY_IDENTITY_CONTROL_LOCAL_API_ORIGIN: 'http://localhost:8788',
       ACADEMY_IDENTITY_CONTROL_LOCAL_STATE_DIRECTORY: stateDirectory,
       RATE_LIMIT_KEY_SECRET: 'local-identity-browser-flow-secret-32b',
@@ -151,7 +151,7 @@ describe('Academy local Identity Control browser flow', () => {
     })))
     expect(started.status).toBe(303)
     const accountCenterUrl = new URL(started.headers.get('location')!)
-    expect(accountCenterUrl.origin + accountCenterUrl.pathname).toBe('http://localhost:5173/sign-in')
+    expect(accountCenterUrl.origin + accountCenterUrl.pathname).toBe('http://localhost:21200/sign-in')
     expect([...accountCenterUrl.searchParams.keys()].sort()).toEqual([
       'client_id',
       'code_challenge',

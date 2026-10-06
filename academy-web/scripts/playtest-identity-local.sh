@@ -35,7 +35,7 @@ if ! command -v nc >/dev/null 2>&1; then
   exit 1
 fi
 
-for port in 8788 5173 3000; do
+for port in 8788 21200 3000; do
   port_pids="$(lsof -t -nP -iTCP:"$port" -sTCP:LISTEN || true)"
   if [[ -n "$port_pids" ]]; then
     echo "พอร์ต $port ถูกใช้อยู่โดย PID: $(echo "$port_pids" | tr "\n" " ")" >&2
@@ -130,13 +130,13 @@ wait_for_service "control-api" "${pids[0]}" 8788
 
 start_service "account-center" "$IDENTITY_ROOT" \
   npm run dev --workspace apps/account-center
-wait_for_service "account-center" "${pids[1]}" 5173
+wait_for_service "account-center" "${pids[1]}" 21200
 
 start_service "academy" "$ACADEMY_WEB" \
   env \
     ACADEMY_IDENTITY_CONTROL_LOCAL_FIXTURE=1 \
     ACADEMY_IDENTITY_CONTROL_LOCAL_APP_ORIGIN=http://localhost:3000 \
-    ACADEMY_IDENTITY_CONTROL_LOCAL_ACCOUNT_CENTER_ORIGIN=http://localhost:5173 \
+    ACADEMY_IDENTITY_CONTROL_LOCAL_ACCOUNT_CENTER_ORIGIN=http://localhost:21200 \
     npm run dev
 wait_for_service "academy" "${pids[2]}" 3000
 
