@@ -42,9 +42,9 @@ import { setTimeout as delay } from 'node:timers/promises'
 import { fileURLToPath } from 'node:url'
 import { unstable_readConfig } from 'wrangler'
 
-// โซน ephemeral ตาม ecosystem/PORT_REGISTRY.md — ไม่จองเลขถาวร
-const PORT = 61987
-const INSPECTOR_PORT = 61988
+// Auxiliary slot 9; run separately from the Supabase inspector on 20698.
+const PORT = 20699
+const INSPECTOR_PORT = 20698
 const BOOT_TIMEOUT_MS = 120_000
 const REQUEST_TIMEOUT_MS = 30_000
 

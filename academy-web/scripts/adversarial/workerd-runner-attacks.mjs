@@ -26,7 +26,7 @@ import { fileURLToPath } from 'node:url'
 
 import { assertPristine, restoreOnExit, Sandbox } from './sandbox.mjs'
 
-const PORT = 61987
+const PORT = 20699
 const root = fileURLToPath(new URL('../..', import.meta.url))
 const runner = 'scripts/workerd-signer-check.mjs'
 const appConfig = 'wrangler.jsonc'
