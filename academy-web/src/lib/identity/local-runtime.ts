@@ -56,7 +56,7 @@ export function createIdentityLocalRuntime(request: Pick<Request, 'url'>) {
     if (!identityControlLocalFixtureAllowedForRequest(request)) throw new IdentityLocalRuntimeError()
     const appOrigin = requireLocalOrigin(process.env.ACADEMY_IDENTITY_CONTROL_LOCAL_APP_ORIGIN)
     const accountCenterOrigin = requireLocalOrigin(
-      process.env.ACADEMY_IDENTITY_CONTROL_LOCAL_ACCOUNT_CENTER_ORIGIN ?? 'http://localhost:5173',
+      process.env.ACADEMY_IDENTITY_CONTROL_LOCAL_ACCOUNT_CENTER_ORIGIN ?? 'http://localhost:21200',
     )
     const apiOrigin = requireLocalOrigin(
       process.env.ACADEMY_IDENTITY_CONTROL_LOCAL_API_ORIGIN ?? 'http://localhost:8788',

@@ -27,7 +27,7 @@ test('Academy sign-in returns from Account Center to an honest empty dashboard',
   })
 
   await page.getByTestId('identity-control-continue').click()
-  await expect(page).toHaveURL(/^http:\/\/localhost:5173\/sign-in\?/)
+  await expect(page).toHaveURL(/^http:\/\/localhost:21200\/sign-in\?/)
   await expect(page.getByRole('heading', { level: 1, name: 'CYBERSKILLS Account' })).toBeVisible()
   await expect(page.getByText('CyberSkills Academy', { exact: true })).toBeVisible()
   await expect(page.getByText('After verifying your email, you will return to CyberSkills Academy.')).toBeVisible()
@@ -73,7 +73,7 @@ test('Academy sign-in returns from Account Center to an honest empty dashboard',
 
 test('Account Center refuses a malformed Academy authorization instead of downgrading to fixture sign-in', async ({ page }) => {
   await page.goto(
-    'http://localhost:5173/sign-in?client_id=academy-web-local&client_id=duplicate&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fauth%2Fcallback',
+    'http://localhost:21200/sign-in?client_id=academy-web-local&client_id=duplicate&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fauth%2Fcallback',
   )
 
   await expect(page.getByRole('alert')).toContainText('Sign-in is temporarily unavailable')
