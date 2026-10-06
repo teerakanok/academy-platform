@@ -10,4 +10,5 @@ evidence.
 
 - `maintenance/README.md` - maintenance index, production inventory, secret registry, backup/restore, rollback.
 - `academy-data-api.md` - dedicated Academy PostgREST boundary and rollback contract.
-- `adr/` - architectural decisions and drafts.
+- `decisions/` - numbered decision records (`NNNN-<slug>.md`).
+- `archive/` - moved history only.

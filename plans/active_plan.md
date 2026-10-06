@@ -1555,7 +1555,7 @@ UI เรนเดอร์จากไฟล์ (key จริง) และ `/
 - `0010` — attempt ที่ยังไม่ถูกใช้ถูกคืนซ้ำ · เปิดหน้าซ้ำ/สองแท็บไม่กินโควตา และ
   หมุนโจทย์ทิ้งด้วยการ refresh ไม่ได้อีก · หนึ่งช่องโควตา = หนึ่งชุดโจทย์ที่ใช้จริง
 - `0011` — `purge_expired_attempts()` ไม่แตะของที่ยังใช้ได้และช่วงที่โควตายังนับ
-  (**ยังไม่มีตัวตั้งเวลา** — เลือกกลไกอยู่ที่เจ้าของระบบ · PENDING_USER_ACTION §7b)
+  (**ยังไม่มีตัวตั้งเวลา** — เลือกกลไกอยู่ที่เจ้าของระบบ · plans/archive/archived-PENDING_USER_ACTION.md §7b)
 
 **RIL รอบ 3 — สองเลนอิสระ (reviewer xhigh + red-team) บน `1dc3de9`:**
 ชี้ตรงกันสามข้อ ปิดแล้วใน `347660b` (migration 0012):
@@ -1648,7 +1648,7 @@ validation ต่อ course เป็นรอบ pitch + poll ของ founder
   landing + PDPA + lead capture + schema `academy` RLS default deny
   (ดู `completed_log.md` entry 2026-07-31 one-shot executed); ส่วน deploy
   Vercel `sin1` / CNAME / Zero Trust = external checkpoints รอ founder ตาม
-  `PENDING_USER_ACTION.md` §1–3 (ห้ามทำใน AFK)
+  `plans/archive/archived-PENDING_USER_ACTION.md` §1–3 (ห้ามทำใน AFK)
 - [x] **M2 — Course player (commodity core):** ✅ **เสร็จ 2026-07-31** — loader
   เสพ Crucible portable JSON + practice (explanation/pool/shuffle/retake) +
   timed exam (deadline timer/resume) + PBQ checks/select/order + exhibit +
@@ -1658,7 +1658,7 @@ validation ต่อ course เป็นรอบ pitch + poll ของ founder
 - [~] **M3 — Identity + personalized path v0** — 🟡 **แกนหลักเสร็จ 2026-08-01**
   (auth ครบวงจร + gating + progress ผูกบัญชี พิสูจน์บน Cloudflare runtime แล้ว;
   เหลือ Google sign-in ที่ต้องใช้ OAuth credential จริง และหน้าโปรไฟล์/ชื่อจริง)
-  (founder เคาะ ADR ครบ 5 ข้อ; ดู `docs/adr/ADR-draft-single-account.md` §0)
+  (founder เคาะ ADR ครบ 5 ข้อ; ดู `docs/decisions/0001-single-account.md` §0)
   - **เคาะแล้ว:** Option A (shared issuer Pool A GoTrue + identity contract) ·
     เปิด asymmetric JWT/JWKS · consent ecosystem · **บังคับสมัครถ้าจะใช้**
     (founder overrule คำแนะนำเดิม — เหตุผล: ค่า infra ต่อหัวไม่ใช่ศูนย์ โดยเฉพาะ
@@ -1678,7 +1678,7 @@ validation ต่อ course เป็นรอบ pitch + poll ของ founder
   - ⚠️ ก่อนแตะ Pool A ทุกครั้ง อ่าน `ecosystem/SHARED_INFRA_ACCESS.md` และ `reports/state/supabase.md`
     ของ director repo ก่อน — เป็น shared infra ที่ Crux/STAR/Forge ใช้ร่วมกัน
   - **ติด external checkpoint:** asymmetric JWT/JWKS บน Pool A (founder เท่านั้น —
-    `PENDING_USER_ACTION.md` §4.1) · ระหว่างรอ ให้ verify ฝั่ง server ไปก่อน
+    `plans/archive/archived-PENDING_USER_ACTION.md` §4.1) · ระหว่างรอ ให้ verify ฝั่ง server ไปก่อน
     (แบบ Crux) ซึ่งไม่ต้องใช้ JWKS
   - **ต้อง DD สดตอนลงมือ:** ความสามารถ asymmetric JWT ของ GoTrue เวอร์ชันที่รันจริง
 
@@ -2216,7 +2216,7 @@ Academy เองเป็นงานที่จะถูกทิ้ง ค�
 
 This is **not a replacement for the learner-facing Academy**. Keep the original B2C / B2B learner path alive. This track is a parallel B2B/B2B2C wedge: sell commercial teaching capability to instructors, training centers, universities, bootcamps, and consultants who want to launch cert-prep classes quickly.
 
-Deep market research, competitor analysis, pricing model, and validation gates: `reports/train-the-trainer-market-research-2026-06-10.md`.
+Deep market research, competitor analysis, pricing model, and validation gates: `research/market/train-the-trainer-market-research-2026-06-10.md`.
 
 ### Concept
 

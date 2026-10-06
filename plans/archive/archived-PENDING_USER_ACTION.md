@@ -98,7 +98,7 @@ source และ Worker version ปัจจุบัน deploy แล้ว แ
 `retention.purge_failed` ที่ surfaced ชัดเจน.
 
 **หลักฐาน rollout:**
-[`reports/academy-retention-api-rollout-2026-08-06.md`](reports/academy-retention-api-rollout-2026-08-06.md).
+[`reports/academy-retention-api-rollout-2026-08-06.md`](../../reports/academy-retention-api-rollout-2026-08-06.md).
 
 ## Completed External Work
 
