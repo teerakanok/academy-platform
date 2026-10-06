@@ -42,9 +42,9 @@ import { setTimeout as delay } from 'node:timers/promises'
 import { fileURLToPath } from 'node:url'
 import { unstable_readConfig } from 'wrangler'
 
-// Auxiliary slot 9; run separately from the Supabase inspector on 20698.
+// Auxiliary slot 9; inspector stays separate from Supabase on 20698.
 const PORT = 20699
-const INSPECTOR_PORT = 20698
+const INSPECTOR_PORT = 20693
 const BOOT_TIMEOUT_MS = 120_000
 const REQUEST_TIMEOUT_MS = 30_000
 
