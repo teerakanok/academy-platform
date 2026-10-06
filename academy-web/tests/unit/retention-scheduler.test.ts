@@ -11,7 +11,7 @@ import {
 
 const secret = 'retention-test-secret-0123456789-abcdefghijklmnopqrstuvwxyz'
 const env = {
-  ACADEMY_RETENTION_API_URL: 'http://127.0.0.1:3102',
+  ACADEMY_RETENTION_API_URL: 'http://127.0.0.1:20601',
   ACADEMY_RETENTION_API_JWT_SECRET: secret,
 }
 const attempts: PurgeJob = { name: 'attempts', rpc: 'run_retention_attempts' }
@@ -41,7 +41,7 @@ describe('Academy retention scheduler', () => {
 
   it('accepts only exact HTTPS origins or local loopback', () => {
     expect(retentionApiBase('https://academy-retention.cyberskills.co.th').origin).toBe('https://academy-retention.cyberskills.co.th')
-    expect(retentionApiBase('http://127.0.0.1:3102').port).toBe('3102')
+    expect(retentionApiBase('http://127.0.0.1:20601').port).toBe('20601')
     for (const raw of ['http://example.test', 'https://academy-retention.cyberskills.co.th/path', 'https://user@example.test', 'https://example.test?x=1']) {
       expect(() => retentionApiBase(raw)).toThrow()
     }

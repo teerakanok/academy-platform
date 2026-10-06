@@ -145,7 +145,7 @@ local-only values. Its JWT secret must match the Worker `.dev.vars` secret below
 ```dotenv
 PGRST_DB_URI=postgres://academy_retention_api_authenticator:<local-only-password>@db:5432/postgres
 PGRST_JWT_SECRET=<local-test-only-secret>
-ACADEMY_RETENTION_API_PORT=3102
+ACADEMY_RETENTION_API_PORT=20601
 ```
 
 Start the dedicated local API with the tracked local override, then require its
@@ -157,7 +157,7 @@ docker compose --env-file ops/academy-retention-api/.env.academy-retention-api \
   -f ops/academy-retention-api/docker-compose.local.yml up -d
 docker compose -f ops/academy-retention-api/docker-compose.yml \
   -f ops/academy-retention-api/docker-compose.local.yml ps
-curl --fail --silent --show-error http://127.0.0.1:3102/
+curl --fail --silent --show-error http://127.0.0.1:20601/
 ```
 
 First provision the test-only database sentinel with a fresh non-secret
@@ -177,7 +177,7 @@ Wrangler config with a loopback API URL and a local-only JWT secret. Do not use
 a production URL or secret.
 
 ```dotenv
-ACADEMY_RETENTION_API_URL=http://127.0.0.1:3102
+ACADEMY_RETENTION_API_URL=http://127.0.0.1:20601
 ACADEMY_RETENTION_API_JWT_SECRET=<local-test-only-secret>
 ```
 
