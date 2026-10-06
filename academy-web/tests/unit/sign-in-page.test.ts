@@ -94,7 +94,7 @@ describe('closed sign-in state', () => {
 
   it('shows the agreement with the usable sign-in form', async () => {
     vi.stubEnv('ACADEMY_LEGACY_DIRECT_OTP_LOCAL_FIXTURE', '1')
-    vi.stubEnv('NEXT_PUBLIC_SUPABASE_URL', 'http://127.0.0.1:54321')
+    vi.stubEnv('NEXT_PUBLIC_SUPABASE_URL', 'http://127.0.0.1:20605')
     vi.stubEnv('NEXT_PUBLIC_SUPABASE_ANON_KEY', 'public-test-key')
 
     const page = await renderSignInPage()
@@ -157,7 +157,7 @@ describe('closed sign-in state', () => {
 
   it('does not show the legacy OTP form on a public Academy host even with a copied local fixture config', async () => {
     vi.stubEnv('ACADEMY_LEGACY_DIRECT_OTP_LOCAL_FIXTURE', '1')
-    vi.stubEnv('NEXT_PUBLIC_SUPABASE_URL', 'http://localhost:54321')
+    vi.stubEnv('NEXT_PUBLIC_SUPABASE_URL', 'http://localhost:20605')
     vi.stubEnv('NEXT_PUBLIC_SUPABASE_ANON_KEY', 'local-public-fixture-key')
 
     const page = await renderSignInPage('academy.cyberskills.co.th')

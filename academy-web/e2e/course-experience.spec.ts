@@ -26,7 +26,7 @@ test.describe('public-to-learner course transition', () => {
     await context.addCookies([{
       name: 'academy.lang',
       value: 'th',
-      url: 'http://127.0.0.1:61001',
+      url: 'http://127.0.0.1:20609',
     }])
     await page.goto('/')
     await page.waitForTimeout(200)
@@ -191,7 +191,7 @@ test.describe('public-to-learner course transition', () => {
       {
         name: 'academy.lang',
         value: 'en',
-        url: 'http://127.0.0.1:61001',
+        url: 'http://127.0.0.1:20609',
       },
     ])
     await page.goto(`${coursePath('th')}?utm_source=locale-test#roadmap-heading`)
@@ -246,7 +246,7 @@ test.describe('public-to-learner course transition', () => {
       {
         name: 'academy.lang',
         value: 'th',
-        url: 'http://127.0.0.1:61001',
+        url: 'http://127.0.0.1:20609',
       },
     ])
     await page.goto(LEGACY_COURSE_PATH)
@@ -262,7 +262,7 @@ test.describe('public-to-learner course transition', () => {
       {
         name: 'academy.lang',
         value: 'th',
-        url: 'http://127.0.0.1:61001',
+        url: 'http://127.0.0.1:20609',
       },
     ])
     const legacy = `${LEGACY_COURSE_PATH}?lang=th&utm_source=locale-test#roadmap-heading`
@@ -310,7 +310,7 @@ test.describe('public-to-learner course transition', () => {
       {
         name: 'academy.lang',
         value: 'en',
-        url: 'http://127.0.0.1:61001',
+        url: 'http://127.0.0.1:20609',
       },
     ])
     await page.route('**/api/progress?**', async (route) => {
@@ -454,7 +454,7 @@ test.describe('public-to-learner course transition', () => {
       {
         name: 'academy.lang',
         value: 'th',
-        url: 'http://127.0.0.1:61001',
+        url: 'http://127.0.0.1:20609',
       },
     ])
     await page.goto(`${CATALOG_PATH}?lang=th&lang=de`)
