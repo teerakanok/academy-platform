@@ -12,7 +12,7 @@ import { Client } from 'pg'
 // ล็อกอินผ่าน API + อ่านรหัสจากกล่องจดหมายทดสอบของ local Supabase (mailpit)
 // ไม่ใช่การ mock — เส้นทางเดียวกับผู้ใช้จริงทุกขั้น
 
-const MAILPIT = 'http://127.0.0.1:54324'
+const MAILPIT = 'http://127.0.0.1:20690'
 export const STORAGE_STATE = join(__dirname, '..', 'test-results', '.auth', 'learner.json')
 /** อีเมลของบัญชีที่ใช้ในรอบนี้ — เทสที่ต้องอ่านของจริงจาก DB ใช้ตัวนี้หาแถวของตัวเอง */
 export const LEARNER_EMAIL_FILE = join(__dirname, '..', 'test-results', '.auth', 'learner-email.txt')
