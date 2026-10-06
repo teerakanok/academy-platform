@@ -20,6 +20,9 @@
 - Security, static review 2026-09-19: the four Mediums of 2026-09-16 stay open
   (retire/unpublish enforcement, no rate rule on `/api/certificate/verify`, shared
   `service_role` on core learner tables, `next@15.5.22`), plus 2 new Lows.
+- Owner gates (`plans/archive/archived-PENDING_USER_ACTION.md` §2-5): public exposure needs
+  its own authorization; Thai privacy/appeal text review and a restricted-case
+  owner; private-media proof with a real session; first retention-cron event.
 - Hosting: deploys go to Cloudflare Workers; the final choice waits for a latency
   measurement after M3.
 - Pool A is shared: before auth, migrations, or SQL read
