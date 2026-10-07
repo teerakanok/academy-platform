@@ -1,0 +1,309 @@
+{
+  "schema": "gathering-ops/v1",
+  "operation": "deploy",
+  "summary": "Typed live-operation runbook for Academy security release (AL-09): database backup, 0041/0042 migration rehearsal and commit, Cloudflare Worker build from pinned snapshot cfa59b4, version upload, 100% activation, and exposure postchecks.",
+  "change": "Creates pre-migration pg_dump on ssh-db host. Rehearses and applies migration 0041 (revoking service_role learner table grants) and migration 0042 (enforcing course visibility) with ROLLBACK verification then COMMIT. Builds and deploys Worker from pin cfa59b4 to 100% traffic.",
+  "verification": "Verifies db-backup mode 0600 and archive list. Checks catalog query for absent service_role grants (0041) and course visibility check in enrol_free_course (0042). Verifies candidate version deployed to 100% traffic and runs verify-launch-exposure with --expect gated.",
+  "recovery_limit": "Worker rollback: npx wrangler versions deploy <previous_version_id>@100 --name cyberskills-academy using recorded previous version. The database is not rolled back automatically; pre-migration dump is retained at /root/academy-db-backups/.",
+  "targets": [
+    {
+      "provider": "cloudflare",
+      "resource_id": "worker:cyberskills-academy",
+      "display": "Cloudflare Worker cyberskills-academy"
+    },
+    {
+      "provider": "ssh",
+      "resource_id": "host:ssh-db.cyberskills.co.th:supabase-db:postgres:academy",
+      "display": "Pool A PostgreSQL academy schema on ssh-db"
+    }
+  ],
+  "execution_inputs": [
+    "academy-web/ops/runbooks/AL-09.json",
+    "academy-web/ops/release/common.mjs",
+    "academy-web/ops/release/target-identity.mjs",
+    "academy-web/ops/release/db-backup.mjs",
+    "academy-web/ops/release/db-migration.mjs",
+    "academy-web/ops/release/npm-ci.mjs",
+    "academy-web/ops/release/build-cf.mjs",
+    "academy-web/ops/release/versions-upload.mjs",
+    "academy-web/ops/release/deploy-100.mjs",
+    "academy-web/ops/release/postcheck.mjs",
+    "academy-web/scripts/build-cloudflare.sh",
+    "academy-web/scripts/verify-launch-exposure.mjs",
+    "academy-web/supabase/migrations/0041_revoke_service_role_core_learner_tables.sql",
+    "academy-web/supabase/migrations/0042_course_visibility_enforcement.sql",
+    "academy-web/package.json",
+    "academy-web/package-lock.json"
+  ],
+  "writable_outputs": [
+    "academy-web/ops/runbooks/state/AL-09",
+    "academy-web/node_modules",
+    "academy-web/.next",
+    "academy-web/.open-next"
+  ],
+  "dependencies": [
+    "Cloudflare credentials supplied by host in runtime environment as CLOUDFLARE_API_TOKEN",
+    "SSH authentication socket supplied by host in runtime environment as SSH_AUTH_SOCK for root@ssh-db.cyberskills.co.th",
+    "Pool A supabase-db container on ssh-db host is reachable and running",
+    "Source commit pinned to cfa59b4df7db480a7254f35dcea7fb98bbfdc58d",
+    "Database migration 0034 and 0035 must never be re-applied"
+  ],
+  "runtime_env": [
+    "CLOUDFLARE_API_TOKEN",
+    "SSH_AUTH_SOCK"
+  ],
+  "target_identity": {
+    "argv": [
+      "node",
+      "academy-web/ops/release/target-identity.mjs",
+      "AL-09"
+    ],
+    "cwd": ".",
+    "timeout_seconds": 30
+  },
+  "steps": [
+    {
+      "id": "db-backup",
+      "label": "Backup Academy schema and data to /root/academy-db-backups/ on ssh-db host",
+      "argv": [
+        "node",
+        "academy-web/ops/release/db-backup.mjs",
+        "run",
+        "--card",
+        "AL-09"
+      ],
+      "cwd": ".",
+      "timeout_seconds": 240,
+      "mutating": true,
+      "irreversible": false,
+      "expected_outcome": {
+        "backup_verified": true,
+        "mode": "0600"
+      },
+      "check": {
+        "argv": [
+          "node",
+          "academy-web/ops/release/db-backup.mjs",
+          "check",
+          "--card",
+          "AL-09"
+        ],
+        "cwd": ".",
+        "timeout_seconds": 30
+      }
+    },
+    {
+      "id": "apply-0041",
+      "label": "Apply migration 0041 (revoke service_role core learner tables) with ROLLBACK rehearsal then COMMIT",
+      "argv": [
+        "node",
+        "academy-web/ops/release/db-migration.mjs",
+        "apply",
+        "--migration",
+        "0041",
+        "--card",
+        "AL-09"
+      ],
+      "cwd": ".",
+      "timeout_seconds": 120,
+      "mutating": true,
+      "irreversible": false,
+      "expected_outcome": {
+        "migration": "0041",
+        "service_role_grants_absent": true
+      },
+      "check": {
+        "argv": [
+          "node",
+          "academy-web/ops/release/db-migration.mjs",
+          "check",
+          "--migration",
+          "0041",
+          "--card",
+          "AL-09"
+        ],
+        "cwd": ".",
+        "timeout_seconds": 30
+      }
+    },
+    {
+      "id": "apply-0042",
+      "label": "Apply migration 0042 (course visibility enforcement in enrol_free_course) with ROLLBACK rehearsal then COMMIT",
+      "argv": [
+        "node",
+        "academy-web/ops/release/db-migration.mjs",
+        "apply",
+        "--migration",
+        "0042",
+        "--card",
+        "AL-09"
+      ],
+      "cwd": ".",
+      "timeout_seconds": 120,
+      "mutating": true,
+      "irreversible": false,
+      "expected_outcome": {
+        "migration": "0042",
+        "course_visibility_enforced": true
+      },
+      "check": {
+        "argv": [
+          "node",
+          "academy-web/ops/release/db-migration.mjs",
+          "check",
+          "--migration",
+          "0042",
+          "--card",
+          "AL-09"
+        ],
+        "cwd": ".",
+        "timeout_seconds": 30
+      }
+    },
+    {
+      "id": "npm-ci",
+      "label": "Install Node dependencies via npm ci in pinned snapshot",
+      "argv": [
+        "node",
+        "academy-web/ops/release/npm-ci.mjs",
+        "run",
+        "--card",
+        "AL-09"
+      ],
+      "cwd": ".",
+      "timeout_seconds": 300,
+      "mutating": true,
+      "irreversible": false,
+      "expected_outcome": {
+        "dependencies_installed": true
+      },
+      "check": {
+        "argv": [
+          "node",
+          "academy-web/ops/release/npm-ci.mjs",
+          "check",
+          "--card",
+          "AL-09"
+        ],
+        "cwd": ".",
+        "timeout_seconds": 30
+      }
+    },
+    {
+      "id": "build-cf",
+      "label": "Build Cloudflare Worker bundle from pinned snapshot",
+      "argv": [
+        "node",
+        "academy-web/ops/release/build-cf.mjs",
+        "run",
+        "--card",
+        "AL-09"
+      ],
+      "cwd": ".",
+      "timeout_seconds": 300,
+      "mutating": true,
+      "irreversible": false,
+      "expected_outcome": {
+        "build_completed": true
+      },
+      "check": {
+        "argv": [
+          "node",
+          "academy-web/ops/release/build-cf.mjs",
+          "check",
+          "--card",
+          "AL-09"
+        ],
+        "cwd": ".",
+        "timeout_seconds": 30
+      }
+    },
+    {
+      "id": "versions-upload",
+      "label": "Upload Worker candidate version via pinned wrangler versions upload --keep-vars",
+      "argv": [
+        "node",
+        "academy-web/ops/release/versions-upload.mjs",
+        "run",
+        "--card",
+        "AL-09"
+      ],
+      "cwd": ".",
+      "timeout_seconds": 240,
+      "mutating": true,
+      "irreversible": false,
+      "expected_outcome": {
+        "uploaded": true
+      },
+      "check": {
+        "argv": [
+          "node",
+          "academy-web/ops/release/versions-upload.mjs",
+          "check",
+          "--card",
+          "AL-09"
+        ],
+        "cwd": ".",
+        "timeout_seconds": 30
+      }
+    },
+    {
+      "id": "deploy-100",
+      "label": "Deploy candidate Worker version to 100% traffic allocation and record rollback predecessor",
+      "argv": [
+        "node",
+        "academy-web/ops/release/deploy-100.mjs",
+        "run",
+        "--card",
+        "AL-09"
+      ],
+      "cwd": ".",
+      "timeout_seconds": 180,
+      "mutating": true,
+      "irreversible": false,
+      "expected_outcome": {
+        "traffic_percentage": 100
+      },
+      "check": {
+        "argv": [
+          "node",
+          "academy-web/ops/release/deploy-100.mjs",
+          "check",
+          "--card",
+          "AL-09"
+        ],
+        "cwd": ".",
+        "timeout_seconds": 30
+      }
+    },
+    {
+      "id": "postcheck",
+      "label": "Verify production launch exposure behind Cloudflare Access and readback deployment",
+      "argv": [
+        "node",
+        "academy-web/ops/release/postcheck.mjs",
+        "run",
+        "--card",
+        "AL-09"
+      ],
+      "cwd": ".",
+      "timeout_seconds": 120,
+      "mutating": true,
+      "irreversible": false,
+      "expected_outcome": {
+        "postcheck_passed": true
+      },
+      "check": {
+        "argv": [
+          "node",
+          "academy-web/ops/release/postcheck.mjs",
+          "check",
+          "--card",
+          "AL-09"
+        ],
+        "cwd": ".",
+        "timeout_seconds": 30
+      }
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "migration": "0041",
+  "file": "0041_revoke_service_role_core_learner_tables.sql",
+  "rehearsalRollbackPassed": true,
+  "commitPassed": true,
+  "applied": true,
+  "schemaDigestBefore": "dry-run-baseline",
+  "schemaDigestAfterRollback": "dry-run-baseline",
+  "schemaDigestAfterCommit": "dry-run-committed",
+  "dryRun": true
+}

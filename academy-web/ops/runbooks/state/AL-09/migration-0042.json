@@ -1,0 +1,11 @@
+{
+  "migration": "0042",
+  "file": "0042_course_visibility_enforcement.sql",
+  "rehearsalRollbackPassed": true,
+  "commitPassed": true,
+  "applied": true,
+  "schemaDigestBefore": "dry-run-baseline",
+  "schemaDigestAfterRollback": "dry-run-baseline",
+  "schemaDigestAfterCommit": "dry-run-committed",
+  "dryRun": true
+}

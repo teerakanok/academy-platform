@@ -1,0 +1,199 @@
+{
+  "schema": "gathering-ops/v1",
+  "operation": "deploy",
+  "summary": "Typed live-operation runbook for Academy Thai content release (AL-21): Cloudflare Worker build from pinned snapshot 00f07ed, version upload, 100% activation, and exposure/content postchecks.",
+  "change": "Builds and deploys Cloudflare Worker from content pin 00f07ed (AL-16, AL-17, AL-18 Thai copy and exercise fixes) to 100% traffic. Records previous version ID for rollback. No database changes.",
+  "verification": "Verifies candidate version uploaded and deployed to 100% traffic. Runs verify-launch-exposure with --expect gated plus raw workers.dev 404. Verifies Thai course routes and exercises behind Access.",
+  "recovery_limit": "Worker rollback: npx wrangler versions deploy <previous_version_id>@100 --name cyberskills-academy using recorded previous version. Exposure remains gated behind Cloudflare Access.",
+  "targets": [
+    {
+      "provider": "cloudflare",
+      "resource_id": "worker:cyberskills-academy",
+      "display": "Cloudflare Worker cyberskills-academy"
+    }
+  ],
+  "execution_inputs": [
+    "academy-web/ops/runbooks/AL-21.json",
+    "academy-web/ops/release/common.mjs",
+    "academy-web/ops/release/target-identity.mjs",
+    "academy-web/ops/release/npm-ci.mjs",
+    "academy-web/ops/release/build-cf.mjs",
+    "academy-web/ops/release/versions-upload.mjs",
+    "academy-web/ops/release/deploy-100.mjs",
+    "academy-web/ops/release/postcheck.mjs",
+    "academy-web/scripts/build-cloudflare.sh",
+    "academy-web/scripts/verify-launch-exposure.mjs",
+    "academy-web/package.json",
+    "academy-web/package-lock.json"
+  ],
+  "writable_outputs": [
+    "academy-web/ops/runbooks/state/AL-21",
+    "academy-web/node_modules",
+    "academy-web/.next",
+    "academy-web/.open-next"
+  ],
+  "dependencies": [
+    "Cloudflare credentials supplied by host in runtime environment as CLOUDFLARE_API_TOKEN",
+    "AL-09 security release must be deployed prior to content release",
+    "Source commit pinned to 00f07ed1528b04b755b8da5e0703aa4c3143df36"
+  ],
+  "runtime_env": [
+    "CLOUDFLARE_API_TOKEN"
+  ],
+  "target_identity": {
+    "argv": [
+      "node",
+      "academy-web/ops/release/target-identity.mjs",
+      "AL-21"
+    ],
+    "cwd": ".",
+    "timeout_seconds": 30
+  },
+  "steps": [
+    {
+      "id": "npm-ci",
+      "label": "Install Node dependencies via npm ci in pinned snapshot",
+      "argv": [
+        "node",
+        "academy-web/ops/release/npm-ci.mjs",
+        "run",
+        "--card",
+        "AL-21"
+      ],
+      "cwd": ".",
+      "timeout_seconds": 300,
+      "mutating": true,
+      "irreversible": false,
+      "expected_outcome": {
+        "dependencies_installed": true
+      },
+      "check": {
+        "argv": [
+          "node",
+          "academy-web/ops/release/npm-ci.mjs",
+          "check",
+          "--card",
+          "AL-21"
+        ],
+        "cwd": ".",
+        "timeout_seconds": 30
+      }
+    },
+    {
+      "id": "build-cf",
+      "label": "Build Cloudflare Worker bundle from pinned snapshot",
+      "argv": [
+        "node",
+        "academy-web/ops/release/build-cf.mjs",
+        "run",
+        "--card",
+        "AL-21"
+      ],
+      "cwd": ".",
+      "timeout_seconds": 300,
+      "mutating": true,
+      "irreversible": false,
+      "expected_outcome": {
+        "build_completed": true
+      },
+      "check": {
+        "argv": [
+          "node",
+          "academy-web/ops/release/build-cf.mjs",
+          "check",
+          "--card",
+          "AL-21"
+        ],
+        "cwd": ".",
+        "timeout_seconds": 30
+      }
+    },
+    {
+      "id": "versions-upload",
+      "label": "Upload Worker candidate version via pinned wrangler versions upload --keep-vars",
+      "argv": [
+        "node",
+        "academy-web/ops/release/versions-upload.mjs",
+        "run",
+        "--card",
+        "AL-21"
+      ],
+      "cwd": ".",
+      "timeout_seconds": 240,
+      "mutating": true,
+      "irreversible": false,
+      "expected_outcome": {
+        "uploaded": true
+      },
+      "check": {
+        "argv": [
+          "node",
+          "academy-web/ops/release/versions-upload.mjs",
+          "check",
+          "--card",
+          "AL-21"
+        ],
+        "cwd": ".",
+        "timeout_seconds": 30
+      }
+    },
+    {
+      "id": "deploy-100",
+      "label": "Deploy candidate Worker version to 100% traffic allocation and record rollback predecessor",
+      "argv": [
+        "node",
+        "academy-web/ops/release/deploy-100.mjs",
+        "run",
+        "--card",
+        "AL-21"
+      ],
+      "cwd": ".",
+      "timeout_seconds": 180,
+      "mutating": true,
+      "irreversible": false,
+      "expected_outcome": {
+        "traffic_percentage": 100
+      },
+      "check": {
+        "argv": [
+          "node",
+          "academy-web/ops/release/deploy-100.mjs",
+          "check",
+          "--card",
+          "AL-21"
+        ],
+        "cwd": ".",
+        "timeout_seconds": 30
+      }
+    },
+    {
+      "id": "postcheck",
+      "label": "Verify production launch exposure behind Cloudflare Access and readback deployment",
+      "argv": [
+        "node",
+        "academy-web/ops/release/postcheck.mjs",
+        "run",
+        "--card",
+        "AL-21"
+      ],
+      "cwd": ".",
+      "timeout_seconds": 120,
+      "mutating": true,
+      "irreversible": false,
+      "expected_outcome": {
+        "postcheck_passed": true
+      },
+      "check": {
+        "argv": [
+          "node",
+          "academy-web/ops/release/postcheck.mjs",
+          "check",
+          "--card",
+          "AL-21"
+        ],
+        "cwd": ".",
+        "timeout_seconds": 30
+      }
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "backup_verified": true,
+  "path": "/Users/teerakanok/Dev/continuations/academy-first-launch-antigravity-1/academy-web/ops/runbooks/state/AL-09/backups/20261005T153604Z-pre-0041-0042/academy.dump",
+  "mode": "0600",
+  "sha256": "e33dc46b8ff6178ab0bee20ec7f6dfc5a861741e41c95bfd0a023bc46ac643db",
+  "bytes": 158,
+  "archiveListEntries": 4,
+  "createdAt": "2026-10-05T15:36:04.045Z",
+  "dryRun": true
+}
