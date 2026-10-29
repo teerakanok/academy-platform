@@ -13,6 +13,10 @@ export function languageNavigationTarget(
 ): { href: string; method: 'assign' | 'replace' } | null {
   const segments = pathname.split('/').filter(Boolean)
   const url = new URL(currentHref)
+  if (pathname === '/profile') {
+    url.searchParams.set('lang', next)
+    return { href: `${url.pathname}${url.search}${url.hash}`, method: 'replace' }
+  }
   if (segments[0] !== 'courses') {
     if (pathname !== '/' || next !== 'th') return null
     const params = new URLSearchParams([['lang', next]])

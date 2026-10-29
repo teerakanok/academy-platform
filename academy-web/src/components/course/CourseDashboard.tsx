@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
+import { useUi } from '@/components/i18n/LocaleProvider'
 import type { LearnerDashboardCourse } from '@/lib/content/course-types'
 import {
   emptyProgress,
@@ -321,6 +322,7 @@ export function CourseDashboard({
   /** คลังข้อสอบภายใน (`/player`) — ค่าตั้งต้นคือซ่อน · ตัวกันจริงอยู่ที่ middleware */
   showInternalSurfaces?: boolean
 }) {
+  const { t } = useUi()
   const [courses, setCourses] = useState<DashboardCourse[]>([])
   const [progress, setProgress] = useState<Record<string, CourseProgressRecord>>({})
   const [accessState, setAccessState] = useState<'loading' | 'ready' | 'signed-out' | 'denied' | 'unavailable'>('loading')
@@ -423,6 +425,9 @@ export function CourseDashboard({
                 ? 'We could not load your courses. Your account and learning record are unchanged.'
                 : 'Your learning record is saved to your CYBERSKILLS account and follows you across devices.'}
         </p>
+        <Link href="/profile" className="mt-5 inline-block text-sm font-medium text-cs-accent underline underline-offset-4">
+          {t.nav.skillsProfile} →
+        </Link>
       </header>
 
       {accessState === 'loading' && (

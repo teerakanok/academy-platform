@@ -44,6 +44,7 @@ function routeSupportsUiLocale(pathname: string): boolean {
     || pathname.startsWith('/courses/')
     || pathname === '/access-required'
     || pathname === '/dashboard'
+    || pathname === '/profile'
     || pathname === '/privacy'
 }
 

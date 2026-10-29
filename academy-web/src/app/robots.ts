@@ -11,7 +11,7 @@ const AI_CRAWLERS = ['GPTBot', 'OAI-SearchBot', 'ChatGPT-User', 'ClaudeBot', 'Pe
 
 // ต้องมี account ถึงใช้ได้ → ไม่มีเหตุผลให้ crawler เข้า และกัน index หน้าเปล่าที่
 // crawler เห็น (มันไม่ได้ login) ซึ่งเป็นสัญญาณคุณภาพที่แย่กับทั้งเว็บ
-const PRIVATE_PATHS = ['/api/', '/player', '/dashboard', '/courses/*/lessons/']
+const PRIVATE_PATHS = ['/api/', '/player', '/dashboard', '/profile', '/courses/*/lessons/']
 
 export default function robots(): MetadataRoute.Robots {
   if (!searchIndexingEnabled()) {

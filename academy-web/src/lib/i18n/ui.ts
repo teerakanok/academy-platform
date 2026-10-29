@@ -25,6 +25,7 @@ export interface UiStrings {
   nav: {
     main: string
     myLearning: string
+    skillsProfile: string
     practice: string
     signIn: string
     signOut: string
@@ -81,6 +82,7 @@ const en: UiStrings = {
   nav: {
     main: 'Main',
     myLearning: 'My learning',
+    skillsProfile: 'Skills profile',
     practice: 'Practice',
     signIn: 'Sign in',
     signOut: 'Sign out',
@@ -143,6 +145,7 @@ const th: UiStrings = {
   nav: {
     main: 'เมนูหลัก',
     myLearning: 'คอร์สของฉัน',
+    skillsProfile: 'โปรไฟล์ทักษะ',
     practice: 'ทำข้อสอบ',
     signIn: 'เข้าสู่ระบบ',
     signOut: 'ออกจากระบบ',

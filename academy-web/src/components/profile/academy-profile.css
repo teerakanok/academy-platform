@@ -1,0 +1,82 @@
+.academy-profile {
+  --mono: var(--font-jetbrains-mono), monospace;
+  --r: 16px;
+  --r-sm: 12px;
+  --r-lg: 24px;
+}
+
+.academy-profile .profile-host :focus-visible {
+  outline-color: rgb(var(--cs-accent));
+}
+
+.academy-profile .profile-host {
+  --lp-accent: var(--signal-text);
+  --lp-wash: var(--signal-dim);
+  --lp-target: var(--warn);
+}
+
+.academy-profile-share {
+  max-width: 64rem;
+  margin: 0 auto;
+  padding: clamp(1rem, 3vw, 1.75rem);
+}
+
+.academy-profile-unavailable {
+  max-width: 72rem;
+  margin: 0 auto;
+  padding: 3rem 1.5rem 2rem;
+  color: rgb(var(--cs-text));
+}
+
+.academy-profile-back, .academy-profile-message a {
+  color: rgb(var(--cs-accent));
+  font-size: .875rem;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.academy-profile-eyebrow {
+  margin-top: 2.5rem;
+  color: rgb(var(--cs-accent));
+  font-family: var(--mono);
+  font-size: .75rem;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+
+.academy-profile-unavailable h1 {
+  margin: .75rem 0 1.75rem;
+  font-family: var(--font-fraunces), serif;
+  font-size: clamp(2.25rem, 5vw, 3rem);
+  font-weight: 600;
+  line-height: 1.1;
+}
+
+.academy-profile-message {
+  max-width: 42rem;
+  padding: 1.75rem;
+  border: 1px solid rgb(var(--cs-border));
+  border-left: 4px solid rgb(var(--cs-accent));
+  border-radius: 16px;
+  background: rgb(var(--cs-surface));
+  box-shadow: var(--cs-shadow-card);
+}
+
+.academy-profile-message h2 {
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.academy-profile-message p {
+  margin: .75rem 0 1.25rem;
+  color: rgb(var(--cs-body));
+  line-height: 1.65;
+}
+
+.academy-profile-error {
+  max-width: 72rem;
+  margin: 1rem auto 0;
+  padding: 0 1.5rem;
+  color: rgb(var(--cs-amber));
+}

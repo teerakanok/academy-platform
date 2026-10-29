@@ -43,6 +43,7 @@ const COURSE_OG_IMAGE = /^\/courses\/[^/]+\/opengraph-image$/
 // ปล่อยให้ static route ตอบ 404 กับ locale ที่ไม่ได้ enumerate; ถ้าปิดตรงนี้ก่อน
 // middleware จะพาคนดูภาพแชร์ที่พิมพ์ locale ผิดไปหน้า sign-in แทน.
 const COURSE_SHARE_IMAGE = /^\/courses\/[^/]+\/share\/[^/]+$/
+const PROFILE_PUBLIC_SHARE = /^\/profile\/share\/shr_[0-9a-f]{32}$/
 
 function isPublic(pathname: string): boolean {
   if (PUBLIC_EXACT.has(pathname)) return true
@@ -64,6 +65,8 @@ function isPublic(pathname: string): boolean {
   // claim — anyone holding a certificate number can verify its status. The
   // endpoint returns status only, never learner identity or evidence.
   if (pathname === '/api/certificate/verify') return true
+  // A share secret stays in the URL fragment and is verified by Core server-side.
+  if (PROFILE_PUBLIC_SHARE.test(pathname) || pathname === '/api/profile/public/read') return true
   return false
 }
 

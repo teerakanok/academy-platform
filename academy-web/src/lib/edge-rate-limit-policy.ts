@@ -15,6 +15,7 @@ export type EdgeRateLimitOperation =
   | 'identity-start-get'
   | 'identity-start-post'
   | 'identity-callback-get'
+  | 'profile-public-read'
 
 export interface EdgeRateLimitRule {
   operation: EdgeRateLimitOperation
@@ -78,6 +79,12 @@ const rules = new Map([
     operation: 'identity-callback-get' as const,
     globalLimit: 600,
     limit: LIMIT,
+    windowMs: WINDOW_MS,
+  }],
+  ['POST:/api/profile/public/read', {
+    operation: 'profile-public-read' as const,
+    globalLimit: 600,
+    limit: 60,
     windowMs: WINDOW_MS,
   }],
 ])
