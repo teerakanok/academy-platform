@@ -1,0 +1,27 @@
+{
+  "source": "@cyberskills/profile-ui",
+  "version": "0.1.0",
+  "files": {
+    "JourneyScene.css": "0d81f1ec34b833bd99b8e6696f21229f8a83a1f0f0c03afffa407d3843d71e43",
+    "JourneyScene.tsx": "a40c80f0312b694f7ee7ef46d11170ecff93861ffebacfa3061ead777422ca01",
+    "LearningProfileScreen.css": "10695f10821b1d27583fd32420b3f04fc52fee8b90fdba5ce225c90291665077",
+    "PrivateProfileView.tsx": "402f6ab450dcc58efedf7feafeda941220702dac59a8e8099bf1e4018d5289d3",
+    "ProfileCard.css": "c83e72f1490667f46a4bee136f12a537610a50f80f4bf281c7b63d81c1db700c",
+    "ProfileCard.tsx": "2d987f9d8123dee8a8f4aa596794c5b72ef806b578f093cce521a12031c16fe0",
+    "ProfileControls.css": "0e0fab16339cdaa76f2a2625dbcf4f355b7f7f1eac6d4a57e782f4b35caf022c",
+    "ProfileControls.tsx": "e1351499c44dae4c08e4d519a19caf23d6e053e21d174d2bc419e09e97576e55",
+    "ProfileHost.tsx": "331f4c1a6640c1db096e4d587f781a57a41465e0d373900bc64e193deab75b81",
+    "ProfileIcon.tsx": "cbe71716c33a41eb4e189c5d40bf83c927a7f55878a5d7d8fdbb672d0d098790",
+    "ProfileSharePreview.ts": "1beb167512cd3b119f1c4f61767e3eb6f17d5fcec149bd794235887877a68e48",
+    "RoleJourney.css": "759dbc12bc392cc859151feca7ee897e87aa7d2713e92ca5e354bcf610fb8632",
+    "RoleJourney.tsx": "b0e4e9db91d6c52e51f742a4a75ad220534150a0f0a0b787390937bd733eafdc",
+    "SkillRadar.tsx": "749e09c65c420d2172aa46ba0d983e34fd79e7aac8caabaf589b296bd3985406",
+    "index.ts": "fdb0e7c611fd8256930a32dfaae7ba1f816462e4103607b4ab20f25431436656",
+    "types.ts": "764cda83446af4170ed7edec52739d4aa1b32de01c62c2cb3affdee2a9c80a7e",
+    "contracts.ts": "50146947e4b401d0706a9f5ed74ff462b9252fd8eb3cc27287ebd76a553e0ed2"
+  },
+  "compatibility": {
+    "zod": "v3-subpath",
+    "contractSourceSha256": "1519414a13fbb6b2e2b4147342e5b24099b2df737bce1dd1d47227efe5809c64"
+  }
+}

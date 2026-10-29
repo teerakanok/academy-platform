@@ -2,6 +2,7 @@ import { randomInt } from 'node:crypto'
 import type { CheckpointQuestion } from '@/lib/content/course-types'
 import type { SimulationChallenge } from '@/lib/simulation/types'
 import type { AttemptQuestion } from '@/lib/content/public-lesson'
+import type { AttemptProfileSnapshot } from '@/lib/profile/attempt-evidence'
 
 // โครง attempt (W0-0) — เซิร์ฟเวอร์สุ่มชุดข้อ + remap key ของตัวเลือกต่อ attempt
 //
@@ -19,6 +20,8 @@ export const CHECKPOINT_CHALLENGE_ID = 'checkpoint'
 
 /** สิ่งที่เก็บใน academy.attempt.params — เซิร์ฟเวอร์ถือฝ่ายเดียว ห้ามส่งไป client */
 export interface AttemptParams {
+  /** Issue-time identity and context, retained with the grading snapshot. */
+  profileEvidence?: AttemptProfileSnapshot
   /** ข้อที่สุ่มมาใช้ครั้งนี้ เรียงตามลำดับที่แสดง */
   questionIds: string[]
   /**

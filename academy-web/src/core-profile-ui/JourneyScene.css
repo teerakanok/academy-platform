@@ -1,0 +1,12 @@
+/* Generated from CYBERSKILLS Core profile-ui. Edit the Core source; run sync-to-host.mjs. Source SHA256: 0d81f1ec34b833bd99b8e6696f21229f8a83a1f0f0c03afffa407d3843d71e43 */
+.journey-scene{--scene-back:color-mix(in srgb,var(--signal-text) 7%,var(--panel));--scene-mid:color-mix(in srgb,var(--signal-text) 13%,var(--panel));--scene-front:color-mix(in srgb,var(--signal-text) 21%,var(--panel));--scene-track:color-mix(in srgb,var(--signal-text) 45%,var(--panel));background:var(--panel);display:block}
+.scene-back{fill:var(--scene-back)}.scene-mid{fill:var(--scene-mid)}.scene-front{fill:var(--scene-front)}
+.scene-canyon{--scene-back:color-mix(in srgb,var(--warn) 9%,var(--panel));--scene-mid:color-mix(in srgb,var(--warn) 18%,var(--panel));--scene-front:color-mix(in srgb,var(--warn) 28%,var(--panel));--scene-track:color-mix(in srgb,var(--warn) 60%,var(--panel))}
+.scene-islands{--scene-mid:color-mix(in srgb,var(--signal) 18%,var(--panel));--scene-front:color-mix(in srgb,var(--signal) 30%,var(--panel))}
+.scene-water{fill:color-mix(in srgb,var(--signal) 6%,var(--panel))}.scene-ripples{fill:none;stroke:color-mix(in srgb,var(--signal) 16%,var(--panel));stroke-width:2}
+.scene-strata{fill:none;stroke:color-mix(in srgb,var(--warn) 35%,var(--panel));stroke-width:3}
+.scene-trail-base{fill:none;stroke:var(--panel);stroke-width:11;stroke-linecap:round}.scene-trail{fill:none;stroke:var(--scene-track);stroke-width:2;stroke-dasharray:2 7;stroke-linecap:round}
+.scene-tree{fill:color-mix(in srgb,var(--signal-text) 38%,var(--panel))}.scene-birds{fill:none;stroke:var(--muted);stroke-width:1.4;opacity:.65}.scene-snow{fill:var(--panel);opacity:.8}
+.scene-camp{fill:#bfaa80}.scene-camp-side{fill:#a79167}.scene-camp-door{fill:#786849}
+.skin-halloween{--scene-back:#252a3e;--scene-mid:#303549;--scene-front:#3c3a4c;--scene-track:#f0a467;background:#191d2a}
+.skin-halloween .scene-trail-base{stroke:#5f4339}.scene-moon{fill:#decda1}.scene-moon-cut{fill:#191d2a}.scene-lava{fill:#de8349}.scene-tower{fill:#101621}.scene-lava-faint{fill:#e89b55;opacity:.5}.scene-lava-line{fill:none;stroke:#d58042;stroke-width:3;opacity:.6}.skin-halloween .scene-birds{stroke:#a49cae}

@@ -55,7 +55,14 @@ describe('language navigation', () => {
   it('uses an exact locale query only on translated routes', () => {
     expect(requestedUiLocale('/courses/basic-os-linux/learn', '?lang=th')).toBe('th')
     expect(requestedUiLocale('/access-required', '?lang=th')).toBe('th')
+    expect(requestedUiLocale('/profile', '?lang=th')).toBe('th')
     expect(requestedUiLocale('/courses', '?lang=en&lang=th')).toBeNull()
     expect(requestedUiLocale('/', '?lang=th')).toBeNull()
+  })
+
+  it('keeps the skills profile when switching language', () => {
+    expect(languageNavigationTarget('/profile', 'https://academy.test/profile?lang=en#main', 'th')).toEqual({
+      href: '/profile?lang=th#main', method: 'replace',
+    })
   })
 })

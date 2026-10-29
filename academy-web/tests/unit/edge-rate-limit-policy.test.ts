@@ -10,6 +10,12 @@ import {
 } from '@/lib/edge-rate-limit-policy'
 
 describe('edge rate-limit policy', () => {
+  it('limits anonymous profile-share reads without inspecting the share secret', () => {
+    const request = new Request('https://academy.cyberskills.co.th/api/profile/public/read', { method: 'POST' })
+    expect(edgeRateLimitRule(request)).toMatchObject({ operation: 'profile-public-read', limit: 60, globalLimit: 600 })
+    expect(edgeRateLimitAdmission(new Request('https://academy.cyberskills.co.th/api/profile/public/%72ead', { method: 'POST' })))
+      .toEqual({ kind: 'invalid' })
+  })
   it.each([
     ['/api/leads', 'leads'],
     ['/api/leads/unsubscribe', 'unsubscribe'],
