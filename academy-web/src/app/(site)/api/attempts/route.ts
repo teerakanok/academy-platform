@@ -19,6 +19,7 @@ import { validateMutationRequest } from '@/lib/http/mutation-security'
 import { authorizeCourseResource, deniedAccessStatus } from '@/lib/account/course-access'
 import { safeErrorMessage } from '@/lib/safe-log'
 import { recordAssessmentIntegrityEvent } from '@/lib/observability/assessment-integrity'
+import { captureAttemptProfileSnapshot } from '@/lib/profile/attempt-evidence'
 
 export const runtime = 'nodejs'
 
@@ -101,6 +102,12 @@ export async function POST(request: Request) {
     // การสุ่ม 5 ข้อต่อ attempt จะกันพื้นผิวกลายเป็น full-bank oracle
     const params = buildAttemptParams(bank, assessmentServeCount(bank.length), isAssessedNode(node))
     if (!assessmentIntegrityEnforced()) params.assessment.integrityEnforced = false
+    params.profileEvidence = captureAttemptProfileSnapshot({
+      principal: user.account, courseSlug: input.slug, nodeId: input.nodeId,
+      courseVersion: structure.version, assessed: isAssessedNode(node),
+      integrityEnforced: params.assessment.integrityEnforced !== false,
+      environment: process.env.ACADEMY_PROFILE_EVIDENCE_ENVIRONMENT,
+    })
 
     // สุ่มค่าตัวแปรของโจทย์จำลองต่อ attempt แล้ว **เก็บโจทย์ทั้งชิ้นหลังแทนค่า**
     // ลง params · ทั้งโจทย์ที่ผู้เรียนอ่านและกติกาที่ใช้ตรวจมาจากวัตถุชิ้นเดียวกันนี้
